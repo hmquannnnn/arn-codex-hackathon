@@ -1,4 +1,9 @@
-import type { BasketOption, KitPlan, PlanDiff } from '@/contract/types';
+import type {
+  BasketOption,
+  KitPlan,
+  PlanDiff,
+  Profile,
+} from '@/contract/types';
 import { getModels, type LLM } from '@/server/llm';
 
 /** The kit panel carries item detail; explanation receives only grounded summary facts. */
@@ -9,10 +14,11 @@ export async function* explainKit(
   diff?: PlanDiff,
   previousPlan?: KitPlan,
   salesContext?: import('@/contract/types').SalesContext,
+  selectedProfile: Profile = 'balanced',
 ): AsyncGenerator<string> {
   const { fast, fastEffort } = getModels();
   const selected =
-    options.find((option) => option.profile === 'balanced') ?? options[0];
+    options.find((option) => option.profile === selectedProfile) ?? options[0];
   const facts = {
     salesContext,
     profileComparison:

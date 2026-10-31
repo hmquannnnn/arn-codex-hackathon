@@ -243,6 +243,7 @@ export async function* completeKit(
         input.diff ?? undefined,
         input.previousPlan,
         context,
+        selected.profile,
       )) {
         explanation += delta;
         yield { event: 'explanation', data: { delta } };

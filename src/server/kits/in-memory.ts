@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { KitStore } from '@/contract/kit-store';
+import { kitSelectionSchema } from '@/contract/schemas';
+import { storedSelectionSchema } from './selection-snapshot';
 import type {
   KitMessage,
   KitSelection,
@@ -78,7 +80,14 @@ export class InMemoryKitStore implements KitStore {
     const entry = this.owned(threadId, owner);
     const latest = entry.versions.at(-1);
     if (!latest) throw new Error('Version not found');
-    latest.selection = structuredClone(selection);
+    const stored = storedSelectionSchema.parse(selection);
+    latest.selection = kitSelectionSchema.parse(stored);
+    if (stored.snapshot)
+      latest.options = latest.options.map((option) =>
+        option.profile === stored.snapshot!.profile
+          ? structuredClone(stored.snapshot!)
+          : option,
+      );
     this.touch(entry);
   }
   async listThreads(owner: string) {

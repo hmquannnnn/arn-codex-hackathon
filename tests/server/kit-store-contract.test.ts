@@ -30,6 +30,44 @@ const input = () => {
 };
 function contract(name: string, makeStore: () => KitStore, enabled = true) {
   describe.skipIf(!enabled)(name, () => {
+    it('B8 saves priced basket snapshots atomically with selection and retains them in history', async () => {
+      const { InMemoryAdapter } = await import('@/server/commerce');
+      const { matchPlan } = await import('@/server/matcher');
+      const { priceSelection } = await import('@/server/optimizer/selection');
+      const owner = `test-kit-store-${randomUUID()}`;
+      if (name === 'SupabaseKitStore') owners.push(owner);
+      const store = makeStore();
+      const { threadId } = await store.createThread(
+        owner,
+        'Saved basket',
+        'lan',
+      );
+      const base = { ...input(), threadId };
+      await store.appendVersion(base, owner);
+      const adapter = new InMemoryAdapter();
+      const matched = await matchPlan(base.plan, adapter);
+      const gap = matched.noMatch.find((g) => g.closest)!;
+      const selection = {
+        profile: 'balanced' as const,
+        picks: { [gap.itemKey]: gap.closest!.candidate.product.id },
+        dropped: [],
+      };
+      const snapshot = priceSelection(
+        base.plan,
+        matched,
+        selection,
+        await adapter.listVouchers('lan'),
+      );
+      const stored = { ...selection, snapshot };
+      await store.saveSelection(threadId, owner, stored);
+      await store.appendVersion({ ...base, kind: 'refine' }, owner);
+      const history = await store.getThread(threadId, owner);
+      expect(history!.versions[0].selection).toEqual(selection);
+      expect(
+        history!.versions[0].options.find((o) => o.profile === 'balanced'),
+      ).toEqual(snapshot);
+      expect(history!.versions[1].selection).toBeNull();
+    }, 30000);
     it('appends ordered versions and answer turns for the owner only', async () => {
       const owner = `test-kit-store-${randomUUID()}`;
       const stranger = `test-kit-store-${randomUUID()}`;

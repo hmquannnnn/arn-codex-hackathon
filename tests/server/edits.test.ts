@@ -272,3 +272,71 @@ it('B8 a budget refinement through chat retains the saved basket choices too', a
     false,
   );
 });
+
+it('B8 historical saved basket prices survive later catalog price changes', async () => {
+  const s = await setup();
+  const first = await s.adjust({ type: 'set_budget', budget: 1500000 });
+  const base = first.options.find(
+    (o: { profile: string }) => o.profile === 'balanced',
+  );
+  const gap = base.noMatch.find((g: { closest?: unknown }) => g.closest);
+  const selection = {
+    profile: 'balanced',
+    picks: { [gap.itemKey]: gap.closest.candidate.product.id },
+    dropped: [],
+  };
+  const priced = await s.handlers.price(s.request({ selection }));
+  const snapshot = (await priced.json()).option;
+  const adapter = new InMemoryAdapter({
+    products: (await s.adapter.searchProducts({})).map((p) =>
+      p.id === selection.picks[gap.itemKey]
+        ? { ...p, price: p.price + 50000 }
+        : p,
+    ),
+  });
+  const later = createEditHandlers({ adapter, store: s.store });
+  const response = await later.thread(
+    new Request('http://localhost', { headers: { cookie: 'kitly_uid=alice' } }),
+    s.threadId,
+  );
+  expect(response.status).toBe(200);
+  const history = await response.json();
+  expect(
+    history.versions[1].options.find(
+      (o: { profile: string }) => o.profile === 'balanced',
+    ),
+  ).toEqual(snapshot);
+});
+
+it('B8 a retained Premium refinement explains its actual selected total/status', async () => {
+  const { runRefine } = await import('@/server/refine');
+  const s = await setup();
+  const first = await s.adjust({ type: 'set_budget', budget: 1500000 });
+  expect(
+    (
+      await s.handlers.price(
+        s.request({
+          selection: { profile: 'premium', picks: {}, dropped: [] },
+        }),
+      )
+    ).status,
+  ).toBe(200);
+  const llm = new FakeLLM([
+    { ...first.plan, budget: 1000000, intent: 'change_kit' },
+  ]);
+  for await (const e of runRefine(
+    { threadId: s.threadId, owner: 'alice', message: 'Budget 1M' },
+    { adapter: s.adapter, store: s.store, llm },
+  ))
+    void e;
+  const latest = (await s.store.getThread(s.threadId, 'alice'))!.versions.at(
+    -1,
+  )!;
+  const facts = JSON.parse(
+    llm.calls.find((c) => c.kind === 'stream')!.messages[1].content,
+  );
+  expect(facts.selected.profile).toBe('premium');
+  expect(facts.selected.grandTotal).toBe(
+    latest.options.find((o) => o.profile === 'premium')!.grandTotal,
+  );
+});

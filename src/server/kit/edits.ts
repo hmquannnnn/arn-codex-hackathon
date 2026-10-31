@@ -17,6 +17,7 @@ import { findInterests } from './interests';
 import { today } from '@/server/today';
 import { diffPlans } from '@/server/diff';
 import { retainSelection } from './selection';
+import { hasPricedSelection } from '@/server/kits/selection-snapshot';
 
 type Deps = { adapter: CommerceAdapter; store: KitStore };
 export function createEditHandlers(dependencies: Deps | (() => Deps)) {
@@ -246,7 +247,8 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
           vouchers,
           today(),
         );
-        await store.saveSelection(threadId, owner, selection);
+        const storedSelection = { ...selection, snapshot: option };
+        await store.saveSelection(threadId, owner, storedSelection);
         console.info(
           `[kit] price ${((performance.now() - start) / 1000).toFixed(3)}s`,
         );
@@ -262,7 +264,7 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
       jsonEndpoint(async () => {
         const { adapter, store } = deps();
         const thread = await loadRefineThread(id, ownerFrom(request), store);
-        if (thread.versions.some(v => v.selection)) {
+        if (thread.versions.some(v => !hasPricedSelection(v))) {
           const shops = adapter.listShops();
           const products = adapter.searchProducts({});
           const [vouchers, persona] = await Promise.all([
@@ -272,7 +274,7 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
           ]);
           // Rehydrate every historical selection read-only; never save it onto the latest version.
           for (const version of thread.versions) {
-            if (!version.selection) continue;
+            if (!version.selection || hasPricedSelection(version)) continue;
             const matched = await matchPlan(version.plan, adapter, shops, products);
             const available = findInterests(version.plan, {lines: []}, matched.related, persona, vouchers, today());
             const selection = retainSelection(version.selection, version.plan, matched, available)!;

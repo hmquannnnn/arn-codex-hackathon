@@ -11,9 +11,10 @@ import {
   kitVersionSchema,
 } from '@/contract/schemas';
 import { createDb } from '@/server/db';
+import { storedSelectionSchema } from './selection-snapshot';
 
 function versionFromRow(row: Record<string, unknown>): KitVersion {
-  return kitVersionSchema.parse({
+  const version = kitVersionSchema.parse({
     threadId: row.thread_id,
     version: row.version,
     createdAt: new Date(String(row.created_at)).toISOString(),
@@ -28,6 +29,12 @@ function versionFromRow(row: Record<string, unknown>): KitVersion {
     selection: row.selection,
     followUp: row.follow_up,
   });
+  const stored = storedSelectionSchema.nullable().parse(row.selection);
+  if (stored?.snapshot)
+    version.options = version.options.map((option) =>
+      option.profile === stored.snapshot!.profile ? stored.snapshot! : option,
+    );
+  return version;
 }
 
 /** Durable history; requests never depend on another instance's process memory. */
