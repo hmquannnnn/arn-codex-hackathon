@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { z } from 'zod';
 import { productSchema, shopSchema } from '@/contract/schemas';
+import { mergeKit, subtractPurchased } from '@/lib/client/cart-flow';
 import type { CartLine } from '@/lib/client/store';
 const storedSchema = z.array(
   z.object({
@@ -12,6 +13,9 @@ const storedSchema = z.array(
 );
 const Context = createContext<{
   lines: CartLine[];
+  ready: boolean;
+  merge: (lines: CartLine[]) => void;
+  purchased: (lines: { productId: string; quantity: number }[]) => void;
   add: (line: CartLine) => void;
   quantity: (id: string, count: number) => void;
   clear: () => void;
@@ -39,6 +43,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     <Context.Provider
       value={{
         lines,
+        ready,
+        merge: (kit) => {
+          const next = mergeKit(lines, kit);
+          localStorage.setItem('kitly-cart', JSON.stringify(next));
+          setLines(next);
+        },
+        purchased: (purchased) => {
+          const next = subtractPurchased(lines, purchased);
+          localStorage.setItem('kitly-cart', JSON.stringify(next));
+          setLines(next);
+        },
         add: (line) =>
           setLines((old) => {
             const found = old.find((l) => l.product.id === line.product.id);

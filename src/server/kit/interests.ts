@@ -15,7 +15,7 @@ export function findInterests(
   vouchers: Voucher[],
   today: string,
 ): Interest[] {
-  if (persona.id === 'guest') return [];
+  if (persona.id === 'guest' || plan.shopping) return [];
   return plan.items.flatMap((item) =>
     persona.cart.flatMap((cart) => {
       const candidate = candidates[item.key]?.find(

@@ -6,7 +6,7 @@ import { getModels, type LLM } from '@/server/llm';
 import { today } from '@/server/today';
 
 // Keep the output vocabulary strict, but normalize raw quantities and dates in code.
-const plannerSchema = kitPlanSchema.extend({
+const plannerSchema = kitPlanSchema.omit({ shopping: true }).extend({
   deadline: z.string().nullable(),
   items: z.array(
     planItemSchema.extend({
@@ -112,16 +112,35 @@ function normalize(raw: z.infer<typeof plannerSchema>): KitPlan {
   });
 }
 
-export async function planNeed(llm: LLM, query: string): Promise<KitPlan> {
+function cartPrompt(shopping?: KitPlan['shopping']) {
+  return shopping
+    ? `Cart scope is ${shopping.source}. Cart products (trusted catalog titles, IDs and available quantities): ${JSON.stringify(shopping)}.
+Return keepProductIds containing only cart IDs explicitly requested to keep or choose (including a switch to that product) by the buyer, plus existing keeps unless explicitly released. Never infer a keep from cart membership. Keep hard requirements even if they conflict with a kept product. The complete checklist still includes missing needs. Never change cart sourcing or quantities.`
+    : '';
+}
+export async function planNeed(
+  llm: LLM,
+  query: string,
+  shopping?: KitPlan['shopping'],
+  cartTitles?: Record<string, string>,
+): Promise<KitPlan> {
   const models = getModels();
   async function request(fuller = false) {
     for (let attempt = 0; ; attempt++) {
       try {
         const raw = await llm.structured(
           models.planner,
-          plannerSchema,
+          shopping
+            ? plannerSchema.extend({ keepProductIds: z.array(z.string()) })
+            : plannerSchema,
           [
-            { role: 'system', content: plannerPrompt() },
+            {
+              role: 'system',
+              content:
+                plannerPrompt() +
+                cartPrompt(shopping) +
+                (shopping ? JSON.stringify(cartTitles) : ''),
+            },
             { role: 'user', content: query },
             ...(fuller
               ? [
@@ -135,7 +154,22 @@ export async function planNeed(llm: LLM, query: string): Promise<KitPlan> {
           ],
           { effort: models.plannerEffort },
         );
-        return normalize(raw);
+        const plan = normalize(raw);
+        if (shopping) {
+          const ids =
+            'keepProductIds' in raw
+              ? (raw.keepProductIds as string[])
+              : shopping.keepProductIds;
+          plan.shopping = {
+            ...shopping,
+            keepProductIds: [
+              ...new Set([...shopping.keepProductIds, ...ids]),
+            ].filter((id) =>
+              shopping.cart.some((line) => line.productId === id),
+            ),
+          };
+        }
+        return plan;
       } catch (error) {
         if (attempt >= 1) throw error;
       }
@@ -158,9 +192,11 @@ export async function refineNeed(
   previous: KitPlan,
   message: string,
   excluded: PlanItem[],
+  cartTitles?: Record<string, string>,
 ): Promise<{ plan: KitPlan; intent: 'change_kit' | 'answer' }> {
   const schema = plannerSchema.extend({
     intent: z.enum(['change_kit', 'answer']),
+    ...(previous.shopping ? { keepProductIds: z.array(z.string()) } : {}),
   });
   const models = getModels();
   for (let attempt = 0; ; attempt++) {
@@ -172,6 +208,8 @@ export async function refineNeed(
           {
             role: 'system',
             content: `${plannerPrompt()}
+${cartPrompt(previous.shopping)}
+${previous.shopping ? JSON.stringify(cartTitles ?? {}) : ''}
 You are refining an existing kit. The JSON contains previousPlan, changeMessage and excludedItems.
 Keep all unchanged constraints and items, preserving unchanged items' key values exactly. Apply requested changes, additions and removals only.
 For excludedItems, the buyer already has these, never add them, even under another key in the same category.
@@ -191,6 +229,17 @@ Return the complete revised plan with intent as one field alongside the plan fie
         { effort: models.plannerEffort },
       );
       const plan = normalize(raw);
+      if (previous.shopping) {
+        const ids = z
+          .array(z.string())
+          .parse(raw.keepProductIds ?? previous.shopping.keepProductIds);
+        plan.shopping = {
+          ...previous.shopping,
+          keepProductIds: ids.filter((id) =>
+            previous.shopping!.cart.some((line) => line.productId === id),
+          ),
+        };
+      }
       plan.items = plan.items.filter(
         (item) =>
           !excluded.some(

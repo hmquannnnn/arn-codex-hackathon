@@ -61,10 +61,18 @@ export async function matchPlan(
       ),
     ),
   ];
-  const [products, shops] = await Promise.all([
+  const [allProducts, shops] = await Promise.all([
     prefetchedProducts ?? adapter.searchProducts({ categories: categoryIds }),
     prefetchedShops ?? adapter.listShops(),
   ]);
+  const shopping = plan.shopping;
+  const cart = new Map(
+    shopping?.cart.map((line) => [line.productId, line.quantity]) ?? [],
+  );
+  const products =
+    shopping?.source === 'cart_only'
+      ? allProducts.filter((product) => cart.has(product.id))
+      : allProducts;
   const shopById = new Map(shops.map((shop) => [shop.id, shop]));
   const result: MatchResult = {
     candidates: {},
@@ -80,6 +88,8 @@ export async function matchPlan(
       (product) =>
         product.category === item.category &&
         product.stock >= item.quantity &&
+        (shopping?.source !== 'cart_only' ||
+          (cart.get(product.id) ?? 0) >= item.quantity) &&
         shopById.has(product.shopId),
     );
     const scored = stocked.map((product): Candidate => ({
@@ -100,11 +110,33 @@ export async function matchPlan(
     const affordable = (c: Candidate) =>
       item.maxUnitPrice === null || c.product.price <= item.maxUnitPrice;
     const inTime = tagged.filter(timely);
-    const exact = inTime.filter(affordable).sort(bestFirst);
+    const kept = products.filter(
+      (product) =>
+        product.category === item.category &&
+        shopping?.keepProductIds.includes(product.id),
+    );
+    const eligible = inTime.filter(affordable);
+    const exact = eligible
+      .filter(
+        (candidate) =>
+          !kept.length ||
+          (kept.length === 1 && candidate.product.id === kept[0].id),
+      )
+      .map((candidate) => ({
+        ...candidate,
+        score: Math.min(
+          1,
+          candidate.score +
+            (shopping?.source === 'catalog' && cart.has(candidate.product.id)
+              ? 0.02
+              : 0),
+        ),
+      }))
+      .sort(bestFirst);
     result.candidates[item.key] = exact;
-    result.matchedCounts[item.key] = exact.length;
+    result.matchedCounts[item.key] = eligible.length;
     if (exact.length) continue;
-    const relaxed = scored.filter(timely).sort(bestFirst);
+    const relaxed = (kept.length ? [] : scored).filter(timely).sort(bestFirst);
     const closest = relaxed.filter(affordable)[0] ?? relaxed[0];
     const reason =
       item.category === null
@@ -116,7 +148,9 @@ export async function matchPlan(
             : 'none_in_budget';
     result.noMatch.push({
       itemKey: item.key,
-      needLabel: item.needLabel,
+      needLabel: kept.length
+        ? `Keep conflict: ${kept.map((p) => p.title).join(', ')} — ${item.needLabel}`
+        : item.needLabel,
       reason,
       closest: closest
         ? {

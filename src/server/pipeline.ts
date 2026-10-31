@@ -31,6 +31,7 @@ export interface KitInput {
   owner: string;
   persona: PersonaId;
   profiles?: Profile[];
+  shopping?: KitPlan['shopping'];
 }
 interface CompletionInput extends KitInput {
   threadId: string;
@@ -191,7 +192,7 @@ export async function* completeKit(
         vouchers,
         today(),
       );
-    if (input.recordDemand)
+    if (input.recordDemand && plan.shopping?.source !== 'cart_only')
       await adapter.recordDemandItems(
         sessionId,
         plan.items.map((item) => ({
@@ -307,7 +308,19 @@ export async function* runKit(
         detail: 'Understanding your need',
       },
     };
-    plan = await planNeed(deps.llm, input.query);
+    const cartProducts = input.shopping
+      ? await Promise.all(
+          input.shopping.cart.map((line) =>
+            deps.adapter.getProduct(line.productId),
+          ),
+        )
+      : [];
+    const titles = Object.fromEntries(
+      cartProducts.flatMap((product) =>
+        product ? [[product.id, product.title]] : [],
+      ),
+    );
+    plan = await planNeed(deps.llm, input.query, input.shopping, titles);
     logKitStep('understand', start);
     yield { event: 'step', data: { id: 'understand', status: 'done' } };
   } catch {

@@ -63,7 +63,7 @@ it('GET shops and categories match the frozen response contracts', async () => {
     categoriesResponseSchema.parse(await c.json()).categories,
   ).toHaveLength(60);
 });
-it('POST checkout prices catalog items plus one shipping fee per shop', async () => {
+it('POST checkout prices catalog items, one shipping fee per shop and eligible vouchers', async () => {
   const r = await checkout(
     request('/api/checkout', {
       lines: [
@@ -74,7 +74,7 @@ it('POST checkout prices catalog items plus one shipping fee per shop', async ()
   );
   expect(r.status).toBe(200);
   expect(checkoutResponseSchema.parse(await r.json())).toMatchObject({
-    grandTotal: 444000,
+    grandTotal: 389000,
   });
 });
 it.each([

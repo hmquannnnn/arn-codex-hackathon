@@ -118,6 +118,14 @@ export function KitPanel({
   return (
     <div className="space-y-5 p-5">
       <header>
+        {version.plan.shopping && (
+          <p className="mb-3 rounded-lg bg-orange-50 p-3 text-xs">
+            {version.plan.shopping.source === 'cart_only'
+              ? 'Only products from your saved cart'
+              : 'Products from the store and your saved cart'}
+            . Unselected products stay in your cart.
+          </p>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold capitalize text-accent">
             {version.plan.event.replaceAll('_', ' ')}
@@ -272,6 +280,19 @@ export function KitPanel({
               )}
             </p>
           )}
+          {option.noMatch
+            .filter((g) => g.needLabel.startsWith('Keep conflict'))
+            .map((g) => (
+              <p
+                key={g.itemKey}
+                role="alert"
+                className="rounded-xl bg-amber-50 p-3 text-sm"
+              >
+                {g.needLabel}. The kept product cannot meet all current
+                requirements. Change your requirements or start a new kit
+                without this keep.
+              </p>
+            ))}
           <section
             data-testid="no-match"
             aria-label="No exact match"
@@ -302,6 +323,7 @@ export function KitPanel({
                     {g.closest!.missingTags.join(', ') || 'No missing tags'}
                   </p>
                   {!guest &&
+                    !version.plan.shopping &&
                     option.interests
                       ?.filter(
                         (interest) =>
@@ -339,7 +361,13 @@ export function KitPanel({
                         />
                       ))}
                   <button
-                    disabled={older || busy || pending || !onSelect}
+                    disabled={
+                      older ||
+                      busy ||
+                      pending ||
+                      !onSelect ||
+                      !!version.plan.shopping
+                    }
                     onClick={() =>
                       void reprice(() =>
                         onSelect!(
@@ -373,7 +401,7 @@ export function KitPanel({
             option={option}
             version={version}
             disabled={older || busy || pending}
-            interests={guest ? [] : option.interests}
+            interests={guest || version.plan.shopping ? [] : option.interests}
             onInterest={
               onSelect
                 ? (interest) =>
@@ -396,8 +424,10 @@ export function KitPanel({
           {option.noMatch.some((g) => !g.closest) && (
             <details className="rounded-xl border bg-slate-50 p-4">
               <summary className="cursor-pointer text-sm font-semibold">
-                Not in store yet (
-                {option.noMatch.filter((g) => !g.closest).length})
+                {version.plan.shopping?.source === 'cart_only'
+                  ? 'Missing from this cart'
+                  : 'Not in store yet'}{' '}
+                ({option.noMatch.filter((g) => !g.closest).length})
               </summary>
               <ul className="mt-3 space-y-2 text-sm">
                 {option.noMatch

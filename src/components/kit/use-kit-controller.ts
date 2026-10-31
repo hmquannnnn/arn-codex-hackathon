@@ -13,17 +13,20 @@ import type {
 import type { KitApi } from '@/lib/client/kit-api';
 import type { LiveTurn, LocalAction } from './conversation';
 import { selectionFor, pickProduct } from '@/lib/client/kit-selection';
+import { kitPurchases } from '@/lib/client/cart-flow';
 import { useCart } from '@/components/store/cart-context';
 export function useKitController({
   api,
   id,
   query,
+  initialSource = 'catalog',
   today,
   onNavigate,
 }: {
   api: KitApi;
   id?: string;
   query: string;
+  initialSource?: 'catalog' | 'cart_only';
   today: string;
   onNavigate?: (url: string) => void;
 }) {
@@ -59,6 +62,8 @@ export function useKitController({
   const controller = useRef<AbortController | null>(null);
   const started = useRef(false);
   const cart = useCart();
+  const [source, setSource] = useState<'catalog' | 'cart_only'>(initialSource);
+  const [keepProductIds, setKeepProductIds] = useState<string[]>([]);
   const navigate = useCallback(
     (url: string) => {
       if (onNavigate) onNavigate(url);
@@ -95,7 +100,13 @@ export function useKitController({
   );
   const send = useCallback(
     async (message: string) => {
-      if (!message.trim() || inFlight.current || personaChanging.current) return;
+      if (
+        !cart.ready ||
+        !message.trim() ||
+        inFlight.current ||
+        personaChanging.current
+      )
+        return;
       inFlight.current = true;
       setBusy(true);
       setError('');
@@ -123,7 +134,21 @@ export function useKitController({
           );
       };
       try {
-        for await (const event of api.run(message, runId, abort.signal)) {
+        for await (const event of api.run(
+          message,
+          runId,
+          abort.signal,
+          !runId
+            ? {
+                source,
+                cart: cart.lines.map((line) => ({
+                  productId: line.product.id,
+                  quantity: line.quantity,
+                })),
+                keepProductIds,
+              }
+            : undefined,
+        )) {
           if (!active.current || abort.signal.aborted) return;
           if (event.event === 'step')
             update((run) => ({
@@ -205,7 +230,16 @@ export function useKitController({
         if (active.current) setBusy(false);
       }
     },
-    [api, applyThread, navigate, refreshHistory],
+    [
+      api,
+      applyThread,
+      navigate,
+      refreshHistory,
+      source,
+      cart.lines,
+      cart.ready,
+      keepProductIds,
+    ],
   );
   const [liveOptions, setLiveOptions] = useState<{
     token: number;
@@ -236,14 +270,14 @@ export function useKitController({
     };
   }, [api, id, applyThread, refreshHistory]);
   useEffect(() => {
-    if (query && !started.current) {
+    if (query && cart.ready && !started.current) {
       const timer = setTimeout(() => {
         started.current = true;
         void send(query);
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [query, send]);
+  }, [query, send, cart.ready]);
   const live = runs.at(-1);
   const streamedVersion: KitVersion | undefined = live?.plan
     ? {
@@ -381,10 +415,7 @@ export function useKitController({
         ...(o.interests || []).map((i) => i.candidate),
       ])
       .find((c) => c.product.id === action.productId);
-    const previous = selectionFor(
-      latest,
-      visibleProfile,
-    );
+    const previous = selectionFor(latest, visibleProfile);
     setActions((old) => [
       ...old,
       {
@@ -425,16 +456,19 @@ export function useKitController({
     }
   }
   function add(option: BasketOption) {
-    option.lines.forEach((line) =>
-      cart.add({
-        product: line.product,
-        shop: line.shop,
-        quantity: line.quantity,
-      }),
+    cart.merge(option.lines);
+    sessionStorage.setItem(
+      'kitly-cart-selection',
+      JSON.stringify(kitPurchases(option.lines)),
     );
     window.location.assign('/cart');
   }
   return {
+    cart,
+    source,
+    setSource,
+    keepProductIds,
+    setKeepProductIds,
     persona,
     setPersona,
     setPersonaBusy,

@@ -4,8 +4,14 @@ export const dynamic = 'force-dynamic';
 export default async function NewKit({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; source?: string }>;
 }) {
-  const { q } = await searchParams;
-  return <KitScreen query={q} today={today()} />;
+  const { q, source } = await searchParams;
+  return (
+    <KitScreen
+      query={q}
+      initialSource={source === 'cart_only' ? 'cart_only' : 'catalog'}
+      today={today()}
+    />
+  );
 }

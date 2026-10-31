@@ -54,6 +54,16 @@ export function BasketRows({
           <p className="mt-1 text-xs text-slate-500">
             {line.shop.name} · Qty {line.quantity}
           </p>
+          {version.plan.shopping?.cart.some(
+            (saved) => saved.productId === line.product.id,
+          ) && (
+            <p className="mt-1 text-xs text-accent">
+              Saved in your cart
+              {version.plan.shopping.keepProductIds.includes(line.product.id)
+                ? ' · Kept by you'
+                : ''}
+            </p>
+          )}
           {line.product.updatedForDemandAt && (
             <p className="mt-1 text-xs text-emerald-700">
               Updated for this need

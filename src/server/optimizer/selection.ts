@@ -5,6 +5,7 @@ import type {
   Voucher,
 } from '@/contract/types';
 import type { MatchResult } from '@/server/matcher';
+import { inventoryConflicts } from './inventory';
 import { optimize } from './index';
 import { priceBasket } from './pricing';
 import { fitToBudget } from './fit';
@@ -46,7 +47,11 @@ export function priceSelection(
         ?.candidate ??
       matched.candidates[key]?.find((c) => c.product.id === id) ??
       (closest?.product.id === id ? closest : undefined);
-    if (!candidate)
+    if (
+      !candidate ||
+      (plan.shopping &&
+        !matched.candidates[key]?.some((c) => c.product.id === id))
+    )
       throw new HttpError(
         400,
         'invalid_request',
@@ -57,6 +62,12 @@ export function priceSelection(
       added.push(key);
   }
   for (const key of selection.dropped) delete picks[key];
+  if (inventoryConflicts(plan, picks).length)
+    throw new HttpError(
+      409,
+      'invalid_request',
+      'Selected quantities exceed availability',
+    );
   const option = priceBasket(
     { ...input, noMatch: matched.noMatch.filter((gap) => !picks[gap.itemKey]) },
     picks,

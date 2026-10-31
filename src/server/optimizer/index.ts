@@ -1,5 +1,6 @@
 import type { BasketOption, Candidate, Profile } from '@/contract/types';
 import type { OptimizerInput } from './types';
+import { inventoryConflicts } from './inventory';
 import { priceBasket } from './pricing';
 import { fitToBudget } from './fit';
 export { priceBasket } from './pricing';
@@ -11,6 +12,7 @@ interface State {
   picks: Picks;
   option: BasketOption;
   quality: number;
+  constraintGaps: number;
 }
 const profiles: Profile[] = ['saver', 'balanced', 'premium'];
 function utility(state: State, profile: Profile) {
@@ -22,6 +24,8 @@ function utility(state: State, profile: Profile) {
 }
 function better(a: State, b: State | undefined, profile: Profile) {
   if (!b) return true;
+  if (a.constraintGaps !== b.constraintGaps)
+    return a.constraintGaps < b.constraintGaps;
   const diff = utility(a, profile) - utility(b, profile);
   return (
     diff > 1e-9 ||
@@ -34,9 +38,32 @@ function better(a: State, b: State | undefined, profile: Profile) {
 function search(input: OptimizerInput, keys: string[]) {
   const winners: Partial<Record<Profile, State>> = {};
   function evaluate(picks: Picks): State {
-    const option = priceBasket(input, picks, 'balanced');
+    let pricedInput = input;
+    let constraintGaps = 0;
+    if (input.plan.shopping) {
+      const conflicts = inventoryConflicts(input.plan, picks);
+      picks = Object.fromEntries(
+        Object.entries(picks).filter(([key]) => !conflicts.includes(key)),
+      );
+      const missing = keys.filter((key) => !picks[key]);
+      constraintGaps = missing.length;
+      pricedInput = {
+        ...input,
+        noMatch: [
+          ...(input.noMatch ?? []),
+          ...missing.map((key) => ({
+            itemKey: key,
+            needLabel: `Insufficient saved quantity: ${input.plan.items.find((item) => item.key === key)!.needLabel}`,
+            reason: 'no_product_with_tags' as const,
+            closest: null,
+          })),
+        ],
+      };
+    }
+    const option = priceBasket(pricedInput, picks, 'balanced');
     const state = {
       picks,
+      constraintGaps,
       option,
       quality: Object.values(picks).reduce((sum, c) => sum + c.score, 0),
     };
@@ -94,9 +121,13 @@ function search(input: OptimizerInput, keys: string[]) {
     // becomes eligible. Seed those groups explicitly so single-item descent does
     // not mistake a threshold barrier for an unaffordable required basket.
     const voucherShops = input.vouchers
-      .filter(v => v.scope === 'shop' && v.shopId && shopCoverage.has(v.shopId))
-      .map(v => v.shopId!);
-    const targetShops = [...new Set([...commonShops.map(([shop]) => shop), ...voucherShops])];
+      .filter(
+        (v) => v.scope === 'shop' && v.shopId && shopCoverage.has(v.shopId),
+      )
+      .map((v) => v.shopId!);
+    const targetShops = [
+      ...new Set([...commonShops.map(([shop]) => shop), ...voucherShops]),
+    ];
     for (const shop of targetShops)
       seeds.push(
         Object.fromEntries(
@@ -167,7 +198,14 @@ export function optimizeProfiles(
     .map((item) => item.key);
   let winners = search(safeInput, keys);
   const optional = input.plan.items
-    .filter((item) => !item.required && candidates[item.key].length)
+    .filter(
+      (item) =>
+        !item.required &&
+        candidates[item.key].length &&
+        !candidates[item.key].some((c) =>
+          input.plan.shopping?.keepProductIds.includes(c.product.id),
+        ),
+    )
     .sort((a, b) => {
       const efficiency = (key: string, quantity: number) =>
         Math.max(

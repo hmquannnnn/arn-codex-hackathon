@@ -1,5 +1,6 @@
 import type { BasketOption, Candidate, FitSuggestion } from '@/contract/types';
 import type { OptimizerInput } from './types';
+import { inventoryConflicts } from './inventory';
 import { priceBasket } from './pricing';
 import { today } from '@/server/today';
 
@@ -30,6 +31,13 @@ export function fitToBudget(
   addedAnywayKeys: string[] = [],
 ): FitSuggestion[] {
   const budget = input.plan.budget ?? Infinity;
+  function quotePicks(picks: Record<string, Candidate>) {
+    const option = priceBasket(input, picks, optionProfile);
+    return inventoryConflicts(input.plan, picks).length
+      ? { ...option, grandTotal: Infinity }
+      : option;
+  }
+  const optionProfile = option.profile;
   if (option.grandTotal <= budget) return [];
   const picks = selectedCandidates(input, option);
   const removed: string[] = [];
@@ -39,7 +47,7 @@ export function fitToBudget(
   );
   const vi = input.plan.language === 'vi';
   function suggestion(): FitSuggestion[] | null {
-    const priced = priceBasket(input, picks, option.profile);
+    const priced = quotePicks(picks);
     if (priced.grandTotal > budget) return null;
     const moves: string[] = [];
     if (removed.length)
@@ -104,7 +112,7 @@ export function fitToBudget(
     const unique = new Map([[original.product.id, original]]);
     for (const candidate of alternatives) {
       if (
-                candidate.product.stock >=
+        candidate.product.stock >=
           (input.plan.items.find((item) => item.key === key)?.quantity ?? 1) &&
         (input.plan.deadline === null ||
           candidate.arrivesBy <= input.plan.deadline)
@@ -117,7 +125,7 @@ export function fitToBudget(
     );
   });
   let bestPicks = { ...picks };
-  let bestTotal = priceBasket(input, bestPicks, option.profile).grandTotal;
+  let bestTotal = quotePicks(bestPicks).grandTotal;
   const combinations = choices.reduce(
     (count, values) => count * values.length,
     1,
@@ -126,7 +134,7 @@ export function fitToBudget(
     const state = { ...picks };
     function visit(index: number) {
       if (index === keys.length) {
-        const total = priceBasket(input, state, option.profile).grandTotal;
+        const total = quotePicks(state).grandTotal;
         if (total < bestTotal) {
           bestTotal = total;
           bestPicks = { ...state };
@@ -148,7 +156,7 @@ export function fitToBudget(
             const next = { ...state.picks, [key]: candidate };
             return {
               picks: next,
-              total: priceBasket(input, next, option.profile).grandTotal,
+              total: quotePicks(next).grandTotal,
             };
           }),
         )

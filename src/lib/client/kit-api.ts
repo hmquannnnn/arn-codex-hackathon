@@ -2,6 +2,7 @@ import type {
   AdjustChange,
   AdjustResponse,
   KitEvent,
+  KitPlan,
   KitSelection,
   KitVersion,
   PriceResponse,
@@ -29,6 +30,7 @@ export interface KitApi {
     text: string,
     id?: string,
     signal?: AbortSignal,
+    shopping?: KitPlan['shopping'],
   ): AsyncGenerator<KitEvent>;
   adjust(id: string, change: AdjustChange): Promise<AdjustResponse>;
   price(id: string, selection: KitSelection): Promise<PriceResponse>;
@@ -63,9 +65,14 @@ export class HttpKitApi implements KitApi {
       post({ threadId: id, selection }),
     );
   }
-  async *run(text: string, id?: string, signal?: AbortSignal) {
+  async *run(
+    text: string,
+    id?: string,
+    signal?: AbortSignal,
+    shopping?: KitPlan['shopping'],
+  ) {
     const response = await fetch(id ? '/api/kit/refine' : '/api/kit', {
-      ...post(id ? { threadId: id, message: text } : { query: text }),
+      ...post(id ? { threadId: id, message: text } : { query: text, shopping }),
       signal,
     });
     if (!response.ok || !response.body)

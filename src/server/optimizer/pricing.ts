@@ -5,6 +5,7 @@ import type {
   ShopGroup,
   Voucher,
 } from '@/contract/types';
+import { inventoryConflicts } from './inventory';
 import { today } from '@/server/today';
 import type { OptimizerInput } from './types';
 
@@ -31,7 +32,16 @@ export function priceBasket(
     const lineTotal = product.price * item.quantity;
     const alternativeShops = new Set<string>();
     const alternatives = [...(input.candidates[item.key] ?? [])]
-      .filter((c) => c.shop.id !== shop.id && c.product.id !== product.id)
+      .filter(
+        (c) =>
+          (input.plan.shopping || c.shop.id !== shop.id) &&
+          c.product.id !== product.id,
+      )
+      .filter(
+        (c) =>
+          !input.plan.shopping ||
+          !inventoryConflicts(input.plan, { ...picks, [item.key]: c }).length,
+      )
       .sort(
         (a, b) =>
           b.score - a.score ||
@@ -39,6 +49,7 @@ export function priceBasket(
           a.product.id.localeCompare(b.product.id),
       )
       .filter((c) => {
+        if (input.plan.shopping) return true;
         if (alternativeShops.has(c.shop.id)) return false;
         alternativeShops.add(c.shop.id);
         return true;

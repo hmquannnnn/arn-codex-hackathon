@@ -6,6 +6,7 @@ import { HttpKitApi, MockKitApi, type KitApi } from '@/lib/client/kit-api';
 import { relativeDate } from '@/lib/client/kit-text';
 import { Conversation } from './conversation';
 import { useKitController } from './use-kit-controller';
+import { CartKitSetup } from './cart-setup';
 import { KitPanel } from './panel';
 import { PersonaChip } from '@/components/persona-chip';
 import { CartProvider } from '@/components/store/cart-context';
@@ -21,12 +22,14 @@ export function KitScreen({
   api: supplied,
   id,
   query = '',
+  initialSource = 'catalog',
   today = '2026-09-02',
   onNavigate,
 }: {
   api?: KitApi;
   id?: string;
   query?: string;
+  initialSource?: 'catalog' | 'cart_only';
   today?: string;
   onNavigate?: (url: string) => void;
 }) {
@@ -44,6 +47,7 @@ export function KitScreen({
         api={api}
         id={id}
         query={query}
+        initialSource={initialSource}
         today={today}
         onNavigate={onNavigate}
       />
@@ -54,16 +58,23 @@ function Workspace({
   api,
   id,
   query,
+  initialSource,
   today,
   onNavigate,
 }: {
   api: KitApi;
   id?: string;
   query: string;
+  initialSource: 'catalog' | 'cart_only';
   today: string;
   onNavigate?: (url: string) => void;
 }) {
   const {
+    cart,
+    source,
+    setSource,
+    keepProductIds,
+    setKeepProductIds,
     persona,
     setPersona,
     setPersonaBusy,
@@ -98,7 +109,7 @@ function Workspace({
     undoPrice,
     canUndoPrice,
     add,
-  } = useKitController({ api, id, query, today, onNavigate });
+  } = useKitController({ api, id, query, initialSource, today, onNavigate });
   const chatScroll = useRef<HTMLDivElement>(null);
   const pinned = useRef(true);
   const lastRun = useRef<number | undefined>(undefined);
@@ -136,7 +147,12 @@ function Workspace({
             </span>
           )}
         </div>
-        <PersonaChip api={api} insideKit onChange={setPersona} onPendingChange={setPersonaBusy} />
+        <PersonaChip
+          api={api}
+          insideKit
+          onChange={setPersona}
+          onPendingChange={setPersonaBusy}
+        />
         <Link href="/" className="text-xs text-slate-500">
           ← Back to DemoMart
         </Link>
@@ -192,18 +208,22 @@ function Workspace({
           </p>
           <nav className="space-y-2 overflow-y-auto">
             {history.map((h) => {
-              const count = h.id === threadId.current ? Math.max(h.versionCount, versions.at(-1)?.version ?? 0) : h.versionCount;
+              const count =
+                h.id === threadId.current
+                  ? Math.max(h.versionCount, versions.at(-1)?.version ?? 0)
+                  : h.versionCount;
               return (
-              <a
-                href={`/kit/t/${h.id}`}
-                key={h.id}
-                className={`block rounded-xl p-3 ${h.id === threadId.current ? 'bg-orange-100' : 'hover:bg-slate-100'}`}
-              >
-                <p className="line-clamp-2 text-sm font-medium">{h.title}</p>
-                <p className="mt-2 text-[10px] text-slate-500">
-                  {relativeDate(h.updatedAt, today)} · {count} {count === 1 ? 'version' : 'versions'}
-                </p>
-              </a>
+                <a
+                  href={`/kit/t/${h.id}`}
+                  key={h.id}
+                  className={`block rounded-xl p-3 ${h.id === threadId.current ? 'bg-orange-100' : 'hover:bg-slate-100'}`}
+                >
+                  <p className="line-clamp-2 text-sm font-medium">{h.title}</p>
+                  <p className="mt-2 text-[10px] text-slate-500">
+                    {relativeDate(h.updatedAt, today)} · {count}{' '}
+                    {count === 1 ? 'version' : 'versions'}
+                  </p>
+                </a>
               );
             })}
             {!history.length && (
@@ -221,7 +241,8 @@ function Workspace({
             ref={chatScroll}
             onScroll={(event) => {
               const node = event.currentTarget;
-              pinned.current = node.scrollHeight - node.scrollTop - node.clientHeight <= 64;
+              pinned.current =
+                node.scrollHeight - node.scrollTop - node.clientHeight <= 64;
             }}
             className="flex-1 overflow-y-auto p-5 lg:p-8"
           >
@@ -268,6 +289,15 @@ function Workspace({
                   ))}
                 </div>
               </div>
+            )}
+            {!threadId.current && !busy && (
+              <CartKitSetup
+                lines={cart.lines}
+                source={source}
+                keepProductIds={keepProductIds}
+                onSource={setSource}
+                onKeep={setKeepProductIds}
+              />
             )}
             <Conversation
               versions={savedVersions}

@@ -26,3 +26,13 @@ Sources: CART_FLOW_TASK.md, SCORING.md. Existing scoring/profile objectives rema
 - Keep is an explicit UI control by product ID; changing requirements never overrides hard eligibility.
 - Scope cannot be widened by the model; start a new kit to use a different source/snapshot.
 - Demo checkout creates a receipt only, preserving existing no-payment behavior.
+
+## Verification — completed 2026-10-31
+
+- `npm test -- --maxWorkers=2`: 261 passed, 10 existing opt-in tests skipped (19 new tests).
+- `npm run build`: production compilation, lint and TypeScript checks passed.
+- `npm run eval`: 13/13 real-model cases passed.
+- Production Playwright rehearsal: 3/3 passed against local memory adapter, including a real-model cart-only kit,
+  spoken keep, reload, confirmation without duplicate quantities, selected-only checkout and leftovers.
+- No schema migration, seed, environment-file edit or external database reset. Test server stopped; port 3211 free.
+- Existing scoring objectives retained; same-shop alternatives are available for cart-aware requests.

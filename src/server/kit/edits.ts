@@ -121,11 +121,28 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
                 favoriteShopIds: [],
                 cart: [],
               };
-        const available = findInterests(plan, { lines: [] }, matched.related, persona, vouchers, today());
-        const selection = awaiting ? null : retainSelection(previousSelection, plan, matched, available);
+        const available = findInterests(
+          plan,
+          { lines: [] },
+          matched.related,
+          persona,
+          vouchers,
+          today(),
+        );
+        const selection = awaiting
+          ? null
+          : retainSelection(previousSelection, plan, matched, available);
         if (selection) {
-          const priced = priceSelection(plan, matched, selection, vouchers, available);
-          const index = options.findIndex(o => o.profile === selection.profile);
+          const priced = priceSelection(
+            plan,
+            matched,
+            selection,
+            vouchers,
+            available,
+          );
+          const index = options.findIndex(
+            (o) => o.profile === selection.profile,
+          );
           if (index < 0) options.push(priced);
           else options[index] = priced;
         }
@@ -138,7 +155,11 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
             vouchers,
             today(),
           );
-        if (!awaiting && !thread.versions.some((v) => v.status === 'ready')) {
+        if (
+          !awaiting &&
+          plan.shopping?.source !== 'cart_only' &&
+          !thread.versions.some((v) => v.status === 'ready')
+        ) {
           const { sessionId } = await adapter.recordIntent({
             query: thread.thread.title,
             plan,
@@ -158,12 +179,18 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
           );
         }
         const total =
-          (options.find((o) => o.profile === (selection?.profile ?? 'balanced')) ?? options[0])
-            ?.grandTotal ?? 0;
-        const invalidated = Object.keys(previousSelection?.picks ?? {}).filter(key =>
-          plan.items.some(i => i.key === key) && !(key in (selection?.picks ?? {})),
+          (
+            options.find(
+              (o) => o.profile === (selection?.profile ?? 'balanced'),
+            ) ?? options[0]
+          )?.grandTotal ?? 0;
+        const invalidated = Object.keys(previousSelection?.picks ?? {}).filter(
+          (key) =>
+            plan.items.some((i) => i.key === key) &&
+            !(key in (selection?.picks ?? {})),
         );
-        if (invalidated.length) label += `. ${plan.language === 'vi' ? 'Lựa chọn không còn phù hợp' : 'Saved choices no longer available'}: ${invalidated.map(key => plan.items.find(i => i.key === key)!.needLabel).join(', ')}`;
+        if (invalidated.length)
+          label += `. ${plan.language === 'vi' ? 'Lựa chọn không còn phù hợp' : 'Saved choices no longer available'}: ${invalidated.map((key) => plan.items.find((i) => i.key === key)!.needLabel).join(', ')}`;
         const explanation = `${label}. ${plan.language === 'vi' ? 'Tổng mới' : 'New total'} ${new Intl.NumberFormat('vi-VN').format(total)}₫.`;
         const version = await store.appendVersion(
           {
@@ -264,23 +291,56 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
       jsonEndpoint(async () => {
         const { adapter, store } = deps();
         const thread = await loadRefineThread(id, ownerFrom(request), store);
-        if (thread.versions.some(v => !hasPricedSelection(v))) {
+        if (thread.versions.some((v) => !hasPricedSelection(v))) {
           const shops = adapter.listShops();
           const products = adapter.searchProducts({});
           const [vouchers, persona] = await Promise.all([
             adapter.listVouchers(thread.thread.persona),
             adapter.getPersona(thread.thread.persona),
-            shops, products,
+            shops,
+            products,
           ]);
           // Rehydrate every historical selection read-only; never save it onto the latest version.
           for (const version of thread.versions) {
             if (!version.selection || hasPricedSelection(version)) continue;
-            const matched = await matchPlan(version.plan, adapter, shops, products);
-            const available = findInterests(version.plan, {lines: []}, matched.related, persona, vouchers, today());
-            const selection = retainSelection(version.selection, version.plan, matched, available)!;
-            const option = priceSelection(version.plan, matched, selection, vouchers, available);
-            option.interests = findInterests(version.plan, option, matched.related, persona, vouchers, today());
-            version.options = version.options.map(o => o.profile === option.profile ? option : o);
+            const matched = await matchPlan(
+              version.plan,
+              adapter,
+              shops,
+              products,
+            );
+            const available = findInterests(
+              version.plan,
+              { lines: [] },
+              matched.related,
+              persona,
+              vouchers,
+              today(),
+            );
+            const selection = retainSelection(
+              version.selection,
+              version.plan,
+              matched,
+              available,
+            )!;
+            const option = priceSelection(
+              version.plan,
+              matched,
+              selection,
+              vouchers,
+              available,
+            );
+            option.interests = findInterests(
+              version.plan,
+              option,
+              matched.related,
+              persona,
+              vouchers,
+              today(),
+            );
+            version.options = version.options.map((o) =>
+              o.profile === option.profile ? option : o,
+            );
           }
         }
         return NextResponse.json(thread);

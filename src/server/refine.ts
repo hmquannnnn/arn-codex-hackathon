@@ -73,11 +73,24 @@ export async function* runRefine(
   let intent;
   try {
     const start = performance.now();
+    const cartProducts = latest.plan.shopping
+      ? await Promise.all(
+          latest.plan.shopping.cart.map((line) =>
+            deps.adapter.getProduct(line.productId),
+          ),
+        )
+      : [];
+    const titles = Object.fromEntries(
+      cartProducts.flatMap((product) =>
+        product ? [[product.id, product.title]] : [],
+      ),
+    );
     ({ plan, intent } = await refineNeed(
       deps.llm,
       latest.plan,
       input.message,
       excluded,
+      titles,
     ));
     logKitStep('understand', start);
     if (intent === 'answer' && latest.status === 'ready') {
