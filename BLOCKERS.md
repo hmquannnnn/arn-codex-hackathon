@@ -41,3 +41,26 @@ T06 enrichment preview/apply/undo is implemented and verified through real-model
 ## T07 backend dependency update
 
 T07 Notify me is implemented and verified through production HTTP against the configured DB; insights include persisted watchers. T13's previously missing T05/T06/T07/T09/T16 backend routes are now present. Lane 2 can resume its live demo pass. T20b still awaits T20a; no env changes required.
+## T13 — Lane 2 resume check, 2026-10-31
+
+Pulled origin/main to 415cad7; T16 personalisation backend has landed, resolving that dependency. T13 remains blocked by T05/T06: `src/app/api/seller/` is absent, including insights and enrichment preview/apply/undo. The deployed seeded-DB seller demo and loop cannot be verified from this implementation. T07 watch support is also still required for Full Notify me. Per AGENTS.md, stopped without moving to another ticket; resume T13 full after the seller backend lands. No runtime files or env values changed; no processes started.
+
+## T20b — dependency audit, Lane 2 full, 2026-10-31
+
+T20a is not recorded as delivered at 415cad7. T02/T03 provide three profiles and Balanced explanation facts, but T20a acceptance is not fully established: the explainer prompt only optionally suggests comparing Saver/Premium, and pipeline tests do not cover the specified >=5-products-per-hero-category, 3M profile invariants or separate identical options. Ticket 20b explicitly lists T20a as a dependency. Per AGENTS.md, stopped before UI implementation; Lane 1 must complete/verify T20a, or the user must explicitly authorize decoupling T20b from that dependency. No source/test/env changes or running processes.
+
+## Lane 2 polling update — 2026-10-31
+
+Pulled T05 at 40ea2d1: seller insights now exists. Earlier notes about the missing insights route are superseded. T13 still awaits T06 enrichment preview/apply/undo; T20b still awaits T20a. Continuing the user-requested five-minute checks.
+
+## T13 — Lane 2 continuation check at 40ea2d1
+
+Resumed Lane 2 in full mode from the recorded T13 handoff. `git pull --rebase --autostash` reports already up to date and preserved existing local changes. T05 insights and T16 personalization are present, but T06 enrichment preview/apply/undo routes remain absent. T13 explicitly depends on T06, so the live seller fix → buyer exact-match loop cannot be verified. Per AGENTS.md, stopped before implementation or moving to another ticket. Lane 1 must deliver T06 before T13 can resume. No tests or servers started; no env/runtime files changed.
+
+## T13 — resumed after T06/T07 at 76413a2
+
+T06 and T07 have landed. All previously missing backend route dependencies for T13 are resolved; earlier blocked-check notes above are historical. Lane 2 is resuming the full live demo pass.
+
+## T13 — deployed URL missing current application routes
+
+At 76413a2, all T13 backend dependencies are present in source. The documented production URL `https://kitly-arn-codex-hackathon.vercel.app` returns HTTP 200 for `/`, but HTTP 404 for `/kit`, `/kit/new`, `/seller`, and `/api/seller/insights?shopId=shop-minhan` (checked 2026-10-31). A real Chromium visit also shows the Next.js 404 page at `/kit/new`. This prevents the required deployed seeded-DB/LLM Beats 1–4 and judge-proofing pass. Supply the current deployment URL or deploy the current application before resuming that pass. Lane 2 added the missing Seller Centre → `/kit` link with a regression test; T13 remains incomplete. No env/database changes, seeds, or listing mutations were performed.

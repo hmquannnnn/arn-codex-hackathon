@@ -129,3 +129,10 @@ it('Notify me handles request state and retry without changing counts on failure
     ).toBeTruthy(),
   );
 });
+it('offers a direct Back to buyer route from Seller Centre', async () => {
+  render(<SellerScreen api={new MockSellerApi()} initialShop="shop-minhan" />);
+  expect(
+    screen.getByRole('link', { name: 'Back to buyer' }).getAttribute('href'),
+  ).toBe('/kit');
+  await screen.findByRole('button', { name: 'Preview fix' });
+});

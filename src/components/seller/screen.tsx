@@ -120,7 +120,12 @@ export function SellerScreen({
               Seller Centre
             </span>
           </Link>
-          <PersonaChip />
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/kit" className="text-sm font-medium text-accent">
+              Back to buyer
+            </Link>
+            <PersonaChip />
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl space-y-6 px-5 py-8">
