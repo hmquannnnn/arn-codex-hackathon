@@ -98,7 +98,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 ### F2 — Empty sections in the seller preview drawer
 - Repro: Preview fix drawer shows "Added attributes" with nothing under it and "Appended description" as an empty green bar.
 - Expected: hide a section when it is empty.
-- Status: open
+- Status: fixed in 82c549a
 
 ### F3 — Swap pill on a non-saved profile tab changes Balanced (low priority)
 - Code: `use-kit-controller.ts:384-387` — a follow-up swap applies to the saved profile, else Balanced. If the user is on

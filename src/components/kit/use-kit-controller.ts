@@ -31,6 +31,7 @@ export function useKitController({
   const [history, setHistory] = useState<KitThreadSummary[]>([]);
   const [runs, setRuns] = useState<LiveTurn[]>([]);
   const [persona, setPersona] = useState<PersonaResponse>();
+  const [visibleProfile, setVisibleProfile] = useState<Profile>('balanced');
   const [actions, setActions] = useState<LocalAction[]>([]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -376,7 +377,7 @@ export function useKitController({
       .find((c) => c.product.id === action.productId);
     const previous = selectionFor(
       latest,
-      latest.selection?.profile || 'balanced',
+      visibleProfile,
     );
     setActions((old) => [
       ...old,
@@ -430,6 +431,7 @@ export function useKitController({
   return {
     persona,
     setPersona,
+    setVisibleProfile,
     actions,
     messages: thread?.messages || [],
     chooseSuggestion,

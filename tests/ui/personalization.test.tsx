@@ -175,3 +175,25 @@ it('interest switch uses price response, hides the card and exposes Undo', async
     screen.getByRole('button', { name: 'Undo last basket edit' }),
   ).toBeTruthy();
 });
+
+it('F3 a follow-up swap acts on the visible Premium tab without a saved selection', async () => {
+  const api = new MockKitApi(0);
+  for await (const e of api.run('School budget 1M')) void e;
+  const id = (await api.listThreads()).threads[0].id;
+  const saved = await api.getThread(id);
+  const profiles: string[] = [];
+  api.price = async (_id, selection) => {
+    profiles.push(selection.profile);
+    return {
+      option: saved.versions[0].options.find(
+        (o) => o.profile === selection.profile,
+      )!,
+    };
+  };
+  render(<KitScreen api={api} id={id} />);
+  fireEvent.click(await screen.findByRole('tab', { name: /Premium/ }));
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Switch to KidZone Lite' }),
+  );
+  await waitFor(() => expect(profiles).toEqual(['premium']));
+});

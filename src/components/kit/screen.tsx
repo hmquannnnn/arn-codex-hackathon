@@ -66,6 +66,7 @@ function Workspace({
   const {
     persona,
     setPersona,
+    setVisibleProfile,
     actions,
     messages,
     chooseSuggestion,
@@ -329,6 +330,7 @@ function Workspace({
         >
           <KitPanel
             version={version}
+            onProfileChange={setVisibleProfile}
             versions={versions}
             busy={busy}
             onVersion={setSelectedVersion}

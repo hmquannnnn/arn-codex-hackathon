@@ -30,6 +30,7 @@ export function KitPanel({
   version,
   versions,
   onVersion,
+  onProfileChange,
   onRestore,
   onSwap,
   onAdd,
@@ -45,6 +46,7 @@ export function KitPanel({
   version?: KitVersion;
   versions: KitVersion[];
   onVersion: (n: number) => void;
+  onProfileChange?: (profile: Profile) => void;
   onRestore: (n: number) => void;
   onSwap: (
     profile: Profile,
@@ -66,10 +68,12 @@ export function KitPanel({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
-    setProfile(version?.selection?.profile ?? 'balanced');
+    const profile = version?.selection?.profile ?? 'balanced';
+    setProfile(profile);
+    onProfileChange?.(profile);
     setRepriced(undefined);
     setError('');
-  }, [version?.version, version?.selection?.profile]);
+  }, [version?.version, version?.selection?.profile, onProfileChange]);
   if (!version)
     return (
       <div className="flex h-full min-h-64 items-center justify-center p-8 text-center text-sm text-slate-400">
@@ -103,6 +107,7 @@ export function KitPanel({
       if (result) {
         setRepriced(result);
         setProfile(result.profile);
+        onProfileChange?.(result.profile);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unable to update basket');
@@ -235,6 +240,7 @@ export function KitPanel({
                   disabled={busy || pending}
                   onClick={() => {
                     setProfile(o.profile);
+                    onProfileChange?.(o.profile);
                     setRepriced(undefined);
                     setError('');
                   }}
