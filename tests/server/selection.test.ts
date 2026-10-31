@@ -139,3 +139,32 @@ it('B9 over-budget selected total is distinct from the achievable minimum and ha
   expect(option.costDrivers?.length).toBeGreaterThan(0);
   expect(option.minimumCost).toBeLessThan(option.fit![0].grandTotal);
 });
+
+it('catalog cart context permits explicitly adding the offered closest product; cart-only still rejects it', async () => {
+  const adapter = new InMemoryAdapter();
+  const plan = {
+    ...hero,
+    shopping: { source: 'catalog' as const, cart: [], keepProductIds: [] },
+  };
+  const matched = await matchPlan(plan, adapter);
+  const gap = matched.noMatch.find((g) => g.closest)!;
+  const id = gap.closest!.candidate.product.id;
+  const selection = {
+    profile: 'balanced' as const,
+    picks: { [gap.itemKey]: id },
+    dropped: [],
+  };
+  const option = priceSelection(plan, matched, selection, []);
+  expect(
+    option.lines.some((l) => l.itemKey === gap.itemKey && l.product.id === id),
+  ).toBe(true);
+  expect(option.noMatch.some((g) => g.itemKey === gap.itemKey)).toBe(false);
+  expect(() =>
+    priceSelection(
+      { ...plan, shopping: { ...plan.shopping, source: 'cart_only' } },
+      matched,
+      selection,
+      [],
+    ),
+  ).toThrow('Product is not offered');
+});

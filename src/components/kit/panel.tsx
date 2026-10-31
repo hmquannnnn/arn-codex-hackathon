@@ -370,7 +370,7 @@ export function KitPanel({
                       busy ||
                       pending ||
                       !onSelect ||
-                      !!version.plan.shopping
+                      version.plan.shopping?.source === 'cart_only'
                     }
                     onClick={() =>
                       void reprice(() =>

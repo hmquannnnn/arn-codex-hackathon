@@ -49,7 +49,7 @@ export function priceSelection(
       (closest?.product.id === id ? closest : undefined);
     if (
       !candidate ||
-      (plan.shopping &&
+      (plan.shopping?.source === 'cart_only' &&
         !matched.candidates[key]?.some((c) => c.product.id === id))
     )
       throw new HttpError(

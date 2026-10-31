@@ -54,6 +54,7 @@ it('over-budget fixture offers two fit suggestions and keeps checkout enabled', 
 });
 it('Add anyway uses returned option, shows honest closest label, and permits removal', async () => {
   const base = structuredClone(thread.versions[0]);
+  base.plan.shopping = { source: 'catalog', cart: [], keepProductIds: [] };
   const balanced = base.options.find((o) => o.profile === 'balanced')!;
   const gap = balanced.noMatch.find((g) => g.closest)!;
   const closest = gap.closest!.candidate;
