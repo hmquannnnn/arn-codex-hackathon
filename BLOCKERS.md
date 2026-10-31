@@ -21,3 +21,7 @@ T15 frontend edits are implemented and verified with fixture-backed API response
 ## T17 live integration dependency
 
 T17 persona/interest/wallet/follow-up/answer UI passes fixture tests and browser flows. Full live verification awaits T09 price/history and T16 interest/follow-up/answer support. GitHub credential helper is configured and Lane 2 can push. No new env values are needed.
+
+## T12 live integration dependency
+
+Seller UI, preview/apply/reload/undo, live strip and Notify me are implemented and fixture-tested. Live verification requires Lane 1 T05/T06/T07 seller insights/enrichment/watch endpoints, which are not present at this HEAD. T09 edit/history routes have landed; those earlier missing-route dependencies are resolved. No env or package changes are needed.

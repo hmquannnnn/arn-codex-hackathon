@@ -18,6 +18,7 @@ import {
 } from '@/lib/client/kit-selection';
 import { InlineEdit } from './inline-edit';
 import { BudgetWarning } from './budget-warning';
+import { NotifyButton } from './notify-button';
 import { InterestCard } from './interest-card';
 import { BasketRows } from './basket-rows';
 const meanings = {
@@ -83,6 +84,10 @@ export function KitPanel({
     options.find((o) => o.profile === 'balanced') ||
     options[0];
   const option = repriced?.profile === selected?.profile ? repriced : selected;
+  const gapKey = (key: string) => {
+    const item = version.plan.items.find((i) => i.key === key);
+    return `${item?.category ?? 'none'}|${[...(item?.mustHaveTags || [])].sort().join(',')}`;
+  };
   const older =
     version.version !==
     Math.max(...versions.map((v) => v.version), version.version);
@@ -324,6 +329,12 @@ export function KitPanel({
                   >
                     Add anyway
                   </button>
+                  <div>
+                    <NotifyButton
+                      key={gapKey(g.itemKey)}
+                      gapKey={gapKey(g.itemKey)}
+                    />
+                  </div>
                   {!!g.closest!.overMaxPriceBy && (
                     <p className="mt-1 text-xs">
                       Over your max price by {money(g.closest!.overMaxPriceBy)}
@@ -366,7 +377,15 @@ export function KitPanel({
                 {option.noMatch
                   .filter((g) => !g.closest)
                   .map((g) => (
-                    <li key={g.itemKey}>{g.needLabel}</li>
+                    <li key={g.itemKey}>
+                      {g.needLabel}
+                      <div>
+                        <NotifyButton
+                          key={gapKey(g.itemKey)}
+                          gapKey={gapKey(g.itemKey)}
+                        />
+                      </div>
+                    </li>
                   ))}
               </ul>
             </details>
