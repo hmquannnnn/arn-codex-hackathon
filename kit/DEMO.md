@@ -79,15 +79,18 @@ adapter, so any marketplace can plug it in."
 - **Lan vs Guest (D43):** header switch → **Guest**, **+ New kit**, the Beat 1 sentence. **Expect** no 💛 card, no wallet
   saving line, no "Deliver to", header chip "Guest". Do NOT promise a higher total: each new kit re-plans, so the item set can
   differ and Guest came out CHEAPER in 2 of 7 runs on 31/10 — point at the missing 💛 card and wallet line instead. Switch back to Lan.
-- Judge clicks a quick reply about express delivery (the wording is written by the model, e.g. "Choose express delivery" /
-  "Giao hoả tốc"): a refine with deadline Sep 4 → **Expect** Version 2, header "By Sep 4", no "By Sep 5" chip, only 1–2-day
+- Judge clicks a quick reply about express delivery when offered (follow-up topics are model chosen; otherwise type
+  `Use express delivery` in the composer). The wording is written by the model, e.g. "Choose express delivery" /
+  "Giao hoả tốc": a refine with deadline Sep 4 → **Expect** Version 2, header "By Sep 4", no "By Sep 5" chip, only 1–2-day
   products, **Balanced ≤ 1.500.000₫** (measured 900.000₫), Minh An backpack still the closest, and the next question does NOT
   offer express again. A quick reply about the cart backpack ("Switch to KidZone Lite") swaps it with no AI call.
 - Judge sets a tiny budget ("Grade 1, budget 200k"): status `over_budget` with minimum cost, drivers and **Fit to
   budget** suggestions; Add to cart still works with the warning — never a fake basket, never a dead end.
-- Judge swaps a line (e.g. Lunch box or School shoes) to its most expensive alternative in the 1M kit of Beat 2: banner
+- Judge swaps a line (e.g. Lunch box or School shoes) to a more expensive alternative in the kit of Beat 2.
+  If the generated alternatives all fit within 1M, first read the Saver total, then set the inline budget to that amount
+  and return to Balanced. Swap to a more expensive alternative (repeat for another item if needed). **Expect** banner
   "Over budget by …", **Add kit to cart stays enabled**, click a Fit to budget suggestion → back under (measured 31/10:
-  603.400₫ → 1.132.000₫ → Fit → 953.000₫). (The 890k anti-hunchback backpack is never offered: it is above the 400k limit.)
+  603.400₫ → 1.132.000₫ → Fit → 953.000₫; these amounts vary with the generated plan). (The 890k anti-hunchback backpack is never offered: it is above the 400k limit.)
 - Judge reloads or opens another browser: reload keeps the kit; the other browser has an empty history (per-browser
   cookie today, accounts in production).
 - "Why not a cart that knows my intent / shop pages / seller sales KPIs?": next steps (D26) — the loop is the core.

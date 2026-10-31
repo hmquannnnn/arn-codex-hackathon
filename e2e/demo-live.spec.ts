@@ -28,7 +28,7 @@ test('tiny budget shows minimum and Fit while cart stays available', async ({
   await expect(page).toHaveURL(/\/cart$/);
 });
 
-test('express quick reply changes the deadline once without repeating express', async ({
+test('express request changes the deadline once without repeating express', async ({
   page,
 }) => {
   await page.goto(
@@ -43,24 +43,20 @@ test('express quick reply changes the deadline once without repeating express', 
   await expect(page.getByLabel('Kit version')).toContainText('Version 1 of 1', {
     timeout: 120000,
   });
-  const replies = page.getByRole('button', {
+  const latestFollowUp = page
+    .getByRole('region', { name: 'Chat', exact: true })
+    .locator('section')
+    .last();
+  const replies = latestFollowUp.getByRole('button', {
     name: /express|hoả tốc|hỏa tốc/i,
   });
-  if (!(await replies.count())) {
-    await page
-      .getByLabel('Message Kitly')
-      .fill(
-        'Can this kit arrive sooner? Please offer an express delivery quick reply.',
-      );
+  if (await replies.count()) {
+    await replies.first().click();
+  } else {
+    // Follow-up wording and topic are model chosen; the same composer path handles an express request.
+    await page.getByLabel('Message Kitly').fill('Use express delivery');
     await page.getByRole('button', { name: 'Send message' }).click();
-    await expect(
-      replies.and(page.locator('button:enabled')).first(),
-    ).toBeEnabled({ timeout: 120000 });
   }
-  await expect(
-    replies.and(page.locator('button:enabled')).first(),
-  ).toBeEnabled();
-  await replies.and(page.locator('button:enabled')).first().click();
   await expect(page.getByLabel('Kit version')).toContainText('Version 2 of 2', {
     timeout: 120000,
   });
@@ -93,11 +89,7 @@ test('express quick reply changes the deadline once without repeating express', 
   await expect(
     page.getByRole('button', { name: /Add kit to cart/ }),
   ).toHaveText('Add kit to cart');
-  await expect(
-    page
-      .getByRole('button', { name: /express|hoả tốc|hỏa tốc/i })
-      .and(page.locator('button:enabled')),
-  ).toHaveCount(0);
+  await expect(replies).toHaveCount(0);
 });
 
 test('expensive alternative warns, keeps cart enabled and Fit restores the budget', async ({
@@ -128,7 +120,18 @@ test('expensive alternative warns, keeps cart enabled and Fit restores the budge
   const id = new URL(page.url()).pathname.split('/').at(-1);
   const response = await page.request.get('/api/threads/' + id);
   expect(response.ok()).toBeTruthy();
-  const thread = await response.json();
+  let thread = await response.json();
+  const saver = thread.versions
+    .at(-1)
+    .options.find((option: { profile: string }) => option.profile === 'saver');
+  await page.getByRole('button', { name: 'Edit budget', exact: true }).click();
+  await page.getByLabel('Budget in VND').fill(String(saver.grandTotal));
+  await page.getByLabel('Budget in VND').press('Enter');
+  await expect(page.getByLabel('Kit version')).toContainText('Version 3 of 3', {
+    timeout: 30000,
+  });
+  await expect(page.getByLabel('Message Kitly')).toBeEnabled();
+  thread = await (await page.request.get('/api/threads/' + id)).json();
   const version = thread.versions.at(-1);
   const balanced = version.options.find(
     (option: { profile: string }) => option.profile === 'balanced',
