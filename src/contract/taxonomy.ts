@@ -451,5 +451,8 @@ export const canonicalTags = [
   'eco-friendly',
   'anti-blue-light',
   'backpack-cover',
+  'minimalist',
+  'cartoon',
+  'sporty',
 ] as const;
 export const CATEGORY_IDS = categories.map((c) => c.id);
