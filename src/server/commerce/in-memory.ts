@@ -11,6 +11,8 @@ import type {
   KitPlan,
   PersonaId,
   Product,
+  Shop,
+  Voucher,
   RecentDemandItem,
 } from '@/contract/types';
 import products from '@/contract/fixtures/products.json';
@@ -56,7 +58,24 @@ export class InMemoryAdapter implements CommerceAdapter {
     .array()
     .parse(structuredClone(demand))
     .map((row) => ({ ...row, source: 'seed' }));
-  constructor(initial: { demand?: DemandItemRow[] } = {}) {
+  constructor(
+    initial: {
+      demand?: DemandItemRow[];
+      products?: Product[];
+      shops?: Shop[];
+      vouchers?: Voucher[];
+    } = {},
+  ) {
+    if (initial.products)
+      this.products = productSchema
+        .array()
+        .parse(structuredClone(initial.products));
+    if (initial.shops)
+      this.shops = shopSchema.array().parse(structuredClone(initial.shops));
+    if (initial.vouchers)
+      this.vouchers = voucherSchema
+        .array()
+        .parse(structuredClone(initial.vouchers));
     if (initial.demand)
       this.demand = demandItemRowSchema
         .array()

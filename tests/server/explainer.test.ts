@@ -109,3 +109,59 @@ it('provides previous and next constraint values plus labelled item changes for 
     },
   ]);
 });
+it('T20a explains Balanced with grounded Saver/Premium line differences and enforces70words across stream chunks', async () => {
+  const balanced = options.find((o) => o.profile === 'balanced')!;
+  const saver = {
+    ...balanced,
+    profile: 'saver' as const,
+    grandTotal: balanced.grandTotal - 100000,
+    lines: balanced.lines.map((l, i) =>
+      i
+        ? l
+        : {
+            ...l,
+            product: { ...l.product, id: 'saver-product', title: 'Saver pens' },
+          },
+    ),
+  };
+  const premium = {
+    ...balanced,
+    profile: 'premium' as const,
+    grandTotal: balanced.grandTotal + 200000,
+    lines: balanced.lines.map((l, i) =>
+      i
+        ? l
+        : {
+            ...l,
+            product: {
+              ...l.product,
+              id: 'premium-product',
+              title: 'Premium pens',
+            },
+          },
+    ),
+  };
+  const llm = new FakeLLM(
+    [],
+    ['Balanced fits. ', ...Array.from({ length: 90 }, (_, i) => `word${i} `)],
+  );
+  let text = '';
+  for await (const chunk of explainKit(llm, plan, [premium, saver, balanced]))
+    text += chunk;
+  const facts = JSON.parse(llm.calls[0].messages[1].content);
+  expect(facts.selected.profile).toBe('balanced');
+  expect(facts.profileComparison.saver).toMatchObject({
+    deltaFromBalanced: -100000,
+    changedItems: [{ title: 'Saver pens' }],
+  });
+  expect(facts.profileComparison.premium).toMatchObject({
+    deltaFromBalanced: 200000,
+    changedItems: [{ title: 'Premium pens' }],
+  });
+  expect(llm.calls[0].messages[0].content).toContain(
+    'one short sentence comparing Saver and Premium',
+  );
+  expect(llm.calls[0].messages[0].content).toContain('Name one changed category');
+  expect(text.trim().split(/\s+/)).toHaveLength(70);
+  expect(text).not.toContain('word68');
+});
