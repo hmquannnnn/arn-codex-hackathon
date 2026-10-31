@@ -1,3 +1,4 @@
+import { readPages } from './paging';
 import { demoTimestamp } from '@/server/today';
 import { createDb } from '@/server/db';
 import type {
@@ -29,6 +30,22 @@ function contractRow(row: Record<string, unknown>) {
 export class SupabaseAdapter implements CommerceAdapter {
   constructor(private readonly db = createDb()) {}
 
+  async getInsightAdvice(key: string, signature: string) {
+    const { data, error } = await this.db
+      .from('insight_advice')
+      .select('advice')
+      .eq('gap_key', key)
+      .eq('counts_signature', signature)
+      .maybeSingle();
+    if (error) throw error;
+    return data?.advice ?? null;
+  }
+  async saveInsightAdvice(key: string, signature: string, advice: string) {
+    const { error } = await this.db
+      .from('insight_advice')
+      .upsert({ gap_key: key, counts_signature: signature, advice });
+    if (error) throw error;
+  }
   async listShops() {
     const { data, error } = await this.db.from('shops').select('*').order('id');
     if (error) throw error;
@@ -169,20 +186,18 @@ export class SupabaseAdapter implements CommerceAdapter {
   }
 
   async demandItemsSince(sinceIso: string, filter?: { category?: CategoryId }) {
-    let query = this.db
-      .from('demand_items')
-      .select('*')
-      .gte('created_at', sinceIso)
-      .order('id');
-    if (filter?.category !== undefined)
-      query = query.eq('category', filter.category);
-    const rows = [];
-    for (let offset = 0; ; offset += 1000) {
-      const { data, error } = await query.range(offset, offset + 999);
+    const rows = await readPages('demandItemsSince', async (offset, size) => {
+      let query = this.db
+        .from('demand_items')
+        .select('*')
+        .gte('created_at', sinceIso)
+        .order('id');
+      if (filter?.category !== undefined)
+        query = query.eq('category', filter.category);
+      const { data, error } = await query.range(offset, offset + size - 1);
       if (error) throw error;
-      rows.push(...data);
-      if (data.length < 1000) break;
-    }
+      return data;
+    });
     return demandItemRowSchema.array().parse(rows.map(contractRow));
   }
 
@@ -192,6 +207,7 @@ export class SupabaseAdapter implements CommerceAdapter {
       .from('demand_items')
       .select('*,intent_sessions!inner(source)')
       .eq('intent_sessions.source', 'live')
+      .lt('matched_count', 2)
       .order('created_at', { ascending: false })
       .order('id', { ascending: false });
     const rows = [];

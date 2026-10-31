@@ -16,16 +16,20 @@ T11 can be developed and verified in the explicitly supported fixture replay mod
 
 ## T15 live integration dependency
 
-T15 frontend edits are implemented and verified with fixture-backed API responses: remove/undo, closest Add anyway, Fit/Undo, inline edits, selection reload and request/error locking. Live verification awaits T09 adjust/price/history endpoints. Fixture replay does not simulate arbitrary optimizer responses; unsupported edits fail explicitly and leave the kit unchanged. No new env values or dependencies are needed.
+T15 frontend edits are implemented and verified with fixture-backed API responses: remove/undo, closest Add anyway, Fit/Undo, inline edits, selection reload and request/error locking. T09 adjust/price/history endpoints have landed and passed the Lane1 seeded HTTP tests; Lane2 end-to-end verification remains part of its live demo pass. Fixture replay does not simulate arbitrary optimizer responses; unsupported edits fail explicitly and leave the kit unchanged. No new env values or dependencies are needed.
 
 ## T17 live integration dependency
 
-T17 persona/interest/wallet/follow-up/answer UI passes fixture tests and browser flows. Full live verification awaits T09 price/history and T16 interest/follow-up/answer support. GitHub credential helper is configured and Lane 2 can push. No new env values are needed.
+T17 persona/interest/wallet/follow-up/answer UI passes fixture tests and browser flows. T09 and T16 backend support has landed and passed real OpenAI+Supabase HTTP checks; Lane2 full live verification remains part of its demo pass. GitHub credential helper is configured and Lane 2 can push. No new env values are needed.
 
 ## T12 live integration dependency
 
-Seller UI, preview/apply/reload/undo, live strip and Notify me are implemented and fixture-tested. Live verification requires Lane 1 T05/T06/T07 seller insights/enrichment/watch endpoints, which are not present at this HEAD. T09 edit/history routes have landed; those earlier missing-route dependencies are resolved. No env or package changes are needed.
+Seller UI, preview/apply/reload/undo, live strip and Notify me are implemented and fixture-tested. T05 seller insights is now implemented and verified against the seeded DB. Live enrichment/watch verification still requires T06/T07, which remain outside this run. T09 edit/history routes have landed; those earlier missing-route dependencies are resolved. No env or package changes are needed.
 
 ## T13 — blocked before live demo pass (Lane 2, full)
 
 After pushing T17 and T12, `git pull --rebase` is up to date at 885a684. Ticket 13 explicitly requires T06 and a real deployed DB/LLM demo; this checkout has no `/api/seller/insights` or `/api/seller/enrichment/{preview,apply,undo}` routes (T05/T06), so Beats 3–4 cannot run. The T16 backend for personalised interests/follow-up/answer turns is also not present yet, preventing the full judge-proofing pass. T12 fixture replay is not evidence for this live acceptance. Per AGENTS.md, stop on missing dependencies. Resume at T13 after Lane 1 pushes T05/T06/T16 (and T07 for Notify me); then T14, then T20b after T20a. Do not mark these tickets or Lane 2 complete. No env change is needed.
+
+## Backend dependency update after T09/T16/T05
+
+T09 edit/history, T16 personalization/answer turns and T05 seller insights are implemented and verified (see CODEX_LOG.md). The T13 historical blocker above describes its earlier checkout; its remaining missing backend dependencies are T06 enrichment and T07 Notify me (and later T20a for T20b). No active blocker applies to this run’s requested T09/T16/T05 tickets. No env values changed.

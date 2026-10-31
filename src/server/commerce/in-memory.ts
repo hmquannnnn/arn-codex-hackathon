@@ -5,6 +5,7 @@ import type {
 } from '@/contract/commerce-adapter';
 import type {
   CategoryId,
+  DemandItemRow,
   KitPlan,
   PersonaId,
   Product,
@@ -26,6 +27,14 @@ import { demoTimestamp } from '@/server/today';
 
 /** Real mutable adapter for fixtures/tests. Per-instance state is deliberately not production persistence. */
 export class InMemoryAdapter implements CommerceAdapter {
+  private advice = new Map<string, { signature: string; advice: string }>();
+  async getInsightAdvice(key: string, signature: string) {
+    const row = this.advice.get(key);
+    return row?.signature === signature ? row.advice : null;
+  }
+  async saveInsightAdvice(key: string, signature: string, advice: string) {
+    this.advice.set(key, { signature, advice });
+  }
   private products = productSchema.array().parse(structuredClone(products));
   private shops = shopSchema.array().parse(structuredClone(shops));
   private vouchers = voucherSchema.array().parse(structuredClone(vouchers));
@@ -34,6 +43,13 @@ export class InMemoryAdapter implements CommerceAdapter {
     .array()
     .parse(structuredClone(demand))
     .map((row) => ({ ...row, source: 'seed' }));
+  constructor(initial: { demand?: DemandItemRow[] } = {}) {
+    if (initial.demand)
+      this.demand = demandItemRowSchema
+        .array()
+        .parse(structuredClone(initial.demand))
+        .map((row) => ({ ...row, source: 'seed' }));
+  }
   private sessions = new Map<
     string,
     { plan: KitPlan; source: 'live' | 'seed'; createdAt: string }
@@ -126,7 +142,7 @@ export class InMemoryAdapter implements CommerceAdapter {
   async recentDemandItems(limit: number) {
     return structuredClone(
       this.demand
-        .filter((d) => d.source === 'live')
+        .filter((d) => d.source === 'live' && d.matchedCount < 2)
         .reverse()
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
         .slice(0, Math.max(0, limit)),
