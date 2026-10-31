@@ -1,0 +1,320 @@
+'use client';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type {
+  BasketOption,
+  KitThreadSummary,
+  KitVersion,
+  Profile,
+  ThreadResponse,
+} from '@/contract/types';
+import type { KitApi } from '@/lib/client/kit-api';
+import type { LiveTurn } from './conversation';
+import { useCart } from '@/components/store/cart-context';
+export function useKitController({
+  api,
+  id,
+  query,
+  today,
+  onNavigate,
+}: {
+  api: KitApi;
+  id?: string;
+  query: string;
+  today: string;
+  onNavigate?: (url: string) => void;
+}) {
+  const [thread, setThread] = useState<ThreadResponse | null>(null);
+  const [history, setHistory] = useState<KitThreadSummary[]>([]);
+  const [runs, setRuns] = useState<LiveTurn[]>([]);
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(!!id);
+  const [error, setError] = useState('');
+  const [notFound, setNotFound] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sidebar, setSidebar] = useState(true);
+  const [mobile, setMobile] = useState<'chat' | 'kit'>('chat');
+  const [selectedVersion, setSelectedVersion] = useState<number>();
+  const threadId = useRef(id);
+  const token = useRef(0);
+  const active = useRef(true);
+  const inFlight = useRef(false);
+  const controller = useRef<AbortController | null>(null);
+  const started = useRef(false);
+  const cart = useCart();
+  const navigate = useCallback(
+    (url: string) => {
+      if (onNavigate) onNavigate(url);
+      else window.history.replaceState(null, '', url);
+    },
+    [onNavigate],
+  );
+  const refreshHistory = useCallback(() => {
+    api
+      .listThreads()
+      .then((result) => {
+        if (active.current) setHistory(result.threads);
+      })
+      .catch((e) => {
+        if (active.current) setError(e.message);
+      });
+  }, [api]);
+  const applyThread = useCallback(
+    (saved: ThreadResponse, completedToken?: number) => {
+      if (!active.current || saved.thread.id !== threadId.current) return;
+      setThread((previous) =>
+        previous &&
+        previous.thread.id === saved.thread.id &&
+        previous.versions.length > saved.versions.length
+          ? previous
+          : saved,
+      );
+      if (completedToken !== undefined)
+        setRuns((previous) =>
+          previous.filter((run) => run.token > completedToken),
+        );
+    },
+    [],
+  );
+  const send = useCallback(
+    async (message: string) => {
+      if (!message.trim() || inFlight.current) return;
+      inFlight.current = true;
+      setBusy(true);
+      setError('');
+      setText('');
+      setSelectedVersion(undefined);
+      const runToken = ++token.current;
+      const runId = threadId.current;
+      const abort = new AbortController();
+      controller.current = abort;
+      setRuns((old) => [
+        ...old.filter((r) => !r.error),
+        {
+          token: runToken,
+          text: message,
+          steps: [{ id: 'understand', status: 'running' }],
+          explanation: '',
+        },
+      ]);
+      const update = (fn: (run: LiveTurn) => LiveTurn) => {
+        if (active.current)
+          setRuns((old) =>
+            old.map((run) => (run.token === runToken ? fn(run) : run)),
+          );
+      };
+      try {
+        for await (const event of api.run(message, runId, abort.signal)) {
+          if (!active.current || abort.signal.aborted) return;
+          if (event.event === 'step')
+            update((run) => ({
+              ...run,
+              steps: [
+                ...run.steps.filter((s) => s.id !== event.data.id),
+                event.data,
+              ],
+            }));
+          if (event.event === 'plan') {
+            threadId.current = event.data.threadId;
+            navigate(`/kit/t/${event.data.threadId}`);
+            update((run) => ({
+              ...run,
+              version: event.data.version,
+              plan: event.data.plan,
+            }));
+          }
+          if (event.event === 'options') {
+            const options = event.data.options;
+            setLiveOptions({ token: runToken, options });
+          }
+          if (event.event === 'explanation')
+            update((run) => ({
+              ...run,
+              explanation: run.explanation + event.data.delta,
+            }));
+          if (event.event === 'clarify')
+            update((run) => ({ ...run, question: event.data.question }));
+          if (event.event === 'error')
+            update((run) => ({
+              ...run,
+              error: event.data.message,
+              complete: true,
+            }));
+          if (event.event === 'done') {
+            threadId.current = event.data.threadId;
+            update((run) => ({ ...run, complete: true }));
+            // Do not await read-back: a later turn may already be streaming when it resolves.
+            api
+              .getThread(event.data.threadId)
+              .then((saved) => applyThread(saved, runToken))
+              .catch((e) => {
+                if (active.current)
+                  setError(`Kit saved, but reload failed: ${e.message}`);
+              });
+            refreshHistory();
+          }
+        }
+      } catch (e) {
+        if (!abort.signal.aborted)
+          update((run) => ({
+            ...run,
+            complete: true,
+            error:
+              e instanceof Error
+                ? e.message
+                : 'Connection failed. Please retry.',
+          }));
+      } finally {
+        inFlight.current = false;
+        if (active.current) setBusy(false);
+      }
+    },
+    [api, applyThread, navigate, refreshHistory],
+  );
+  const [liveOptions, setLiveOptions] = useState<{
+    token: number;
+    options: BasketOption[];
+  }>();
+  useEffect(() => {
+    active.current = true;
+    refreshHistory();
+    if (id)
+      api
+        .getThread(id)
+        .then((saved) => applyThread(saved))
+        .catch((e) => {
+          if (active.current) {
+            setNotFound(e.message.includes('not found'));
+            setError(e.message);
+          }
+        })
+        .finally(() => {
+          if (active.current) setLoading(false);
+        });
+    return () => {
+      active.current = false;
+      controller.current?.abort();
+    };
+  }, [api, id, applyThread, refreshHistory]);
+  useEffect(() => {
+    if (query && !started.current) {
+      const timer = setTimeout(() => {
+        started.current = true;
+        void send(query);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [query, send]);
+  const live = runs.at(-1);
+  const streamedVersion: KitVersion | undefined = live?.plan
+    ? {
+        threadId: threadId.current || '',
+        version: live.version || 1,
+        createdAt: `${today}T00:00:00Z`,
+        kind: thread ? 'refine' : 'new',
+        userText: live.text,
+        plan: live.plan,
+        excludedKeys: [],
+        status: live.question ? 'awaiting_budget' : 'ready',
+        options: liveOptions?.token === live.token ? liveOptions.options : [],
+        explanation: live.explanation,
+        diff: null,
+        selection: null,
+        followUp: null,
+      }
+    : undefined;
+  const savedVersions = thread?.versions || [];
+  const versions = streamedVersion
+    ? [
+        ...savedVersions.filter((v) => v.version !== streamedVersion.version),
+        streamedVersion,
+      ]
+    : savedVersions;
+  const latest = versions.at(-1);
+  const version = selectedVersion
+    ? versions.find((v) => v.version === selectedVersion)
+    : latest;
+  async function adjust(change: Parameters<KitApi['adjust']>[1]) {
+    if (!threadId.current || inFlight.current) return;
+    inFlight.current = true;
+    setBusy(true);
+    setError('');
+    try {
+      const result = await api.adjust(threadId.current, change);
+      const saved = await api.getThread(threadId.current);
+      applyThread(saved);
+      setRuns([]);
+      setSelectedVersion(result.version.version);
+      refreshHistory();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unable to update kit');
+    } finally {
+      inFlight.current = false;
+      if (active.current) setBusy(false);
+    }
+  }
+  async function swap(profile: Profile, key: string, productId: string) {
+    if (!threadId.current || !latest)
+      throw new Error('Please wait for this kit to finish.');
+    const base =
+      latest.selection?.profile === profile
+        ? latest.selection
+        : { profile, picks: {}, dropped: [] };
+    const selection = { ...base, picks: { ...base.picks, [key]: productId } };
+    const { option } = await api.price(threadId.current, selection);
+    setThread((old) =>
+      old
+        ? {
+            ...old,
+            versions: old.versions.map((v) =>
+              v.version === latest.version
+                ? {
+                    ...v,
+                    selection,
+                    options: v.options.map((o) =>
+                      o.profile === profile ? option : o,
+                    ),
+                  }
+                : v,
+            ),
+          }
+        : old,
+    );
+    return option;
+  }
+  function add(option: BasketOption) {
+    option.lines.forEach((line) =>
+      cart.add({
+        product: line.product,
+        shop: line.shop,
+        quantity: line.quantity,
+      }),
+    );
+    window.location.assign('/cart');
+  }
+  return {
+    drawer,
+    setDrawer,
+    sidebar,
+    setSidebar,
+    mobile,
+    setMobile,
+    history,
+    threadId,
+    error,
+    notFound,
+    loading,
+    savedVersions,
+    runs,
+    busy,
+    send,
+    adjust,
+    text,
+    setText,
+    version,
+    versions,
+    setSelectedVersion,
+    swap,
+    add,
+  };
+}
