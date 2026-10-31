@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { ArrowUp, History, Plus, Sparkles, X } from 'lucide-react';
 import { HttpKitApi, MockKitApi, type KitApi } from '@/lib/client/kit-api';
@@ -97,6 +97,16 @@ function Workspace({
     canUndoPrice,
     add,
   } = useKitController({ api, id, query, today, onNavigate });
+  const chatScroll = useRef<HTMLDivElement>(null);
+  const pinned = useRef(true);
+  const lastRun = useRef<number | undefined>(undefined);
+  useLayoutEffect(() => {
+    const token = runs.at(-1)?.token;
+    if (token !== undefined && token !== lastRun.current) pinned.current = true;
+    lastRun.current = token;
+    const node = chatScroll.current;
+    if (node && pinned.current) node.scrollTop = node.scrollHeight;
+  }, [runs, savedVersions, messages, actions, loading, mobile]);
   return (
     <div className="flex h-dvh flex-col bg-white">
       <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-5 py-4">
@@ -202,7 +212,14 @@ function Workspace({
           aria-label="Chat"
           className={`${mobile === 'chat' ? 'flex' : 'hidden'} min-w-0 flex-1 flex-col md:flex`}
         >
-          <div className="flex-1 overflow-y-auto p-5 lg:p-8">
+          <div
+            ref={chatScroll}
+            onScroll={(event) => {
+              const node = event.currentTarget;
+              pinned.current = node.scrollHeight - node.scrollTop - node.clientHeight <= 64;
+            }}
+            className="flex-1 overflow-y-auto p-5 lg:p-8"
+          >
             {loading && (
               <p role="status" className="text-sm text-slate-500">
                 Loading your kit…

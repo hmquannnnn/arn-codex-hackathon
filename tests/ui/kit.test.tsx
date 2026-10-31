@@ -209,3 +209,48 @@ it('renders named refine diff chips from server keys after removal and on reload
     screen.getByText(`Removed: ${removed.needLabel}`, { exact: true }),
   ).toBeTruthy();
 });
+
+it('F1 reload and new turns scroll to the newest content, but manual scroll-up survives incoming updates', async () => {
+  const api = new MockKitApi(0);
+  for await (const e of api.run('School budget 1M')) void e;
+  const id = (await api.listThreads()).threads[0].id;
+  const get = api.getThread.bind(api);
+  let release!: () => void;
+  api.getThread = async (key) => {
+    const result = await get(key);
+    await new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    return result;
+  };
+  render(<KitScreen api={api} id={id} />);
+  const chat = screen.getByRole('region', { name: 'Chat' })
+    .firstElementChild as HTMLElement;
+  Object.defineProperties(chat, {
+    scrollHeight: { configurable: true, value: 2000 },
+    clientHeight: { configurable: true, value: 300 },
+  });
+  await waitFor(() => expect(release).toBeTruthy());
+  release();
+  await screen.findByLabelText('Kit version');
+  expect(chat.scrollTop).toBeGreaterThanOrEqual(1700);
+  const run = api.run.bind(api);
+  let resume!: () => void;
+  api.run = async function* (...args) {
+    await new Promise<void>((resolve) => {
+      resume = resolve;
+    });
+    yield* run(...args);
+  };
+  fireEvent.change(screen.getByLabelText('Message Kitly'), {
+    target: { value: 'Is this waterproof?' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+  await waitFor(() => expect(resume).toBeTruthy());
+  chat.scrollTop = 50;
+  fireEvent.scroll(chat);
+  api.getThread = get;
+  resume();
+  await screen.findByText(/The description mentions S-shaped straps/);
+  expect(chat.scrollTop).toBe(50);
+});

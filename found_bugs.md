@@ -84,7 +84,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 - Expected: show a correctly computed minimum and meaningful drivers, or avoid calling the selected total a minimum.
   Ticket 11 requires the over-budget warning's minimum cost and drivers.
 - Regression seams: S9 pricing plus BudgetWarning UI; assert the meaning of the minimum, not just total/Fit arithmetic.
-- Status: open
+- Status: fixed in 8440bbe
 
 ## Lane 2 (frontend)
 
