@@ -22,7 +22,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 - Expected (kit/DEMO.md Beat 3.5, ticket 06): title = original title + suffix; added tags include `anti-hunchback` and
   usually `lightweight`, `waterproof`, `grade-1` when supported by the product's description/attributes (never invent
   unsupported tags); a short appended description backed by the evidence quote.
-- Status: open
+- Status: fixed in be5d42c
 
 ### B3 — "Needed with" shows 100% for every category on every card
 - Repro: Seller Centre, any gap card → "Needed with Notebooks · 100%, Pencil case · 100%, Pencils pens · 100%,

@@ -87,13 +87,17 @@ export function generateDemand(products: Product[], today: string): SeedDemand {
           event === 'back_to_school'
             ? [
                 'school-backpack',
-                'water-bottle',
+                index % 5 === 3 ? 'uniform-shirt' : 'water-bottle',
                 index % 4 === 0 ? 'school-shoes' : 'lunch-box',
-                'kids-raincoat',
-                'kids-desk-lamp',
-                'notebooks',
-                'pencils-pens',
-                'pencil-case',
+                index < forced[1].counts[week] || index % 3 === 0
+                  ? 'kids-raincoat'
+                  : 'book-covers',
+                index < forced[2].counts[week] || index % 4 === 0
+                  ? 'kids-desk-lamp'
+                  : 'crayons-paints',
+                index % 3 === 1 ? 'book-covers' : 'notebooks',
+                index % 4 === 2 ? 'crayons-paints' : 'pencils-pens',
+                index % 5 === 4 ? 'uniform-shirt' : 'pencil-case',
               ].map((id) => categories.find((c) => c.id === id)!)
             : Array.from(
                 { length: 6 + (index % 3) },

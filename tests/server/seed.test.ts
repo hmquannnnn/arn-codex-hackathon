@@ -296,3 +296,42 @@ it('keeps an affordable express hero kit and exactly one closest backpack', () =
   );
   expect(subtotal + shipping).toBeLessThanOrEqual(1500000);
 });
+
+it('B3 seller companion shares reflect varied seeded sessions while forced gap counts remain intact', async () => {
+  const { aggregateDemand } = await import('@/server/insights/aggregate');
+  const world = buildCatalog([], '2026-09-02');
+  const history = generateDemand(world.products, '2026-09-02');
+  const result = aggregateDemand(history.demandItems, {
+    today: '2026-09-02',
+    thisWeekFrom: '2026-08-27',
+    lastWeekFrom: '2026-08-20',
+  });
+  for (const [key, count] of [
+    ['school-backpack|anti-hunchback', 37],
+    ['kids-raincoat|backpack-cover', 52],
+    ['kids-desk-lamp|anti-blue-light', 18],
+  ] as const) {
+    const gap = result.gaps.find((g) => g.key === key)!;
+    expect(gap.thisWeek).toBe(count);
+    expect(gap.neededWith.some((n) => n.share > 0 && n.share < 1)).toBe(true);
+    const sessions = new Set(
+      history.demandItems
+        .filter(
+          (r) =>
+            r.createdAt >= '2026-08-27' &&
+            `${r.category}|${r.tags.join(',')}` === key,
+        )
+        .map((r) => r.sessionId),
+    );
+    const bottleSessions = new Set(
+      history.demandItems
+        .filter(
+          (r) => sessions.has(r.sessionId) && r.category === 'water-bottle',
+        )
+        .map((r) => r.sessionId),
+    );
+    expect(
+      gap.neededWith.find((n) => n.category === 'water-bottle')?.share,
+    ).toBe(bottleSessions.size / count);
+  }
+});
