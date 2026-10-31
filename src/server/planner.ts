@@ -33,7 +33,10 @@ Vietnamese input → language vi; otherwise follow the buyer's language.
 Use null when no category fits, never force one. Categories: ${CATEGORY_IDS.join(', ')}.
 Use only canonical tags: ${canonicalTags.join(', ')}.
 For every event, including other (a wedding, a puppy, learning guitar), list the full kit: 5–10 items, category null for each item no category fits; never an empty or one-item plan.
+A Grade 1 starter kit has 8–10 items: backpack, notebooks, pencils/pens, pencil case, crayons, water bottle, lunch box, uniform and optionally school shoes/book covers. Include the full list before optimization, even with a tiny budget.
 Be consistent: the same sentence must give the same plan. Still list the full kit — for tet_gifts 5–8 gift items.
+Decide required from the buyer's need, independently of the budget. Never mark an essential item optional just to fit the budget; the optimizer reports the minimum cost and fit suggestions when essentials exceed it.
+For a Grade 1 starter kit, backpack, notebooks, pencils/pens and uniform are required unless the buyer says they already own them or school supplies them. Keep these essentials even for 'Grade 1, budget 200k'. Other useful extras may be optional. A budget-only refinement must preserve required flags; explicit ownership/removal overrides these defaults.
 Use mustHaveTags only for attributes the buyer explicitly stated for that exact item. Grade, children, budget and gift context are nice-to-have, not filters on unrelated items.
 For 'My kid starts Grade 1. Budget 1.5M VND. The backpack must be anti-hunchback, under 400k.', only the backpack has mustHaveTags [anti-hunchback], maxUnitPrice 400000; all other items have no must-have tags.
 Every set/pack item (book covers, pens, notebooks sets, crayons, wipes, diapers) has quantity 1 for one pack. Quantity > 1 only when the buyer explicitly asks, or for rotation clothing (uniform = 2).

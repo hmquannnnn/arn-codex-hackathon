@@ -63,6 +63,7 @@ it('normalizes context tags, quantities and old deadlines while prompting item-s
     'Vietnamese input',
     '5–10',
     'tet_gifts',
+    'Grade 1 starter kit has 8–10 items',
     '5–8',
   ])
     expect(prompt).toContain(required);
@@ -283,4 +284,18 @@ it('honors deliberate sparse refinements and excludes uncovered needs by key wit
   );
   expect(result.plan.items.map((item) => item.key)).toEqual(['pet-1']);
   expect(fake.calls).toHaveLength(1);
+});
+
+it('keeps essential needs independent of the spending limit in both initial and refine prompts', async () => {
+  const fake = new FakeLLM([plan(), { ...plan(), intent: 'change_kit' }]);
+  await planNeed(fake, 'Grade 1, budget 200k');
+  await refineNeed(fake, plan(), 'Cut the budget to 200k', []);
+  for (const call of fake.calls) {
+    const prompt = call.messages[0].content;
+    expect(prompt).toContain(
+      'Never mark an essential item optional just to fit the budget',
+    );
+    expect(prompt).toContain('backpack, notebooks, pencils/pens and uniform');
+    expect(prompt).toContain('optimizer reports the minimum cost');
+  }
 });
