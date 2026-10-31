@@ -2,7 +2,13 @@
 import type { Gap, InsightsResponse } from '@/contract/types';
 import { categories } from '@/contract/taxonomy';
 import { money } from '@/lib/client/store';
-export function LiveStrip({ recent }: { recent: InsightsResponse['recent'] }) {
+export function LiveStrip({
+  recent,
+  today,
+}: {
+  recent: InsightsResponse['recent'];
+  today: string;
+}) {
   return (
     <section className="rounded-2xl border bg-white p-5">
       <h2 className="font-semibold">Just searched (live)</h2>
@@ -22,7 +28,7 @@ export function LiveStrip({ recent }: { recent: InsightsResponse['recent'] }) {
               >
                 <p className="font-semibold">{item.needLabel}</p>
                 <p className="mt-1">
-                  {relativeTime(item.createdAt)}
+                  {relativeTime(item.createdAt, today)}
                   {item.category === null && (
                     <>
                       {' '}
@@ -37,11 +43,10 @@ export function LiveStrip({ recent }: { recent: InsightsResponse['recent'] }) {
     </section>
   );
 }
-function relativeTime(date: string) {
-  const minutes = Math.max(
-    0,
-    Math.floor((Date.now() - Date.parse(date)) / 60000),
-  );
+function relativeTime(date: string, today: string) {
+  // Live demand uses the demo day with the current UTC time of day.
+  const now = Date.parse(`${today}T${new Date().toISOString().split('T')[1]}`);
+  const minutes = Math.max(0, Math.floor((now - Date.parse(date)) / 60000));
   return minutes < 1
     ? 'Just now'
     : minutes < 60

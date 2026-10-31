@@ -208,7 +208,7 @@ export function SellerScreen({
         ) : (
           data && (
             <>
-              <LiveStrip recent={data.recent} />
+              <LiveStrip recent={data.recent} today={data.window.today} />
               <div className="grid gap-3 sm:grid-cols-3">
                 {[
                   ['Unmet needs this week', unmet],

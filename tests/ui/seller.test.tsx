@@ -1,4 +1,4 @@
-import { afterEach, expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 import {
   cleanup,
   fireEvent,
@@ -13,6 +13,7 @@ import { SellerScreen } from '@/components/seller/screen';
 import { NotifyButton } from '@/components/kit/notify-button';
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
   localStorage.clear();
 });
 it('live strip is newest first and has an honest empty state', () => {
@@ -32,13 +33,13 @@ it('live strip is newest first and has an honest empty state', () => {
       createdAt: '2026-09-02T08:01:00Z',
     },
   ];
-  render(<LiveStrip recent={recent} />);
+  render(<LiveStrip recent={recent} today="2026-09-02" />);
   expect(
     screen.getAllByTestId('recent-need').map((n) => n.textContent),
   ).toEqual([expect.stringContaining('New'), expect.stringContaining('Old')]);
   expect(screen.getByText('Not in catalog')).toBeTruthy();
   cleanup();
-  render(<LiveStrip recent={[]} />);
+  render(<LiveStrip recent={[]} today="2026-09-02" />);
   expect(screen.getByText('No live searches yet — try Kitly')).toBeTruthy();
 });
 it('preview shows added/kept changes and original keyword checks', async () => {
@@ -135,4 +136,36 @@ it('offers a direct Back to buyer route from Seller Centre', async () => {
     screen.getByRole('link', { name: 'Back to buyer' }).getAttribute('href'),
   ).toBe('/kit');
   await screen.findByRole('button', { name: 'Preview fix' });
+});
+
+it('dates live searches against the API demo day while preserving UTC time of day', () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-10-31T12:34:00Z'));
+  const recent = [
+    {
+      needLabel: 'Just searched backpack',
+      category: 'school-backpack',
+      tags: [],
+      event: 'back_to_school' as const,
+      createdAt: '2026-09-02T12:33:40Z',
+    },
+    {
+      needLabel: 'Earlier backpack',
+      category: 'school-backpack',
+      tags: [],
+      event: 'back_to_school' as const,
+      createdAt: '2026-09-02T12:31:00Z',
+    },
+    {
+      needLabel: 'Yesterday backpack',
+      category: 'school-backpack',
+      tags: [],
+      event: 'back_to_school' as const,
+      createdAt: '2026-09-01T12:34:00Z',
+    },
+  ];
+  render(<LiveStrip recent={recent} today="2026-09-02" />);
+  expect(screen.getByText('Just now')).toBeTruthy();
+  expect(screen.getByText('3 min ago')).toBeTruthy();
+  expect(screen.getByText('1 days ago')).toBeTruthy();
 });
