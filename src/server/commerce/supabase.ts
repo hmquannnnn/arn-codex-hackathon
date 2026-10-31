@@ -31,6 +31,27 @@ function contractRow(row: Record<string, unknown>) {
 export class SupabaseAdapter implements CommerceAdapter {
   constructor(private readonly db = createDb()) {}
 
+  async addDemandWatch(gapKey: string) {
+    const { error } = await this.db
+      .from('demand_watches')
+      .insert({ gap_key: gapKey });
+    if (error) throw error;
+    return (await this.demandWatchCounts([gapKey]))[gapKey];
+  }
+  async demandWatchCounts(gapKeys: string[]): Promise<Record<string, number>> {
+    return Object.fromEntries(
+      await Promise.all(
+        [...new Set(gapKeys)].map(async (key) => {
+          const { count, error } = await this.db
+            .from('demand_watches')
+            .select('id', { count: 'exact', head: true })
+            .eq('gap_key', key);
+          if (error) throw error;
+          return [key, count ?? 0];
+        }),
+      ),
+    );
+  }
   async getInsightAdvice(key: string, signature: string) {
     const { data, error } = await this.db
       .from('insight_advice')

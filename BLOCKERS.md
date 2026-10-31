@@ -37,3 +37,7 @@ T09 edit/history, T16 personalization/answer turns and T05 seller insights are i
 ## T06 backend dependency update
 
 T06 enrichment preview/apply/undo is implemented and verified through real-model/DB production HTTP, including durable insights `appliedFix` and exact Undo restoration. Migration `0004_enrichment_apply.sql` was applied alone to the configured schema, preserving data. Apply is atomic across instances. T13's remaining missing route dependency is T07 Notify me; T20b still awaits T20a. No env values changed.
+
+## T07 backend dependency update
+
+T07 Notify me is implemented and verified through production HTTP against the configured DB; insights include persisted watchers. T13's previously missing T05/T06/T07/T09/T16 backend routes are now present. Lane 2 can resume its live demo pass. T20b still awaits T20a; no env changes required.

@@ -1,3 +1,4 @@
+import type { DemandWatches } from '@/server/demand/watch';
 import type { CommerceAdapter } from '@/contract/commerce-adapter';
 import type { InsightAdviceCache } from '@/server/commerce/advice-cache';
 import type { InsightsResponse } from '@/contract/types';
@@ -8,7 +9,7 @@ import { HttpError } from '@/server/http';
 import { aggregateDemand, gapKey } from './aggregate';
 import { classifyAndAdvise } from './classify';
 export interface InsightDeps {
-  adapter: CommerceAdapter;
+  adapter: CommerceAdapter & DemandWatches;
   cache: InsightAdviceCache;
   llm: LLM;
 }
@@ -45,9 +46,13 @@ export async function getInsights(
       b.thisWeek - a.thisWeek ||
       a.key.localeCompare(b.key),
   );
+  const visible = classified.slice(0, 8);
+  const watchers = await deps.adapter.demandWatchCounts(
+    visible.map((g) => g.key),
+  );
   return {
     window,
-    gaps: classified.slice(0, 8),
+    gaps: visible.map((g) => ({ ...g, watchers: watchers[g.key] ?? 0 })),
     combos,
     topNeeds,
     recent: recent

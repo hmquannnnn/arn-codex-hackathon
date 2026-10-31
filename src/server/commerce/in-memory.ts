@@ -29,6 +29,17 @@ import { demoTimestamp } from '@/server/today';
 
 /** Real mutable adapter for fixtures/tests. Per-instance state is deliberately not production persistence. */
 export class InMemoryAdapter implements CommerceAdapter {
+  private watches = new Map<string, number>();
+  async addDemandWatch(gapKey: string) {
+    const count = (this.watches.get(gapKey) ?? 0) + 1;
+    this.watches.set(gapKey, count);
+    return count;
+  }
+  async demandWatchCounts(gapKeys: string[]) {
+    return Object.fromEntries(
+      gapKeys.map((key) => [key, this.watches.get(key) ?? 0]),
+    );
+  }
   private advice = new Map<string, { signature: string; advice: string }>();
   async getInsightAdvice(key: string, signature: string) {
     const row = this.advice.get(key);
