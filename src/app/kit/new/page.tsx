@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { KitScreen } from '@/components/kit/screen';
 import { today } from '@/server/today';
 export const dynamic = 'force-dynamic';
@@ -7,11 +8,7 @@ export default async function NewKit({
   searchParams: Promise<{ q?: string; source?: string }>;
 }) {
   const { q, source } = await searchParams;
-  return (
-    <KitScreen
-      query={q}
-      initialSource={source === 'cart_only' ? 'cart_only' : 'catalog'}
-      today={today()}
-    />
-  );
+  if (source === 'cart_only')
+    redirect(`/cart/kit/new${q ? `?q=${encodeURIComponent(q)}` : ''}`);
+  return <KitScreen query={q} today={today()} />;
 }

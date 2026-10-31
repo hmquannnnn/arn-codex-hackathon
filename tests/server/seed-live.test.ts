@@ -90,12 +90,23 @@ describe.skipIf(!process.env.SUPABASE_URL)('seeded Supabase catalog', () => {
         .map((p) => p.id),
     ).toEqual(['prod-minhan-backpack']);
     const today = process.env.DEMO_TODAY || '2026-09-02';
-    expect(lan.cart).toEqual([
-      {
-        productId: 'prod-kidzone-lite-backpack',
-        addedAt: seedDate(today, -14),
-      },
-    ]);
+    // The live buyer can save more products; seed.test.ts verifies the exact initial cart.
+    expect(lan.cart).toEqual(
+      expect.arrayContaining([
+        {
+          productId: 'prod-kidzone-lite-backpack',
+          addedAt: seedDate(today, -14),
+        },
+      ]),
+    );
+    expect(new Set(lan.cart.map((line) => line.productId)).size).toBe(
+      lan.cart.length,
+    );
+    expect(
+      lan.cart.every((line) =>
+        products.some((product) => product.id === line.productId),
+      ),
+    ).toBe(true);
     expect(vouchers.filter((v) => v.ownerPersona === null)).toHaveLength(8);
     expect(vouchers.filter((v) => v.ownerPersona === 'lan')).toHaveLength(2);
     expect(vouchers.find((v) => v.code === 'LAN-BTS10')?.validUntil).toBe(

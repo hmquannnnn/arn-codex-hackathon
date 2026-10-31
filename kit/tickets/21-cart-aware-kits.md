@@ -36,3 +36,23 @@ Sources: CART_FLOW_TASK.md, SCORING.md. Existing scoring/profile objectives rema
   spoken keep, reload, confirmation without duplicate quantities, selected-only checkout and leftovers.
 - No schema migration, seed, environment-file edit or external database reset. Test server stopped; port 3211 free.
 - Existing scoring objectives retained; same-shop alternatives are available for cart-aware requests.
+
+## Approved follow-up — dedicated cart flow
+
+User approved the diagnostic plan: dedicated `/cart/kit/new` and `/cart/kit/t/:id` screens;
+fixed cart-only sourcing, cart-focused introduction/review; `Use selected items` applies purchase quantities
+without changing saved cart lines. Catalog search retains `Add kit to cart` and merges missing products.
+Legacy cart-only entry and history links resolve to the dedicated flow. Cancel leaves cart/selection unchanged.
+Show a confirmation on return, guard against changed/missing saved quantities, and test both flows end to end.
+
+### Follow-up verification — completed
+
+- Dedicated cart routes and fixed-source introduction; purchase rows, alternatives, saved leftovers and missing needs.
+- Cart-only confirmation does not write cart contents. It validates current local storage against snapshot quantities,
+  including changes from another tab, before saving the purchase selection and returning with a confirmation notice.
+- Generic discovery retains add/merge semantics. Legacy entry and wrong-experience thread links redirect by persisted source.
+- `npm test -- --maxWorkers=2`: 265 passed, 10 opt-in skipped. Production build passed; real-model eval 13/13.
+- Six production Playwright cases passed with memory adapter + real model: desktop entry/cancel, mobile handoff/empty cart,
+  catalog add, selected checkout, empty-selection reload, and cart kit creation/swap/budget/history/reload/stale guard/leftovers.
+- Live catalog verification now allows the nine valid products explicitly requested in Lan's saved cart; the offline seed
+  generator test still verifies the exact initial seed. No reset, seed, schema change or environment-file edit.

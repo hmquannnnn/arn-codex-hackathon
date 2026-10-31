@@ -6,6 +6,8 @@ import { HttpKitApi, MockKitApi, type KitApi } from '@/lib/client/kit-api';
 import { relativeDate } from '@/lib/client/kit-text';
 import { Conversation } from './conversation';
 import { useKitController } from './use-kit-controller';
+import { kitThreadPath } from '@/lib/client/cart-flow';
+import { CartKitIntro } from './cart-intro';
 import { CartKitSetup } from './cart-setup';
 import { KitPanel } from './panel';
 import { PersonaChip } from '@/components/persona-chip';
@@ -18,7 +20,10 @@ const examples = [
   'Set up a home office, budget 4M.',
   'Tet gifts for my family, budget 2M.',
 ];
-export function KitScreen({
+export function KitScreen(props: Parameters<typeof KitWorkspace>[0]) {
+  return <KitWorkspace {...props} initialSource="catalog" />;
+}
+export function KitWorkspace({
   api: supplied,
   id,
   query = '',
@@ -110,6 +115,8 @@ function Workspace({
     canUndoPrice,
     add,
   } = useKitController({ api, id, query, initialSource, today, onNavigate });
+  const cartMode = initialSource === 'cart_only';
+  const newKitPath = cartMode ? '/cart/kit/new' : '/kit/new';
   const chatScroll = useRef<HTMLDivElement>(null);
   const pinned = useRef(true);
   const lastRun = useRef<number | undefined>(undefined);
@@ -121,7 +128,9 @@ function Workspace({
     if (node && pinned.current) node.scrollTop = node.scrollHeight;
   }, [runs, savedVersions, messages, actions, loading, mobile]);
   return (
-    <div className="flex h-dvh flex-col bg-white">
+    <div
+      className={`flex flex-col bg-white ${cartMode ? 'h-[80dvh] min-h-[600px] overflow-hidden rounded-2xl border' : 'h-dvh'}`}
+    >
       <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-5 py-4">
         <div className="flex items-center gap-3">
           <button
@@ -135,11 +144,11 @@ function Workspace({
             <History size={19} />
           </button>
           <Link
-            href="/kit/new"
+            href={newKitPath}
             className="flex items-center gap-2 text-lg font-bold"
           >
             <Sparkles size={21} className="text-accent" />
-            Kitly
+            {cartMode ? 'Cart kit' : 'Kitly'}
           </Link>
           {process.env.NEXT_PUBLIC_KITLY_MOCK === '1' && (
             <span className="rounded-full bg-orange-50 px-2 py-1 text-[10px] text-orange-700">
@@ -147,14 +156,19 @@ function Workspace({
             </span>
           )}
         </div>
-        <PersonaChip
-          api={api}
-          insideKit
-          onChange={setPersona}
-          onPendingChange={setPersonaBusy}
-        />
-        <Link href="/" className="text-xs text-slate-500">
-          ← Back to DemoMart
+        {!cartMode && (
+          <PersonaChip
+            api={api}
+            insideKit
+            onChange={setPersona}
+            onPendingChange={setPersonaBusy}
+          />
+        )}
+        <Link
+          href={cartMode ? '/cart' : '/'}
+          className="text-xs text-slate-500"
+        >
+          {cartMode ? '← Back to cart' : '← Back to DemoMart'}
         </Link>
       </header>
       <div className="flex border-b md:hidden">
@@ -187,7 +201,7 @@ function Workspace({
         >
           <div className="mb-5 flex items-center justify-between">
             <a
-              href="/kit/new"
+              href={newKitPath}
               className="flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-sm font-semibold"
             >
               <Plus size={16} />
@@ -214,7 +228,10 @@ function Workspace({
                   : h.versionCount;
               return (
                 <a
-                  href={`/kit/t/${h.id}`}
+                  href={kitThreadPath(
+                    h.id,
+                    h.id === threadId.current ? initialSource : 'catalog',
+                  )}
                   key={h.id}
                   className={`block rounded-xl p-3 ${h.id === threadId.current ? 'bg-orange-100' : 'hover:bg-slate-100'}`}
                 >
@@ -260,42 +277,57 @@ function Workspace({
                   ? 'Kit not found. It may belong to another browser.'
                   : error}
                 {notFound && (
-                  <a href="/kit/new" className="ml-2 underline">
+                  <a href={newKitPath} className="ml-2 underline">
                     New kit
                   </a>
                 )}
               </div>
             )}
-            {!savedVersions.length && !runs.length && !loading && !id && (
-              <div className="mx-auto max-w-lg py-8">
-                <Sparkles className="text-accent" size={32} />
-                <h1 className="mt-5 text-3xl font-bold">
-                  What are you getting ready for?
-                </h1>
-                <p className="mt-4 text-sm leading-6 text-slate-500">
-                  Tell me your plan, budget and what matters most. I’ll bring
-                  everything together.
-                </p>
-                <div className="mt-6 grid gap-2">
-                  {examples.map((example) => (
-                    <button
-                      key={example}
-                      disabled={busy}
-                      onClick={() => void send(example)}
-                      className="rounded-xl border p-3 text-left text-xs leading-5 hover:border-orange-300"
-                    >
-                      {example}
-                    </button>
-                  ))}
+            {!savedVersions.length &&
+              !runs.length &&
+              !loading &&
+              !id &&
+              !cartMode && (
+                <div className="mx-auto max-w-lg py-8">
+                  <Sparkles className="text-accent" size={32} />
+                  <h1 className="mt-5 text-3xl font-bold">
+                    What are you getting ready for?
+                  </h1>
+                  <p className="mt-4 text-sm leading-6 text-slate-500">
+                    Tell me your plan, budget and what matters most. I’ll bring
+                    everything together.
+                  </p>
+                  <div className="mt-6 grid gap-2">
+                    {examples.map((example) => (
+                      <button
+                        key={example}
+                        disabled={busy}
+                        onClick={() => void send(example)}
+                        className="rounded-xl border p-3 text-left text-xs leading-5 hover:border-orange-300"
+                      >
+                        {example}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+            {!threadId.current && !busy && cartMode && !loading && (
+              <CartKitIntro
+                lines={cart.lines}
+                keepProductIds={keepProductIds}
+                onKeep={setKeepProductIds}
+              />
             )}
-            {!threadId.current && !busy && (
+            {!threadId.current && !busy && !cartMode && (
               <CartKitSetup
                 lines={cart.lines}
                 source={source}
                 keepProductIds={keepProductIds}
-                onSource={setSource}
+                onSource={(source) => {
+                  if (source === 'cart_only')
+                    window.location.assign('/cart/kit/new');
+                  else setSource(source);
+                }}
                 onKeep={setKeepProductIds}
               />
             )}
@@ -327,7 +359,9 @@ function Workspace({
                 placeholder={
                   threadId.current
                     ? 'Tell Kitly what to change…'
-                    : 'Describe your need. What’s your budget?'
+                    : cartMode
+                      ? 'What would you like to buy from your cart? What’s your budget?'
+                      : 'Describe your need. What’s your budget?'
                 }
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -341,13 +375,24 @@ function Workspace({
                     void send(text);
                   }
                 }}
-                disabled={busy || loading || notFound}
+                disabled={
+                  busy ||
+                  loading ||
+                  notFound ||
+                  (cartMode && !cart.lines.length)
+                }
                 rows={2}
                 className="min-w-0 flex-1 resize-none bg-transparent px-2 py-1 text-sm outline-none"
               />
               <button
                 aria-label="Send message"
-                disabled={busy || loading || notFound || !text.trim()}
+                disabled={
+                  busy ||
+                  loading ||
+                  notFound ||
+                  !text.trim() ||
+                  (cartMode && !cart.lines.length)
+                }
                 className="rounded-xl bg-accent p-3 text-white disabled:opacity-30"
               >
                 <ArrowUp size={18} />
@@ -364,6 +409,7 @@ function Workspace({
         >
           <KitPanel
             version={version}
+            cartLines={cart.lines}
             onProfileChange={setVisibleProfile}
             versions={versions}
             busy={busy}

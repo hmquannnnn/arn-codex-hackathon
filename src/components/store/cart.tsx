@@ -12,6 +12,15 @@ export function Cart() {
   const [selection, setSelection] = useState<Record<string, number> | null>(
     null,
   );
+  const [notice, setNotice] = useState('');
+  useEffect(() => {
+    const count = Number(sessionStorage.getItem('kitly-cart-notice'));
+    if (Number.isInteger(count) && count > 0 && count <= 100)
+      setNotice(
+        `Selected ${count} ${count === 1 ? 'item' : 'items'} for this purchase. Other products stay saved.`,
+      );
+    sessionStorage.removeItem('kitly-cart-notice');
+  }, []);
   const [quote, setQuote] = useState<BasketOption>();
   const [quoting, setQuoting] = useState(false);
   useEffect(() => {
@@ -100,9 +109,17 @@ export function Cart() {
   return (
     <div>
       <h1 className="mb-6 text-3xl font-bold">Your cart</h1>
+      {notice && (
+        <p
+          role="status"
+          className="mb-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800"
+        >
+          {notice}
+        </p>
+      )}
       {!!lines.length && (
         <Link
-          href="/kit/new?source=cart_only"
+          href="/cart/kit/new"
           className="mb-5 inline-block rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 font-semibold text-accent"
         >
           Build a kit from my cart

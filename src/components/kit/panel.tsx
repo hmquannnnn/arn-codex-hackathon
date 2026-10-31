@@ -20,6 +20,8 @@ import { InlineEdit } from './inline-edit';
 import { BudgetWarning } from './budget-warning';
 import { NotifyButton } from './notify-button';
 import { InterestCard } from './interest-card';
+import type { CartLine } from '@/lib/client/store';
+import { CartKitReview } from './cart-review';
 import { BasketRows } from './basket-rows';
 const meanings = {
   saver: 'lowest total',
@@ -28,6 +30,7 @@ const meanings = {
 };
 export function KitPanel({
   version,
+  cartLines = [],
   versions,
   onVersion,
   onProfileChange,
@@ -44,6 +47,7 @@ export function KitPanel({
   busy = false,
 }: {
   version?: KitVersion;
+  cartLines?: CartLine[];
   versions: KitVersion[];
   onVersion: (n: number) => void;
   onProfileChange?: (profile: Profile) => void;
@@ -421,6 +425,9 @@ export function KitPanel({
               void reprice(() => onSwap(option.profile, key, id))
             }
           />
+          {version.plan.shopping?.source === 'cart_only' && (
+            <CartKitReview lines={cartLines} option={option} />
+          )}
           {option.noMatch.some((g) => !g.closest) && (
             <details className="rounded-xl border bg-slate-50 p-4">
               <summary className="cursor-pointer text-sm font-semibold">
@@ -526,9 +533,11 @@ export function KitPanel({
             onClick={() => onAdd(option)}
             className="w-full rounded-xl bg-accent py-3 text-sm font-bold text-white disabled:opacity-40"
           >
-            {option.status === 'over_budget'
-              ? `Add kit to cart (over budget by ${money(option.overBy ?? Math.max(0, option.grandTotal - (version.plan.budget ?? option.grandTotal)))})`
-              : 'Add kit to cart'}
+            {version.plan.shopping?.source === 'cart_only'
+              ? 'Use selected items'
+              : option.status === 'over_budget'
+                ? `Add kit to cart (over budget by ${money(option.overBy ?? Math.max(0, option.grandTotal - (version.plan.budget ?? option.grandTotal)))})`
+                : 'Add kit to cart'}
           </button>
         </>
       )}

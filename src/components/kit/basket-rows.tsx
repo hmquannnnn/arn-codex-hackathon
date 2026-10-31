@@ -27,7 +27,10 @@ export function BasketRows({
       className="divide-y rounded-xl border bg-white"
     >
       <h2 className="px-4 py-3 text-sm font-bold">
-        Basket · {option.lines.length} items
+        {version.plan.shopping?.source === 'cart_only'
+          ? 'Items to buy'
+          : 'Basket'}{' '}
+        · {option.lines.length} items
       </h2>
       {option.lines.map((line) => (
         <div key={line.itemKey} className="p-4">

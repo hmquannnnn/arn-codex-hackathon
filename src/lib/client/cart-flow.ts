@@ -54,3 +54,40 @@ export function kitPurchases(kit: CartLine[]) {
     );
   return [...amounts].map(([productId, quantity]) => ({ productId, quantity }));
 }
+
+export function kitThreadPath(
+  id: string,
+  source: 'catalog' | 'cart_only' = 'catalog',
+) {
+  return `${source === 'cart_only' ? '/cart/kit/t' : '/kit/t'}/${encodeURIComponent(id)}`;
+}
+
+/** Cart-only confirmation selects an existing subset; only catalog discovery merges new lines. */
+export function confirmKit(
+  current: CartLine[],
+  kit: CartLine[],
+  shopping?: import('@/contract/types').KitPlan['shopping'],
+) {
+  const purchases = kitPurchases(kit);
+  if (shopping?.source === 'cart_only') {
+    for (const purchase of purchases) {
+      const saved = shopping.cart.find(
+        (line) => line.productId === purchase.productId,
+      );
+      if (!saved || saved.quantity < purchase.quantity)
+        throw new Error('Selection exceeds the saved cart. Build a new kit.');
+      const present = current.find(
+        (line) => line.product.id === purchase.productId,
+      );
+      if (
+        !present ||
+        Math.min(present.quantity, present.product.stock) < purchase.quantity
+      )
+        throw new Error(
+          'Your cart has changed. Review it and build a new kit.',
+        );
+    }
+    return { cart: current, purchases };
+  }
+  return { cart: mergeKit(current, kit), purchases };
+}

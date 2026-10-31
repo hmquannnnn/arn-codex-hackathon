@@ -13,8 +13,8 @@ import type {
 import type { KitApi } from '@/lib/client/kit-api';
 import type { LiveTurn, LocalAction } from './conversation';
 import { selectionFor, pickProduct } from '@/lib/client/kit-selection';
-import { kitPurchases } from '@/lib/client/cart-flow';
-import { useCart } from '@/components/store/cart-context';
+import { confirmKit, kitThreadPath } from '@/lib/client/cart-flow';
+import { useCart, storedCartSchema } from '@/components/store/cart-context';
 export function useKitController({
   api,
   id,
@@ -102,6 +102,7 @@ export function useKitController({
     async (message: string) => {
       if (
         !cart.ready ||
+        (source === 'cart_only' && !cart.lines.length) ||
         !message.trim() ||
         inFlight.current ||
         personaChanging.current
@@ -160,7 +161,12 @@ export function useKitController({
             }));
           if (event.event === 'plan') {
             threadId.current = event.data.threadId;
-            navigate(`/kit/t/${event.data.threadId}`);
+            navigate(
+              kitThreadPath(
+                event.data.threadId,
+                event.data.plan.shopping?.source,
+              ),
+            );
             update((run) => ({
               ...run,
               version: event.data.version,
@@ -253,6 +259,14 @@ export function useKitController({
         .getThread(id)
         .then((saved) => {
           if (!active.current || saved.thread.id !== threadId.current) return;
+          const savedSource =
+            saved.versions.at(-1)?.plan.shopping?.source ?? 'catalog';
+          if (savedSource !== initialSource) {
+            const path = kitThreadPath(saved.thread.id, savedSource);
+            if (onNavigate) onNavigate(path);
+            else window.location.replace(path);
+            return;
+          }
           applyThread(saved);
         })
         .catch((e) => {
@@ -268,7 +282,7 @@ export function useKitController({
       active.current = false;
       controller.current?.abort();
     };
-  }, [api, id, applyThread, refreshHistory]);
+  }, [api, id, applyThread, refreshHistory, initialSource, onNavigate]);
   useEffect(() => {
     if (query && cart.ready && !started.current) {
       const timer = setTimeout(() => {
@@ -456,13 +470,37 @@ export function useKitController({
     }
   }
   function add(option: BasketOption) {
-    cart.merge(option.lines);
-    sessionStorage.setItem(
-      'kitly-cart-selection',
-      JSON.stringify(kitPurchases(option.lines)),
-    );
-    window.location.assign('/cart');
+    try {
+      const shopping = version?.plan.shopping;
+      // Another tab may have changed the cart since this workspace loaded.
+      const current =
+        shopping?.source === 'cart_only'
+          ? storedCartSchema.parse(
+              JSON.parse(localStorage.getItem('kitly-cart') || '[]'),
+            )
+          : cart.lines;
+      const confirmation = confirmKit(current, option.lines, shopping);
+      if (shopping?.source !== 'cart_only') cart.merge(confirmation.cart);
+      sessionStorage.setItem(
+        'kitly-cart-selection',
+        JSON.stringify(confirmation.purchases),
+      );
+      if (shopping?.source === 'cart_only')
+        sessionStorage.setItem(
+          'kitly-cart-notice',
+          String(confirmation.purchases.length),
+        );
+      else sessionStorage.removeItem('kitly-cart-notice');
+      window.location.assign('/cart');
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Unable to apply your selection.',
+      );
+    }
   }
+
   return {
     cart,
     source,

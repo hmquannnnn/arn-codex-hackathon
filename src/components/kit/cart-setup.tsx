@@ -6,8 +6,10 @@ export function CartKitSetup({
   keepProductIds,
   onSource,
   onKeep,
+  fixedSource = false,
 }: {
   lines: CartLine[];
+  fixedSource?: boolean;
   source: 'catalog' | 'cart_only';
   keepProductIds: string[];
   onSource: (source: 'catalog' | 'cart_only') => void;
@@ -15,24 +17,30 @@ export function CartKitSetup({
 }) {
   return (
     <section className="m-4 space-y-3 rounded-xl border bg-orange-50 p-4 text-sm">
-      <label className="block">
-        Choose products from
-        <select
-          aria-label="Choose products from"
-          className="ml-2 rounded border bg-white p-2"
-          value={source}
-          onChange={(e) => onSource(e.target.value as typeof source)}
-        >
-          <option value="catalog">Store and my cart</option>
-          <option value="cart_only">Only my cart</option>
-        </select>
-      </label>
+      {fixedSource ? (
+        <p className="font-semibold">Only products already in your cart</p>
+      ) : (
+        <label className="block">
+          Choose products from
+          <select
+            aria-label="Choose products from"
+            className="ml-2 rounded border bg-white p-2"
+            value={source}
+            onChange={(e) => onSource(e.target.value as typeof source)}
+          >
+            <option value="catalog">Store and my cart</option>
+            <option value="cart_only">Only my cart</option>
+          </select>
+        </label>
+      )}
       <p className="text-xs text-slate-600">
         Recommendations leave your cart unchanged until you confirm. Items you
         do not choose stay saved.
       </p>
       {source === 'cart_only' && !lines.length && (
-        <p>Your cart is empty. Save products first, or choose the store.</p>
+        <p>
+          Your cart is empty. Save products in the store before building a kit.
+        </p>
       )}
       {!!lines.length && (
         <details>

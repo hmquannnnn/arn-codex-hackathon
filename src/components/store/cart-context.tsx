@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { productSchema, shopSchema } from '@/contract/schemas';
 import { mergeKit, subtractPurchased } from '@/lib/client/cart-flow';
 import type { CartLine } from '@/lib/client/store';
-const storedSchema = z.array(
+export const storedCartSchema = z.array(
   z.object({
     product: productSchema,
     shop: shopSchema,
@@ -25,7 +25,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     try {
-      const parsed = storedSchema.safeParse(
+      const parsed = storedCartSchema.safeParse(
         JSON.parse(localStorage.getItem('kitly-cart') || '[]'),
       );
       if (parsed.success) setLines(parsed.data);
