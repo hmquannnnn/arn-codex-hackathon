@@ -169,3 +169,26 @@ it('dates live searches against the API demo day while preserving UTC time of da
   expect(screen.getByText('3 min ago')).toBeTruthy();
   expect(screen.getByText('1 days ago')).toBeTruthy();
 });
+
+it('F2 hides empty preview sections while retaining nonempty evidence and changes', async () => {
+  const preview = await new MockSellerApi().preview(
+    'prod-minhan-backpack',
+    'school-backpack|anti-hunchback',
+  );
+  preview.added.attributes = {};
+  preview.added.descriptionAppend = '   ';
+  preview.kept.tags = [];
+  render(
+    <PreviewDrawer
+      preview={preview}
+      busy={false}
+      onClose={() => {}}
+      onApply={() => {}}
+    />,
+  );
+  expect(screen.queryByText('Added attributes')).toBeNull();
+  expect(screen.queryByText('Appended description')).toBeNull();
+  expect(screen.queryByText('Kept tags')).toBeNull();
+  expect(screen.getByText('Added tags')).toBeTruthy();
+  expect(screen.getByText('Evidence')).toBeTruthy();
+});

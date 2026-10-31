@@ -60,41 +60,60 @@ export function PreviewDrawer({
         <p className="mt-2 rounded-xl bg-emerald-50 p-3 text-sm">
           {preview.after.title}
         </p>
-        <h3 className="mt-5 text-sm font-semibold">Added tags</h3>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {preview.added.tags.map((t) => (
-            <span
-              key={t}
-              className="rounded-full bg-emerald-100 px-3 py-1 text-xs text-emerald-800"
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-        <h3 className="mt-5 text-sm font-semibold">Kept tags</h3>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {preview.kept.tags.map((t) => (
-            <span
-              key={t}
-              className="rounded-full bg-slate-100 px-3 py-1 text-xs"
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-        <h3 className="mt-5 text-sm font-semibold">Added attributes</h3>
-        <dl className="mt-2 space-y-2 text-sm">
-          {Object.entries(preview.added.attributes).map(([key, value]) => (
-            <div key={key} className="flex justify-between gap-4 border-b py-2">
-              <dt>{key}</dt>
-              <dd>{value}</dd>
+        {!!preview.added.tags.length && (
+          <>
+            <h3 className="mt-5 text-sm font-semibold">Added tags</h3>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {preview.added.tags.map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full bg-emerald-100 px-3 py-1 text-xs text-emerald-800"
+                >
+                  {t}
+                </span>
+              ))}
             </div>
-          ))}
-        </dl>
-        <h3 className="mt-5 text-sm font-semibold">Appended description</h3>
-        <p className="mt-2 rounded-xl bg-emerald-50 p-3 text-sm leading-6">
-          {preview.added.descriptionAppend}
-        </p>
+          </>
+        )}
+        {!!preview.kept.tags.length && (
+          <>
+            <h3 className="mt-5 text-sm font-semibold">Kept tags</h3>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {preview.kept.tags.map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full bg-slate-100 px-3 py-1 text-xs"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+        {!!Object.keys(preview.added.attributes).length && (
+          <>
+            <h3 className="mt-5 text-sm font-semibold">Added attributes</h3>
+            <dl className="mt-2 space-y-2 text-sm">
+              {Object.entries(preview.added.attributes).map(([key, value]) => (
+                <div
+                  key={key}
+                  className="flex justify-between gap-4 border-b py-2"
+                >
+                  <dt>{key}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </>
+        )}
+        {!!preview.added.descriptionAppend.trim() && (
+          <>
+            <h3 className="mt-5 text-sm font-semibold">Appended description</h3>
+            <p className="mt-2 rounded-xl bg-emerald-50 p-3 text-sm leading-6">
+              {preview.added.descriptionAppend}
+            </p>
+          </>
+        )}
         <h3 className="mt-5 text-sm font-semibold">Evidence</h3>
         <blockquote className="mt-2 text-sm leading-6 text-slate-600">
           {preview.evidence}

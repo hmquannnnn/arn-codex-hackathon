@@ -93,7 +93,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   chat opens at the top, not at the latest turn.
 - Expected: keep the conversation pinned to the bottom while streaming and after sending/reload, unless the user has
   scrolled up manually.
-- Status: open
+- Status: fixed in e5038b9
 
 ### F2 — Empty sections in the seller preview drawer
 - Repro: Preview fix drawer shows "Added attributes" with nothing under it and "Appended description" as an empty green bar.
