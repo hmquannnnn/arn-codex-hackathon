@@ -66,6 +66,7 @@ function Workspace({
   const {
     persona,
     setPersona,
+    setPersonaBusy,
     setVisibleProfile,
     actions,
     messages,

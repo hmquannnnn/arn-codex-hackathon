@@ -44,7 +44,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   Premium totals so Balanced lands in between. If two profiles become identical, tabs merge and Beat 1.10
   ("three real trade-offs") breaks.
 - Only change if a quick test shows Balanced == Premium/Saver on the hero sentence; otherwise leave it.
-- Status: open
+- Status: checked — no change (hero fixture: 598,500 / 855,000 / 1,210,000; live catalog: 600,300 / 1,153,000 / 1,500,000; all selections distinct)
 
 ### B6 — After-swap totals in answers can drop a line (low priority)
 - Code: `src/server/kit/alternatives.ts:17-25` — a line whose product is not in `related` is skipped in the recount, so the
@@ -107,7 +107,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 
 ### F4 — History sidebar version count lags (cosmetic)
 - Repro: after a refine the sidebar still says "Today · 1 versions" until reload; also "1 versions" → "1 version".
-- Status: open
+- Status: fixed in f943f84
 
 ### F5 — Switching to Guest and immediately sending can create a Lan kit (P2, confirmed live)
 - Repro: on `/kit/new`, switch Lan → Guest and immediately send the hero query. The header becomes Guest, but the

@@ -6,10 +6,12 @@ export function PersonaChip({
   api: supplied,
   insideKit = false,
   onChange,
+  onPendingChange,
 }: {
   api?: Pick<KitApi, 'getPersona' | 'setPersona'>;
   insideKit?: boolean;
   onChange?: (data: PersonaResponse) => void;
+  onPendingChange?: (pending: boolean) => void;
 }) {
   const api = useMemo(
     () =>
@@ -63,6 +65,7 @@ export function PersonaChip({
                 disabled={busy}
                 onClick={async () => {
                   setBusy(true);
+                  onPendingChange?.(true);
                   setError('');
                   try {
                     const result = await api.setPersona(id);
@@ -73,6 +76,7 @@ export function PersonaChip({
                     setError('Could not change profile. Try again.');
                   } finally {
                     setBusy(false);
+                    onPendingChange?.(false);
                   }
                 }}
                 className="block w-full rounded-lg px-3 py-2 text-left capitalize hover:bg-orange-50"

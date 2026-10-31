@@ -35,6 +35,12 @@ export function useKitController({
   const [actions, setActions] = useState<LocalAction[]>([]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
+  const [personaBusy, updatePersonaBusy] = useState(false);
+  const personaChanging = useRef(false);
+  const setPersonaBusy = useCallback((pending: boolean) => {
+    personaChanging.current = pending;
+    updatePersonaBusy(pending);
+  }, []);
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState('');
   const [notFound, setNotFound] = useState(false);
@@ -89,7 +95,7 @@ export function useKitController({
   );
   const send = useCallback(
     async (message: string) => {
-      if (!message.trim() || inFlight.current) return;
+      if (!message.trim() || inFlight.current || personaChanging.current) return;
       inFlight.current = true;
       setBusy(true);
       setError('');
@@ -431,6 +437,7 @@ export function useKitController({
   return {
     persona,
     setPersona,
+    setPersonaBusy,
     setVisibleProfile,
     actions,
     messages: thread?.messages || [],
@@ -449,7 +456,7 @@ export function useKitController({
     loading,
     savedVersions,
     runs,
-    busy,
+    busy: busy || personaBusy,
     send,
     adjust,
     text,

@@ -197,3 +197,46 @@ it('F3 a follow-up swap acts on the visible Premium tab without a saved selectio
   );
   await waitFor(() => expect(profiles).toEqual(['premium']));
 });
+
+it('F5 holds new-kit submission until the selected persona cookie has been confirmed', async () => {
+  const api = new MockKitApi(0);
+  const set = api.setPersona.bind(api);
+  let release!: () => void;
+  api.setPersona = async (id) => {
+    await new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    return set(id);
+  };
+  render(<KitScreen api={api} />);
+  await screen.findByRole('button', { name: /Lan ·/ });
+  fireEvent.change(screen.getByLabelText('Message Kitly'), {
+    target: { value: 'School budget 1M' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: /Lan ·/ }));
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Guest' }));
+  expect(
+    (screen.getByRole('button', { name: 'Send message' }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  fireEvent.keyDown(screen.getByLabelText('Message Kitly'), { key: 'Enter' });
+  expect((await api.listThreads()).threads).toHaveLength(0);
+  release();
+  await screen.findByRole('button', { name: '👤 Guest' });
+  await waitFor(() =>
+    expect(
+      (
+        screen.getByRole('button', {
+          name: 'Send message',
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(false),
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+  await waitFor(async () =>
+    expect((await api.listThreads()).threads[0]?.persona).toBe('guest'),
+  );
+  await screen.findByLabelText('Kit version');
+  expect(screen.queryByText('💛 In your cart')).toBeNull();
+  expect(screen.queryByText(/Deliver to/)).toBeNull();
+});
