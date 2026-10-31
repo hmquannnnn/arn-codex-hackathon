@@ -61,7 +61,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 - Expected: record demand exactly once on the first ready run, regardless of whether the buyer supplies the budget
   through a quick choice or the composer (CONTRACT §3 once-per-thread invariant). Subsequent refines add no demand.
 - Regression seam: S2/S6 pipeline or HTTP handlers; cover both budget-entry paths and later edits without double counting.
-- Status: open
+- Status: fixed in 4b851a6
 
 ### B8 — Adjust/restore discards saved swaps, Add anyway and Fit selections (P2, confirmed live)
 - Repro on Vercel: run the hero query → Add anyway on the closest Minh An backpack → remove the water bottle.

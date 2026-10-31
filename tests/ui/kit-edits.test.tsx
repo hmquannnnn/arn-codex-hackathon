@@ -415,7 +415,7 @@ it('reloading a saved Premium edit shows that selected basket', async () => {
     ).toBe('true'),
   );
 });
-it('rehydrates persisted selection through pricing when the saved options are original', async () => {
+it('B8 reload views each hydrated historical selection without writing it onto the latest version', async () => {
   const api = new MockKitApi(0);
   for await (const event of api.run('School budget 1M')) void event;
   const id = (await api.listThreads()).threads[0].id;
@@ -446,13 +446,24 @@ it('rehydrates persisted selection through pricing when the saved options are or
     ],
     grandTotal: 1184000,
   };
+  const second = structuredClone(latest);
+  second.version = 2;
+  second.selection = { profile: 'balanced', picks: {}, dropped: [] };
+  saved.versions.push(second);
+  latest.options = latest.options.map((o) =>
+    o.profile === priced.profile ? priced : o,
+  );
   let sent: KitSelection | undefined;
   api.getThread = async () => structuredClone(saved);
   api.price = async (_id, selection) => {
     sent = selection;
-    return { option: priced };
+    throw new Error('Reload must be read-only');
   };
   render(<KitScreen api={api} id={id} />);
+  await screen.findByLabelText('Kit version');
+  fireEvent.change(screen.getByLabelText('Kit version'), {
+    target: { value: '1' },
+  });
   await waitFor(() =>
     expect(
       within(screen.getByTestId('basket')).getByText(
@@ -460,7 +471,8 @@ it('rehydrates persisted selection through pricing when the saved options are or
       ),
     ).toBeTruthy(),
   );
-  expect(sent).toEqual(latest.selection);
+  expect(sent).toBeUndefined();
+  expect(screen.getByText(/Viewing an earlier version/)).toBeTruthy();
 });
 it('normalizes a backend removal explanation into the required system line', () => {
   const previous = structuredClone(thread.versions[0]);

@@ -142,3 +142,133 @@ it('S6 non-budget edits keep clarification awaiting without demand', async () =>
   expect(version.options).toEqual([]);
   expect(await s.adapter.demandItemsSince('2000-01-01')).toEqual(before);
 });
+
+it.each(['remove', 'budget'])(
+  'B8 %s retains saved Add anyway, swap and Fit drops; history/restore reproduces each saved basket',
+  async (edit) => {
+    const s = await setup();
+    const first = await s.adjust({ type: 'set_budget', budget: 1500000 });
+    const base = first.options.find(
+      (o: { profile: string }) => o.profile === 'balanced',
+    );
+    const gap = base.noMatch.find((g: { closest?: unknown }) => g.closest);
+    const line = base.lines.find(
+      (l: { alternatives: unknown[] }) => l.alternatives.length,
+    );
+    const dropped = base.lines.find(
+      (l: { itemKey: string }) => l.itemKey !== line.itemKey,
+    )!.itemKey;
+    const removed = base.lines.find(
+      (l: { itemKey: string }) =>
+        l.itemKey !== line.itemKey && l.itemKey !== dropped,
+    )!.itemKey;
+    const selection = {
+      profile: 'balanced',
+      picks: {
+        [gap.itemKey]: gap.closest.candidate.product.id,
+        [line.itemKey]: line.alternatives[0].product.id,
+      },
+      dropped: [dropped],
+    };
+    const priced = await s.handlers.price(s.request({ selection }));
+    expect(priced.status).toBe(200);
+    const before = (await priced.json()).option;
+    const next = await s.adjust(
+      edit === 'remove'
+        ? { type: 'remove_item', itemKey: removed }
+        : { type: 'set_budget', budget: 1200000 },
+    );
+    expect(next.selection).toEqual(selection);
+    const option = next.options.find(
+      (o: { profile: string }) => o.profile === 'balanced',
+    );
+    for (const [key, productId] of Object.entries(selection.picks))
+      expect(
+        option.lines.find((l: { itemKey: string }) => l.itemKey === key)
+          ?.product.id,
+      ).toBe(productId);
+    expect(
+      option.lines.some((l: { itemKey: string }) => l.itemKey === dropped),
+    ).toBe(false);
+    const history = await (
+      await s.handlers.thread(
+        new Request('http://localhost', {
+          headers: { cookie: 'kitly_uid=alice' },
+        }),
+        s.threadId,
+      )
+    ).json();
+    expect(
+      history.versions[1].options.find(
+        (o: { profile: string }) => o.profile === 'balanced',
+      ),
+    ).toEqual(before);
+    const restored = await s.adjust({ type: 'restore_version', version: 2 });
+    expect(restored.selection).toEqual(selection);
+    expect(
+      restored.options.find(
+        (o: { profile: string }) => o.profile === 'balanced',
+      ),
+    ).toEqual(before);
+  },
+);
+
+it('B8 prunes removed keys and invalidated choices but retains other saved choices', async () => {
+  const s = await setup();
+  const first = await s.adjust({ type: 'set_budget', budget: 1500000 });
+  const base = first.options.find(
+    (o: { profile: string }) => o.profile === 'balanced',
+  );
+  const gap = base.noMatch.find((g: { closest?: unknown }) => g.closest);
+  const selection = {
+    profile: 'balanced',
+    picks: { [gap.itemKey]: gap.closest.candidate.product.id },
+    dropped: [],
+  };
+  expect((await s.handlers.price(s.request({ selection }))).status).toBe(200);
+  const changed = await s.adjust({
+    type: 'set_deadline',
+    deadline: '2026-09-02',
+  });
+  expect(changed.selection?.picks).toEqual({});
+  const removed = await s.adjust({ type: 'remove_item', itemKey: gap.itemKey });
+  expect(removed.selection?.picks).toEqual({});
+});
+
+it('B8 a budget refinement through chat retains the saved basket choices too', async () => {
+  const { runRefine } = await import('@/server/refine');
+  const s = await setup();
+  const first = await s.adjust({ type: 'set_budget', budget: 1500000 });
+  const option = first.options.find(
+    (o: { profile: string }) => o.profile === 'balanced',
+  );
+  const gap = option.noMatch.find((g: { closest?: unknown }) => g.closest);
+  const selection = {
+    profile: 'balanced',
+    picks: { [gap.itemKey]: gap.closest.candidate.product.id },
+    dropped: [option.lines[0].itemKey],
+  };
+  expect((await s.handlers.price(s.request({ selection }))).status).toBe(200);
+  for await (const e of runRefine(
+    { threadId: s.threadId, owner: 'alice', message: 'Budget 1M' },
+    {
+      adapter: s.adapter,
+      store: s.store,
+      llm: new FakeLLM([
+        { ...first.plan, budget: 1000000, intent: 'change_kit' },
+      ]),
+    },
+  ))
+    void e;
+  const latest = (await s.store.getThread(s.threadId, 'alice'))!.versions.at(
+    -1,
+  )!;
+  expect(latest.selection).toEqual(selection);
+  const selected = latest.options.find((o) => o.profile === 'balanced')!;
+  expect(
+    selected.lines.find((l) => l.itemKey === gap.itemKey)?.product.id,
+  ).toBe(selection.picks[gap.itemKey]);
+  expect(selected.lines.some((l) => l.itemKey === selection.dropped[0])).toBe(
+    false,
+  );
+});

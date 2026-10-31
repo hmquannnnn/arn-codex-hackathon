@@ -210,15 +210,8 @@ export function useKitController({
     if (id)
       api
         .getThread(id)
-        .then(async (saved) => {
+        .then((saved) => {
           if (!active.current || saved.thread.id !== threadId.current) return;
-          const version = saved.versions.at(-1);
-          if (version?.selection) {
-            const { option } = await api.price(id, version.selection);
-            version.options = version.options.map((current) =>
-              current.profile === option.profile ? option : current,
-            );
-          }
           applyThread(saved);
         })
         .catch((e) => {

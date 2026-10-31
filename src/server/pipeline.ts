@@ -3,6 +3,7 @@ import type { KitStore } from '@/contract/kit-store';
 import type {
   KitEvent,
   KitPlan,
+  KitSelection,
   PersonaId,
   PlanDiff,
   Profile,
@@ -17,6 +18,8 @@ import { buildSalesContext } from '@/server/kit/sales-context';
 import { followUp } from '@/server/kit/follow-up';
 import { alternativeFacts } from '@/server/kit/alternatives';
 import { today } from '@/server/today';
+import { retainSelection } from '@/server/kit/selection';
+import { priceSelection } from '@/server/optimizer/selection';
 
 export interface PipelineDeps {
   adapter: CommerceAdapter;
@@ -38,6 +41,7 @@ interface CompletionInput extends KitInput {
   diff: PlanDiff | null;
   recordDemand: boolean;
   previousPlan?: KitPlan;
+  previousSelection?: KitSelection | null;
 }
 export function logKitStep(id: string, start: number) {
   console.info(
@@ -152,6 +156,32 @@ export async function* completeKit(
       },
       input.profiles,
     );
+    const available = findInterests(
+      plan,
+      { lines: [] },
+      matched.related,
+      persona,
+      vouchers,
+      today(),
+    );
+    const selection = retainSelection(
+      input.previousSelection ?? null,
+      plan,
+      matched,
+      available,
+    );
+    if (selection) {
+      const priced = priceSelection(
+        plan,
+        matched,
+        selection,
+        vouchers,
+        available,
+      );
+      const index = options.findIndex((o) => o.profile === selection.profile);
+      if (index < 0) options.push(priced);
+      else options[index] = priced;
+    }
     for (const option of options)
       option.interests = findInterests(
         plan,
@@ -184,7 +214,8 @@ export async function* completeKit(
     optionsSent = true;
     yield { event: 'options', data: { options } };
     const selected =
-      options.find((o) => o.profile === 'balanced') ?? options[0];
+      options.find((o) => o.profile === (selection?.profile ?? 'balanced')) ??
+      options[0];
     const context = buildSalesContext(
       plan,
       selected,
@@ -235,6 +266,7 @@ export async function* completeKit(
     const version = await store.appendVersion(
       {
         ...base,
+        selection,
         followUp: nextFollowUp,
         status: 'ready',
         options,
