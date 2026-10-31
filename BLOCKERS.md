@@ -25,3 +25,7 @@ T17 persona/interest/wallet/follow-up/answer UI passes fixture tests and browser
 ## T12 live integration dependency
 
 Seller UI, preview/apply/reload/undo, live strip and Notify me are implemented and fixture-tested. Live verification requires Lane 1 T05/T06/T07 seller insights/enrichment/watch endpoints, which are not present at this HEAD. T09 edit/history routes have landed; those earlier missing-route dependencies are resolved. No env or package changes are needed.
+
+## T13 — blocked before live demo pass (Lane 2, full)
+
+After pushing T17 and T12, `git pull --rebase` is up to date at 885a684. Ticket 13 explicitly requires T06 and a real deployed DB/LLM demo; this checkout has no `/api/seller/insights` or `/api/seller/enrichment/{preview,apply,undo}` routes (T05/T06), so Beats 3–4 cannot run. The T16 backend for personalised interests/follow-up/answer turns is also not present yet, preventing the full judge-proofing pass. T12 fixture replay is not evidence for this live acceptance. Per AGENTS.md, stop on missing dependencies. Resume at T13 after Lane 1 pushes T05/T06/T16 (and T07 for Notify me); then T14, then T20b after T20a. Do not mark these tickets or Lane 2 complete. No env change is needed.
