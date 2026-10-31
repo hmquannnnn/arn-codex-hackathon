@@ -49,6 +49,8 @@ function bestFirst(a: Candidate, b: Candidate): number {
 export async function matchPlan(
   plan: KitPlan,
   adapter: CommerceAdapter,
+  prefetchedShops?: Promise<Shop[]>,
+  prefetchedProducts?: Promise<Product[]>,
 ): Promise<MatchResult> {
   const categoryIds = [
     ...new Set(
@@ -58,8 +60,8 @@ export async function matchPlan(
     ),
   ];
   const [products, shops] = await Promise.all([
-    adapter.searchProducts({ categories: categoryIds }),
-    adapter.listShops(),
+    prefetchedProducts ?? adapter.searchProducts({ categories: categoryIds }),
+    prefetchedShops ?? adapter.listShops(),
   ]);
   const shopById = new Map(shops.map((shop) => [shop.id, shop]));
   const result: MatchResult = {

@@ -75,43 +75,16 @@ export class SupabaseKitStore implements KitStore {
     v: Omit<KitVersion, 'version' | 'createdAt'>,
     owner: string,
   ): Promise<KitVersion> {
-    await this.requireOwned(v.threadId, owner);
-    // The unique constraint arbitrates independent serverless writers. Retry only
-    // collisions, never ambiguous transport failures that could duplicate a write.
-    for (let attempt = 0; attempt < 20; attempt++) {
-      const { data: latest, error: readError } = await this.db
-        .from('kit_versions')
-        .select('version')
-        .eq('thread_id', v.threadId)
-        .order('version', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (readError) throw readError;
-      const { data, error } = await this.db
-        .from('kit_versions')
-        .insert({
-          thread_id: v.threadId,
-          version: (latest?.version ?? 0) + 1,
-          kind: v.kind,
-          user_text: v.userText,
-          plan: v.plan,
-          excluded_keys: v.excludedKeys,
-          status: v.status,
-          options: v.options,
-          explanation: v.explanation,
-          diff: v.diff,
-          selection: v.selection,
-          follow_up: v.followUp,
-        })
-        .select('*')
-        .single();
-      if (error?.code === '23505') continue;
-      if (error) throw error;
-      const version = versionFromRow(data);
-      await this.touch(v.threadId, owner, data.created_at);
-      return version;
-    }
-    throw new Error('Concurrent kit updates: please retry');
+    const { data, error } = await this.db.rpc('kitly_append_version', {
+      p_owner: owner,
+      p_version: v,
+    });
+    if (error) throw error;
+    return kitVersionSchema.parse({
+      ...v,
+      version: data.version,
+      createdAt: new Date(data.createdAt).toISOString(),
+    });
   }
 
   async appendMessage(m: Omit<KitMessage, 'createdAt'>, owner: string) {
@@ -149,22 +122,12 @@ export class SupabaseKitStore implements KitStore {
     owner: string,
     selection: KitSelection,
   ) {
-    await this.requireOwned(threadId, owner);
-    const { data, error: readError } = await this.db
-      .from('kit_versions')
-      .select('id')
-      .eq('thread_id', threadId)
-      .order('version', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (readError) throw readError;
-    if (!data) throw new Error('Version not found');
-    const { error } = await this.db
-      .from('kit_versions')
-      .update({ selection })
-      .eq('id', data.id);
+    const { error } = await this.db.rpc('kitly_save_selection', {
+      p_thread: threadId,
+      p_owner: owner,
+      p_selection: selection,
+    });
     if (error) throw error;
-    await this.touch(threadId, owner, new Date().toISOString());
   }
 
   async listThreads(owner: string) {
@@ -181,35 +144,34 @@ export class SupabaseKitStore implements KitStore {
   }
 
   async getThread(threadId: string, owner: string) {
-    const thread = await this.owned(threadId, owner);
+    const { data: thread, error } = await this.db
+      .from('kit_threads')
+      .select('id,title,persona,updated_at,kit_versions(*),kit_messages(*)')
+      .eq('id', threadId)
+      .eq('owner', owner)
+      .maybeSingle();
+    if (error) throw error;
     if (!thread) return null;
-    const [versions, messages] = await Promise.all([
-      this.db
-        .from('kit_versions')
-        .select('*')
-        .eq('thread_id', threadId)
-        .order('version'),
-      this.db
-        .from('kit_messages')
-        .select('*')
-        .eq('thread_id', threadId)
-        .order('id'),
-    ]);
-    if (versions.error) throw versions.error;
-    if (messages.error) throw messages.error;
     return {
-      thread: this.summary(thread),
-      versions: versions.data.map(versionFromRow),
-      messages: messages.data.map((row) =>
-        kitMessageSchema.parse({
-          threadId: row.thread_id,
-          afterVersion: row.after_version,
-          createdAt: new Date(String(row.created_at)).toISOString(),
-          userText: row.user_text,
-          answer: row.answer,
-          followUp: row.follow_up,
-        }),
-      ),
+      thread: this.summary({
+        ...thread,
+        kit_versions: [{ count: thread.kit_versions.length }],
+      }),
+      versions: thread.kit_versions
+        .sort((a, b) => a.version - b.version)
+        .map(versionFromRow),
+      messages: thread.kit_messages
+        .sort((a, b) => a.id - b.id)
+        .map((row) =>
+          kitMessageSchema.parse({
+            threadId: row.thread_id,
+            afterVersion: row.after_version,
+            createdAt: new Date(row.created_at).toISOString(),
+            userText: row.user_text,
+            answer: row.answer,
+            followUp: row.follow_up,
+          }),
+        ),
     };
   }
 
