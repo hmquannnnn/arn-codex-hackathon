@@ -36,7 +36,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   uniform shirts (rotation): 85.000₫"; "Skipped for budget" lists "Useful extra — pencil case", "Optional — school shoes".
 - Expected: plain need labels ("Grade 1 backpack", "Pencil case"). Find where the priority prefix is baked into the label
   (planner output vs formatter) and fix at the source.
-- Status: open
+- Status: fixed in c629ea0
 
 ### B5 — Balanced weight is fixed → Balanced can sit next to / merge with Premium (low priority, check first)
 - Seen: Beat 4 run: Saver 916.900 · Balanced 1.426.000 · Premium 1.476.000 (Balanced ≈ Premium).

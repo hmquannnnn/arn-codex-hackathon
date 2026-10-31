@@ -7,6 +7,7 @@ import type {
 import { priceBasket } from '@/server/optimizer';
 import type { MatchResult } from '@/server/matcher';
 import type { AlternativeFact } from './follow-up';
+import { today } from '@/server/today';
 /** Price each displayed alternative against the actual current lines, including buyer edits. */
 export function alternativeFacts(
   plan: KitPlan,
@@ -15,11 +16,19 @@ export function alternativeFacts(
   vouchers: Voucher[],
 ): AlternativeFact[] {
   const picks: Record<string, Candidate> = Object.fromEntries(
-    option.lines.flatMap((line) => {
+    option.lines.map((line) => {
+      const arrives = new Date(`${today()}T00:00:00Z`);
+      arrives.setUTCDate(arrives.getUTCDate() + line.product.shipDaysMax);
       const candidate = matched.related[line.itemKey]?.find(
         (c) => c.product.id === line.product.id,
-      );
-      return candidate ? [[line.itemKey, candidate]] : [];
+      ) ?? {
+        product: line.product,
+        shop: line.shop,
+        score: 0,
+        matchedTags: [],
+        arrivesBy: arrives.toISOString().slice(0, 10),
+      };
+      return [line.itemKey, candidate];
     }),
   );
   return option.lines.flatMap((line) =>

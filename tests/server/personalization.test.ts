@@ -384,7 +384,9 @@ it('S10 follow-up and explainer run concurrently, not in series', async () => {
       if (this.calls.length) await new Promise((r) => setTimeout(r, 150));
       return super.structured(...args) as Promise<T>;
     }
-    override async *stream(...args: Parameters<InstanceType<typeof FakeLLM>['stream']>) {
+    override async *stream(
+      ...args: Parameters<InstanceType<typeof FakeLLM>['stream']>
+    ) {
       await new Promise((r) => setTimeout(r, 150));
       yield* super.stream(...args);
     }
@@ -510,4 +512,49 @@ it('S10 favorite shop promos survive when the favorite has no chosen line/cart c
       await adapter.listShops(),
     ).walletVouchers,
   ).toEqual([]);
+});
+
+it('B6 after-swap answers retain a selected line even when it is absent from the related pool', async () => {
+  const { alternativeFacts } = await import('@/server/kit/alternatives');
+  const { priceBasket } = await import('@/server/optimizer');
+  const { option, matched, vouchers, plan } = await heroContext();
+  const fixed = option.lines.find(
+    (l) => l.itemKey !== option.lines[0].itemKey,
+  )!;
+  const swapLine = option.lines[0];
+  const replacement = swapLine.alternatives[0];
+  expect(replacement).toBeDefined();
+  const related = { ...matched.related, [fixed.itemKey]: [] };
+  const facts = alternativeFacts(
+    plan,
+    option,
+    { ...matched, related },
+    vouchers,
+  );
+  const expected = priceBasket(
+    { plan, candidates: matched.candidates, vouchers, noMatch: option.noMatch },
+    Object.fromEntries(
+      option.lines.map((l) => [
+        l.itemKey,
+        l.itemKey === swapLine.itemKey
+          ? replacement
+          : {
+              product: l.product,
+              shop: l.shop,
+              score: 0,
+              matchedTags: [],
+              arrivesBy: '2026-09-05',
+            },
+      ]),
+    ),
+    option.profile,
+  );
+  expect(expected.grandTotal).toBe(823500);
+  expect(
+    facts.find(
+      (f) =>
+        f.itemKey === swapLine.itemKey &&
+        f.productId === replacement.product.id,
+    )?.grandTotal,
+  ).toBe(expected.grandTotal);
 });
