@@ -135,7 +135,7 @@ function Workspace({
             </span>
           )}
         </div>
-        <PersonaChip api={api} insideKit onChange={setPersona} />
+        <PersonaChip api={api} insideKit onChange={setPersona} onPendingChange={setPersonaBusy} />
         <Link href="/" className="text-xs text-slate-500">
           ← Back to DemoMart
         </Link>
@@ -190,7 +190,9 @@ function Workspace({
             Your kits
           </p>
           <nav className="space-y-2 overflow-y-auto">
-            {history.map((h) => (
+            {history.map((h) => {
+              const count = h.id === threadId.current ? Math.max(h.versionCount, versions.at(-1)?.version ?? 0) : h.versionCount;
+              return (
               <a
                 href={`/kit/t/${h.id}`}
                 key={h.id}
@@ -198,10 +200,11 @@ function Workspace({
               >
                 <p className="line-clamp-2 text-sm font-medium">{h.title}</p>
                 <p className="mt-2 text-[10px] text-slate-500">
-                  {relativeDate(h.updatedAt, today)} · {h.versionCount} versions
+                  {relativeDate(h.updatedAt, today)} · {count} {count === 1 ? 'version' : 'versions'}
                 </p>
               </a>
-            ))}
+              );
+            })}
             {!history.length && (
               <p className="text-xs leading-5 text-slate-400">
                 Your plans will be saved here, ready whenever you are.

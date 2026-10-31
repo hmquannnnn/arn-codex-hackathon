@@ -254,3 +254,28 @@ it('F1 reload and new turns scroll to the newest content, but manual scroll-up s
   await screen.findByText(/The description mentions S-shaped straps/);
   expect(chat.scrollTop).toBe(50);
 });
+
+it('F4 sidebar uses the live version count even when the history list is stale, and uses singular version', async () => {
+  const api = new MockKitApi(0);
+  for await (const e of api.run('School budget 1M')) void e;
+  const history = await api.listThreads();
+  const id = history.threads[0].id;
+  api.listThreads = async () => history;
+  render(<KitScreen api={api} id={id} />);
+  await screen.findByLabelText('Kit version');
+  const sidebar = screen.getByRole('complementary', { name: 'Kit history' });
+  expect(sidebar.textContent).toContain('Today · 1 version');
+  expect(sidebar.textContent).not.toContain('1 versions');
+  fireEvent.change(screen.getByLabelText('Message Kitly'), {
+    target: { value: 'Budget 1M now' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+  await waitFor(() =>
+    expect(screen.getByLabelText('Kit version').textContent).toContain(
+      'Version 2 of 2',
+    ),
+  );
+  await waitFor(() =>
+    expect(sidebar.textContent).toContain('Today · 2 versions'),
+  );
+});

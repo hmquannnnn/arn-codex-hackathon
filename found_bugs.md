@@ -103,7 +103,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 ### F3 — Swap pill on a non-saved profile tab changes Balanced (low priority)
 - Code: `use-kit-controller.ts:384-387` — a follow-up swap applies to the saved profile, else Balanced. If the user is on
   the Premium tab with no saved selection, the pill swaps Balanced instead of the visible tab. Apply to the visible tab.
-- Status: open
+- Status: fixed in e112580
 
 ### F4 — History sidebar version count lags (cosmetic)
 - Repro: after a refine the sidebar still says "Today · 1 versions" until reload; also "1 versions" → "1 version".
