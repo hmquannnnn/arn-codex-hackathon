@@ -150,6 +150,11 @@ export class MockKitApi implements KitApi {
     }
   }
   async adjust(id: string, change: AdjustChange) {
+    if (change.type !== 'set_budget' && change.type !== 'restore_version') {
+      throw new Error(
+        'Fixture replay has no recorded response for this edit. Try live editing when it is available.',
+      );
+    }
     const thread = await this.getThread(id);
     const previous = thread.versions.at(-1)!;
     const source =
@@ -182,12 +187,16 @@ export class MockKitApi implements KitApi {
       .at(-1)!
       .options.find((o) => o.profile === selection.profile);
     if (!option) throw new Error('No recorded option for this profile.');
-    const unchanged = option.lines.every(
-      (l) => (selection.picks[l.itemKey] || l.product.id) === l.product.id,
-    );
+    const unchanged =
+      selection.dropped.length === 0 &&
+      Object.entries(selection.picks).every(([key, productId]) =>
+        option.lines.some(
+          (line) => line.itemKey === key && line.product.id === productId,
+        ),
+      );
     if (!unchanged)
       throw new Error(
-        'Fixture replay has no recorded price for that swap. Switch to live mode to compare alternatives.',
+        'Fixture replay has no recorded price for that selection. Switch to live mode to compare alternatives.',
       );
     return { option: structuredClone(option) };
   }

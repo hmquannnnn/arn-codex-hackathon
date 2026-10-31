@@ -1,10 +1,24 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import type { BasketOption, KitVersion, Profile } from '@/contract/types';
+import type {
+  AdjustChange,
+  BasketOption,
+  KitSelection,
+  KitVersion,
+  Profile,
+} from '@/contract/types';
 import { money } from '@/lib/client/store';
 import { noMatchText } from '@/lib/client/kit-text';
 import { mergeOptions } from '@/lib/client/kit-compare';
+import {
+  applyFit,
+  pickProduct,
+  selectionFor,
+} from '@/lib/client/kit-selection';
+import { InlineEdit } from './inline-edit';
+import { BudgetWarning } from './budget-warning';
+import { BasketRows } from './basket-rows';
 const meanings = {
   saver: 'lowest total',
   balanced: 'best value',
@@ -17,6 +31,11 @@ export function KitPanel({
   onRestore,
   onSwap,
   onAdd,
+  onSelect,
+  onRemove,
+  onAdjust,
+  onUndoPrice,
+  canUndoPrice,
   busy = false,
 }: {
   version?: KitVersion;
@@ -30,16 +49,21 @@ export function KitPanel({
   ) => Promise<BasketOption | void>;
   onAdd: (option: BasketOption) => void;
   busy?: boolean;
+  onSelect?: (selection: KitSelection) => Promise<BasketOption | void>;
+  onRemove?: (key: string) => void;
+  onAdjust?: (change: AdjustChange) => Promise<void>;
+  onUndoPrice?: () => Promise<BasketOption | void>;
+  canUndoPrice?: boolean;
 }) {
   const [profile, setProfile] = useState<Profile>('balanced');
   const [repriced, setRepriced] = useState<BasketOption>();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
-    setProfile('balanced');
+    setProfile(version?.selection?.profile ?? 'balanced');
     setRepriced(undefined);
     setError('');
-  }, [version?.version]);
+  }, [version?.version, version?.selection?.profile]);
   if (!version)
     return (
       <div className="flex h-full min-h-64 items-center justify-center p-8 text-center text-sm text-slate-400">
@@ -57,6 +81,22 @@ export function KitPanel({
   const older =
     version.version !==
     Math.max(...versions.map((v) => v.version), version.version);
+  async function reprice(action: () => Promise<BasketOption | void>) {
+    if (busy || pending || older) return;
+    setPending(true);
+    setError('');
+    try {
+      const result = await action();
+      if (result) {
+        setRepriced(result);
+        setProfile(result.profile);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unable to update basket');
+    } finally {
+      setPending(false);
+    }
+  }
   return (
     <div className="space-y-5 p-5">
       <header>
@@ -80,21 +120,61 @@ export function KitPanel({
           </select>
         </div>
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium">
-          <span>
-            Budget{' '}
-            {version.plan.budget === null
-              ? 'No limit'
-              : money(version.plan.budget)}
-          </span>
-          {version.plan.deadline && (
+          {onAdjust ? (
+            <InlineEdit
+              label="budget"
+              type="number"
+              value={String(version.plan.budget ?? '')}
+              display={
+                <>
+                  Budget{' '}
+                  {version.plan.budget === null
+                    ? 'No limit'
+                    : money(version.plan.budget)}
+                </>
+              }
+              disabled={older || busy || pending}
+              onSave={(value) =>
+                onAdjust({
+                  type: 'set_budget',
+                  budget: value === '' ? null : Number(value),
+                })
+              }
+            />
+          ) : (
             <span>
-              By{' '}
-              {new Intl.DateTimeFormat('en-US', {
-                month: 'short',
-                day: 'numeric',
-                timeZone: 'UTC',
-              }).format(new Date(version.plan.deadline + 'T00:00:00Z'))}
+              Budget{' '}
+              {version.plan.budget === null
+                ? 'No limit'
+                : money(version.plan.budget)}
             </span>
+          )}
+          {onAdjust ? (
+            <InlineEdit
+              label="deadline"
+              type="date"
+              value={version.plan.deadline || ''}
+              display={
+                version.plan.deadline
+                  ? `By ${new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(version.plan.deadline + 'T00:00:00Z'))}`
+                  : 'No deadline'
+              }
+              disabled={older || busy || pending}
+              onSave={(value) =>
+                onAdjust({ type: 'set_deadline', deadline: value || null })
+              }
+            />
+          ) : (
+            version.plan.deadline && (
+              <span>
+                By{' '}
+                {new Intl.DateTimeFormat('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  timeZone: 'UTC',
+                }).format(new Date(version.plan.deadline + 'T00:00:00Z'))}
+              </span>
+            )
           )}
         </div>
         {older && (
@@ -130,7 +210,7 @@ export function KitPanel({
                 key={o.profile}
                 role="tab"
                 aria-selected={option.profile === o.profile}
-                disabled={pending}
+                disabled={busy || pending}
                 onClick={() => {
                   setProfile(o.profile);
                   setRepriced(undefined);
@@ -180,6 +260,23 @@ export function KitPanel({
                     Missing:{' '}
                     {g.closest!.missingTags.join(', ') || 'No missing tags'}
                   </p>
+                  <button
+                    disabled={older || busy || pending || !onSelect}
+                    onClick={() =>
+                      void reprice(() =>
+                        onSelect!(
+                          pickProduct(
+                            selectionFor(version, option.profile),
+                            g.itemKey,
+                            g.closest!.candidate.product.id,
+                          ),
+                        ),
+                      )
+                    }
+                    className="mt-3 rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs font-semibold disabled:opacity-40"
+                  >
+                    Add anyway
+                  </button>
                   {!!g.closest!.overMaxPriceBy && (
                     <p className="mt-1 text-xs">
                       Over your max price by {money(g.closest!.overMaxPriceBy)}
@@ -188,85 +285,15 @@ export function KitPanel({
                 </div>
               ))}
           </section>
-          <section
-            data-testid="basket"
-            aria-label="Basket"
-            className="divide-y rounded-xl border bg-white"
-          >
-            <h2 className="px-4 py-3 text-sm font-bold">
-              Basket · {option.lines.length} items
-            </h2>
-            {option.lines.map((line) => (
-              <div key={line.itemKey} className="p-4">
-                <div className="flex justify-between gap-3">
-                  <Link
-                    href={`/products/${line.product.id}`}
-                    className="text-sm font-semibold hover:text-accent"
-                  >
-                    {line.product.title}
-                  </Link>
-                  <span className="shrink-0 text-sm font-bold">
-                    {money(line.lineTotal)}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-slate-500">
-                  {line.shop.name} · Qty {line.quantity}
-                </p>
-                {line.product.updatedForDemandAt && (
-                  <p className="mt-1 text-xs text-emerald-700">
-                    Updated for this need
-                  </p>
-                )}
-                <p className="mt-2 text-xs leading-5 text-slate-600">
-                  {line.reason}
-                </p>
-                {line.alternatives.length > 0 && (
-                  <details className="mt-3 text-xs">
-                    <summary className="cursor-pointer text-accent">
-                      {line.alternatives.length} alternatives
-                    </summary>
-                    {line.alternatives.map((a) => (
-                      <div
-                        key={a.product.id}
-                        className="mt-3 rounded-lg bg-slate-50 p-3"
-                      >
-                        <p>
-                          {a.product.title} · {money(a.product.price)}
-                        </p>
-                        <p className="mt-1 text-slate-500">
-                          {a.shop.name} · ★ {a.product.rating}
-                        </p>
-                        <button
-                          disabled={older || busy || pending}
-                          onClick={async () => {
-                            setPending(true);
-                            setError('');
-                            try {
-                              const result = await onSwap(
-                                option.profile,
-                                line.itemKey,
-                                a.product.id,
-                              );
-                              if (result) setRepriced(result);
-                            } catch (e) {
-                              setError(
-                                e instanceof Error ? e.message : 'Swap failed',
-                              );
-                            } finally {
-                              setPending(false);
-                            }
-                          }}
-                          className="mt-2 rounded-lg border px-3 py-2 font-semibold disabled:opacity-40"
-                        >
-                          Swap
-                        </button>
-                      </div>
-                    ))}
-                  </details>
-                )}
-              </div>
-            ))}
-          </section>
+          <BasketRows
+            option={option}
+            version={version}
+            disabled={older || busy || pending}
+            onRemove={onRemove}
+            onSwap={(key, id) =>
+              void reprice(() => onSwap(option.profile, key, id))
+            }
+          />
           {option.noMatch.some((g) => !g.closest) && (
             <details className="rounded-xl border bg-slate-50 p-4">
               <summary className="cursor-pointer text-sm font-semibold">
@@ -292,18 +319,29 @@ export function KitPanel({
               ))}
             </section>
           )}
-          {option.status === 'over_budget' && (
-            <div role="alert" className="rounded-xl bg-amber-50 p-4 text-sm">
-              <p className="font-semibold">This kit exceeds your budget</p>
-              <p className="mt-2">
-                Minimum cost: {money(option.minimumCost ?? option.grandTotal)}
-              </p>
-              {option.costDrivers?.map((d) => (
-                <p key={d} className="mt-1 text-xs">
-                  {d}
-                </p>
-              ))}
-            </div>
+          <BudgetWarning
+            option={option}
+            budget={version.plan.budget}
+            disabled={older || busy || pending}
+            onFit={
+              onSelect
+                ? (fit) =>
+                    void reprice(() =>
+                      onSelect(
+                        applyFit(selectionFor(version, option.profile), fit),
+                      ),
+                    )
+                : undefined
+            }
+          />
+          {canUndoPrice && onUndoPrice && (
+            <button
+              disabled={older || busy || pending}
+              onClick={() => void reprice(onUndoPrice)}
+              className="text-xs text-accent underline"
+            >
+              Undo last basket edit
+            </button>
           )}
           <section className="space-y-3 rounded-xl bg-slate-50 p-4 text-sm">
             <h2 className="font-bold">Your kit total</h2>
@@ -345,7 +383,9 @@ export function KitPanel({
             onClick={() => onAdd(option)}
             className="w-full rounded-xl bg-accent py-3 text-sm font-bold text-white disabled:opacity-40"
           >
-            Add kit to cart
+            {option.status === 'over_budget'
+              ? `Add kit to cart (over budget by ${money(option.overBy ?? Math.max(0, option.grandTotal - (version.plan.budget ?? option.grandTotal)))})`
+              : 'Add kit to cart'}
           </button>
         </>
       )}

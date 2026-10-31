@@ -7,6 +7,7 @@ import type {
   StepPayload,
 } from '@/contract/types';
 import { money } from '@/lib/client/store';
+import { InlineEdit } from './inline-edit';
 export type LiveTurn = {
   token: number;
   text: string;
@@ -59,12 +60,16 @@ export function Conversation({
   live = [],
   onBudget,
   onRetry,
+  onRefine,
+  onUndoRemove,
   disabled = false,
 }: {
   versions: KitVersion[];
   live?: LiveTurn[];
   onBudget?: (budget: number | null) => void;
   onRetry?: (text: string) => void;
+  onRefine?: (text: string) => void;
+  onUndoRemove?: (key: string) => void;
   disabled?: boolean;
 }) {
   return (
@@ -75,7 +80,34 @@ export function Conversation({
             key={v.version}
             className="rounded-lg bg-slate-100 p-3 text-xs text-slate-600"
           >
-            ⚙ {v.explanation || v.userText}
+            ⚙ {systemText(v, versions)}
+            {v.excludedKeys
+              .filter(
+                (key) =>
+                  !versions
+                    .find((previous) => previous.version === v.version - 1)
+                    ?.excludedKeys.includes(key) &&
+                  versions.at(-1)?.excludedKeys.includes(key),
+              )
+              .map((key) => {
+                const label =
+                  versions
+                    .flatMap((previous) => previous.plan.items)
+                    .find((item) => item.key === key)?.needLabel || key;
+                return (
+                  onUndoRemove && (
+                    <button
+                      key={key}
+                      aria-label={`Undo removal of ${label}`}
+                      disabled={disabled}
+                      onClick={() => onUndoRemove(key)}
+                      className="ml-2 text-accent underline"
+                    >
+                      Undo
+                    </button>
+                  )
+                );
+              })}
           </p>
         ) : (
           <div key={v.version} className="space-y-4">
@@ -89,7 +121,11 @@ export function Conversation({
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7">
                 {v.explanation}
               </p>
-              <Assumptions plan={v.plan} />
+              <Assumptions
+                plan={v.plan}
+                onRefine={onRefine}
+                disabled={disabled}
+              />
               {v.status === 'awaiting_budget' && (
                 <BudgetChoices onBudget={onBudget} disabled={disabled} />
               )}
@@ -128,7 +164,13 @@ export function Conversation({
             <p className="mt-3 whitespace-pre-wrap text-sm leading-7">
               {turn.explanation}
             </p>
-            {turn.plan && <Assumptions plan={turn.plan} />}
+            {turn.plan && (
+              <Assumptions
+                plan={turn.plan}
+                onRefine={onRefine}
+                disabled={disabled}
+              />
+            )}
             {turn.question && (
               <BudgetChoices
                 question={turn.question}
@@ -167,7 +209,15 @@ function UserBubble({ text }: { text: string }) {
     </p>
   );
 }
-function Assumptions({ plan }: { plan: KitPlan }) {
+function Assumptions({
+  plan,
+  onRefine,
+  disabled,
+}: {
+  plan: KitPlan;
+  onRefine?: (text: string) => void;
+  disabled?: boolean;
+}) {
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       {plan.assumptions.map((a, i) => (
@@ -175,9 +225,29 @@ function Assumptions({ plan }: { plan: KitPlan }) {
           key={i}
           className="rounded-full border px-3 py-1 text-xs text-slate-500"
         >
-          {a}
+          {onRefine ? (
+            <InlineEdit
+              label={`assumption: ${a}`}
+              value={a}
+              display={a}
+              disabled={disabled}
+              onSave={(value) => onRefine(`"${a}" is wrong: ${value}`)}
+            />
+          ) : (
+            a
+          )}
         </span>
       ))}
     </div>
   );
+}
+
+function systemText(version: KitVersion, versions: KitVersion[]) {
+  const previous = versions.find((v) => v.version === version.version - 1);
+  const removed = version.excludedKeys.filter(
+    (key) => !previous?.excludedKeys.includes(key),
+  );
+  if (removed.length)
+    return `Removed: ${removed.map((key) => previous?.plan.items.find((item) => item.key === key)?.needLabel || key).join(', ')}`;
+  return version.explanation || version.userText;
 }

@@ -4,11 +4,13 @@ import type {
   BasketOption,
   KitThreadSummary,
   KitVersion,
+  KitSelection,
   Profile,
   ThreadResponse,
 } from '@/contract/types';
 import type { KitApi } from '@/lib/client/kit-api';
 import type { LiveTurn } from './conversation';
+import { selectionFor, pickProduct } from '@/lib/client/kit-selection';
 import { useCart } from '@/components/store/cart-context';
 export function useKitController({
   api,
@@ -34,6 +36,10 @@ export function useKitController({
   const [drawer, setDrawer] = useState(false);
   const [sidebar, setSidebar] = useState(true);
   const [mobile, setMobile] = useState<'chat' | 'kit'>('chat');
+  const [selectionUndo, setSelectionUndo] = useState<{
+    version: number;
+    selection: KitSelection;
+  }>();
   const [selectedVersion, setSelectedVersion] = useState<number>();
   const threadId = useRef(id);
   const token = useRef(0);
@@ -84,6 +90,7 @@ export function useKitController({
       setError('');
       setText('');
       setSelectedVersion(undefined);
+      setSelectionUndo(undefined);
       const runToken = ++token.current;
       const runId = threadId.current;
       const abort = new AbortController();
@@ -181,7 +188,17 @@ export function useKitController({
     if (id)
       api
         .getThread(id)
-        .then((saved) => applyThread(saved))
+        .then(async (saved) => {
+          if (!active.current || saved.thread.id !== threadId.current) return;
+          const version = saved.versions.at(-1);
+          if (version?.selection) {
+            const { option } = await api.price(id, version.selection);
+            version.options = version.options.map((current) =>
+              current.profile === option.profile ? option : current,
+            );
+          }
+          applyThread(saved);
+        })
         .catch((e) => {
           if (active.current) {
             setNotFound(e.message.includes('not found'));
@@ -241,9 +258,32 @@ export function useKitController({
     setError('');
     try {
       const result = await api.adjust(threadId.current, change);
-      const saved = await api.getThread(threadId.current);
-      applyThread(saved);
+      setThread((old) =>
+        old
+          ? {
+              ...old,
+              thread: { ...old.thread, versionCount: result.version.version },
+              versions: [
+                ...old.versions.filter(
+                  (v) => v.version !== result.version.version,
+                ),
+                result.version,
+              ],
+            }
+          : {
+              thread: {
+                id: threadId.current!,
+                title: result.version.userText.slice(0, 60),
+                versionCount: result.version.version,
+                updatedAt: result.version.createdAt,
+                persona: 'lan',
+              },
+              versions: [result.version],
+              messages: [],
+            },
+      );
       setRuns([]);
+      setSelectionUndo(undefined);
       setSelectedVersion(result.version.version);
       refreshHistory();
     } catch (e) {
@@ -253,34 +293,53 @@ export function useKitController({
       if (active.current) setBusy(false);
     }
   }
-  async function swap(profile: Profile, key: string, productId: string) {
-    if (!threadId.current || !latest)
+  async function priceSelection(selection: KitSelection, recordUndo = true) {
+    if (!threadId.current || !latest || inFlight.current)
       throw new Error('Please wait for this kit to finish.');
-    const base =
-      latest.selection?.profile === profile
-        ? latest.selection
-        : { profile, picks: {}, dropped: [] };
-    const selection = { ...base, picks: { ...base.picks, [key]: productId } };
-    const { option } = await api.price(threadId.current, selection);
-    setThread((old) =>
-      old
-        ? {
-            ...old,
-            versions: old.versions.map((v) =>
-              v.version === latest.version
-                ? {
-                    ...v,
-                    selection,
-                    options: v.options.map((o) =>
-                      o.profile === profile ? option : o,
-                    ),
-                  }
-                : v,
-            ),
-          }
-        : old,
+    inFlight.current = true;
+    setBusy(true);
+    try {
+      const { option } = await api.price(threadId.current, selection);
+      if (recordUndo)
+        setSelectionUndo({
+          version: latest.version,
+          selection: selectionFor(latest, selection.profile),
+        });
+      else setSelectionUndo(undefined);
+      setThread((old) =>
+        old
+          ? {
+              ...old,
+              versions: old.versions.map((v) =>
+                v.version === latest.version
+                  ? {
+                      ...v,
+                      selection,
+                      options: v.options.map((o) =>
+                        o.profile === selection.profile ? option : o,
+                      ),
+                    }
+                  : v,
+              ),
+            }
+          : old,
+      );
+      return option;
+    } finally {
+      inFlight.current = false;
+      if (active.current) setBusy(false);
+    }
+  }
+  async function swap(profile: Profile, key: string, productId: string) {
+    if (!latest) throw new Error('Please wait for this kit to finish.');
+    return priceSelection(
+      pickProduct(selectionFor(latest, profile), key, productId),
     );
-    return option;
+  }
+  async function undoPrice() {
+    if (!selectionUndo || selectionUndo.version !== latest?.version)
+      throw new Error('This edit is no longer available to undo.');
+    return priceSelection(selectionUndo.selection, false);
   }
   function add(option: BasketOption) {
     option.lines.forEach((line) =>
@@ -315,6 +374,9 @@ export function useKitController({
     versions,
     setSelectedVersion,
     swap,
+    priceSelection,
+    undoPrice,
+    canUndoPrice: !!selectionUndo && selectionUndo.version === latest?.version,
     add,
   };
 }

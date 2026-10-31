@@ -85,6 +85,9 @@ function Workspace({
     versions,
     setSelectedVersion,
     swap,
+    priceSelection,
+    undoPrice,
+    canUndoPrice,
     add,
   } = useKitController({ api, id, query, today, onNavigate });
   return (
@@ -242,6 +245,10 @@ function Workspace({
               disabled={busy}
               onBudget={(budget) => void adjust({ type: 'set_budget', budget })}
               onRetry={(message) => void send(message)}
+              onRefine={(message) => void send(message)}
+              onUndoRemove={(itemKey) =>
+                void adjust({ type: 'restore_item', itemKey })
+              }
             />
           </div>
           <form
@@ -301,6 +308,13 @@ function Workspace({
               void adjust({ type: 'restore_version', version: n })
             }
             onSwap={swap}
+            onSelect={priceSelection}
+            onUndoPrice={undoPrice}
+            canUndoPrice={canUndoPrice}
+            onRemove={(itemKey) =>
+              void adjust({ type: 'remove_item', itemKey })
+            }
+            onAdjust={adjust}
             onAdd={add}
           />
         </section>
