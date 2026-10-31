@@ -13,7 +13,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   lower than Balanced, including changes to notebooks; Premium is " (sentence cut).
 - Cause (likely): the ≤70-word cap added in T20a truncates the stream by word count.
 - Expected: never cut mid-sentence — end at the last complete sentence within the cap, or have the model write ≤70 words.
-- Status: open
+- Status: fixed in 0fb2926
 
 ### B2 — Listing enrichment preview is weak (Beat 3 step 5)
 - Repro: Seller Centre → Minh An Stationery → listing gap "Anti-hunchback backpack" → Preview fix.

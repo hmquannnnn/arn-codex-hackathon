@@ -138,3 +138,40 @@ it('S4 rejects expired, unknown and tampered tokens; changed listing conflicts',
     (await handlers.apply(post({ proposalId: body.proposalId }))).status,
   ).toBe(404);
 });
+
+it('B2 preview adds an evidence-backed suffix, paragraph and supported companion tags', async () => {
+  const adapter = new InMemoryAdapter();
+  const before = (await adapter.getProduct('prod-minhan-backpack'))!;
+  const handlers = createEnrichmentHandlers({
+    adapter,
+    secret: 'test-secret',
+    llm: new FakeLLM([
+      {
+        ...draft,
+        titleSuffix: '',
+        tags: ['anti-hunchback', 'lightweight', 'waterproof', 'grade-1'],
+        tagEvidence: [
+          { tag: 'anti-hunchback', supports: true, evidence: 'spine straight' },
+          { tag: 'lightweight', supports: true, evidence: before.description },
+          {
+            tag: 'waterproof',
+            supports: true,
+            evidence: 'invented waterproof claim',
+          },
+          { tag: 'grade-1', supports: false, evidence: before.description },
+        ],
+      },
+    ]),
+  });
+  const response = await handlers.preview(
+    post({ productId: before.id, gapKey: 'school-backpack|anti-hunchback' }),
+  );
+  expect(response.status).toBe(200);
+  const preview = enrichmentPreviewResponseSchema.parse(await response.json());
+  expect(preview.after.title).toMatch(
+    new RegExp('^' + before.title + ' \\| .+'),
+  );
+  expect(preview.added.tags).toEqual(['anti-hunchback', 'lightweight']);
+  expect(preview.added.descriptionAppend).toContain('spine straight');
+  expect(preview.keywordCheck.every((k) => k.stillMatches)).toBe(true);
+});

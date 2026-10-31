@@ -57,9 +57,17 @@ it('S4 retries a missing gap tag, accepts tag hints, and code drops tags without
   expect(proposal.tags).toEqual(['anti-hunchback']);
   expect(llm.calls).toHaveLength(2);
   const input = JSON.parse(llm.calls[0].messages[1].content);
-  expect(input.allowedTags).toEqual(['anti-hunchback', 'waterproof']);
+  expect(input.allowedTags).toEqual(
+    expect.arrayContaining([
+      'anti-hunchback',
+      'waterproof',
+      'lightweight',
+      'grade-1',
+    ]),
+  );
+  expect(input.missingGapTags).toEqual(['anti-hunchback', 'waterproof']);
   expect(input.tagHints).toBeDefined();
-  expect(llm.calls[0].messages[0].content).toContain('not already');
+  expect(llm.calls[0].messages[0].content).toContain('never invent claims');
 });
 it('S4 refuses proposals after two drafts without an evidence-supported gap tag', async () => {
   const p = (await new InMemoryAdapter().getProduct('prod-minhan-backpack'))!;
