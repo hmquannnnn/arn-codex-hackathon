@@ -1,4 +1,5 @@
 'use client';
+import { PersonaChip } from '@/components/persona-chip';
 import { useEffect, useState } from 'react';
 import { HttpKitApi, MockKitApi } from '@/lib/client/kit-api';
 export function KitEntry() {
@@ -26,6 +27,7 @@ export function KitEntry() {
   }, []);
   return (
     <main className="mx-auto max-w-lg p-10">
+      <PersonaChip insideKit />
       {error ? (
         <div role="alert">
           <p>{error}</p>

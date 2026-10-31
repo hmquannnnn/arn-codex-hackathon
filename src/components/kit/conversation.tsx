@@ -3,11 +3,21 @@ import { Check, LoaderCircle } from 'lucide-react';
 import type {
   ClarifyPayload,
   KitPlan,
+  KitMessage,
+  FollowUp,
   KitVersion,
   StepPayload,
 } from '@/contract/types';
 import { money } from '@/lib/client/store';
 import { InlineEdit } from './inline-edit';
+import { FollowUpView } from './follow-up';
+export type LocalAction = {
+  id: number;
+  createdAt: string;
+  userText: string;
+  text: string;
+  undo?: () => void;
+};
 export type LiveTurn = {
   token: number;
   text: string;
@@ -18,6 +28,8 @@ export type LiveTurn = {
   question?: ClarifyPayload['question'];
   error?: string;
   complete?: boolean;
+  followUp?: FollowUp;
+  answered?: boolean;
 };
 export function BudgetChoices({
   question,
@@ -62,9 +74,15 @@ export function Conversation({
   onRetry,
   onRefine,
   onUndoRemove,
+  messages = [],
+  actions = [],
+  onSuggestion,
   disabled = false,
 }: {
   versions: KitVersion[];
+  messages?: KitMessage[];
+  actions?: LocalAction[];
+  onSuggestion?: (suggestion: FollowUp['suggestions'][number]) => void;
   live?: LiveTurn[];
   onBudget?: (budget: number | null) => void;
   onRetry?: (text: string) => void;
@@ -72,10 +90,72 @@ export function Conversation({
   onUndoRemove?: (key: string) => void;
   disabled?: boolean;
 }) {
+  const entries = [
+    ...versions.map((v) => ({
+      createdAt: v.createdAt,
+      key: `v${v.version}`,
+      version: v,
+      message: undefined as KitMessage | undefined,
+      action: undefined as LocalAction | undefined,
+    })),
+    ...messages.map((m, i) => ({
+      createdAt: m.createdAt,
+      key: `m${i}`,
+      version: undefined as KitVersion | undefined,
+      message: m,
+      action: undefined as LocalAction | undefined,
+    })),
+    ...actions.map((a) => ({
+      createdAt: a.createdAt,
+      key: `a${a.id}`,
+      version: undefined as KitVersion | undefined,
+      message: undefined as KitMessage | undefined,
+      action: a,
+    })),
+  ].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const latestKey = entries.at(-1)?.key;
   return (
     <div className="space-y-7" aria-live="polite">
-      {versions.map((v) =>
-        v.kind === 'adjust' || v.kind === 'restore' ? (
+      {entries.map((entry) => {
+        if (entry.message)
+          return (
+            <div key={entry.key} className="space-y-4">
+              <UserBubble text={entry.message.userText} />
+              <div>
+                <p className="mb-2 text-xs font-bold text-accent">KITLY</p>
+                <p className="whitespace-pre-wrap text-sm leading-7">
+                  {entry.message.answer}
+                </p>
+                <FollowUpView
+                  followUp={entry.message.followUp}
+                  disabled={
+                    disabled || !!live.length || latestKey !== entry.key
+                  }
+                  onChoose={onSuggestion}
+                />
+              </div>
+            </div>
+          );
+        if (entry.action)
+          return (
+            <div key={entry.key} className="space-y-3">
+              <UserBubble text={entry.action.userText} />
+              <p className="rounded-lg bg-slate-100 p-3 text-xs">
+                ⚙ {entry.action.text}
+                {entry.action.undo && (
+                  <button
+                    disabled={disabled}
+                    onClick={entry.action.undo}
+                    className="ml-2 text-accent underline"
+                  >
+                    Undo
+                  </button>
+                )}
+              </p>
+            </div>
+          );
+        const v = entry.version!;
+        return v.kind === 'adjust' || v.kind === 'restore' ? (
           <p
             key={v.version}
             className="rounded-lg bg-slate-100 p-3 text-xs text-slate-600"
@@ -126,13 +206,18 @@ export function Conversation({
                 onRefine={onRefine}
                 disabled={disabled}
               />
+              <FollowUpView
+                followUp={v.status === 'ready' ? v.followUp : null}
+                disabled={disabled || !!live.length || latestKey !== entry.key}
+                onChoose={onSuggestion}
+              />
               {v.status === 'awaiting_budget' && (
                 <BudgetChoices onBudget={onBudget} disabled={disabled} />
               )}
             </div>
           </div>
-        ),
-      )}
+        );
+      })}
       {live.map((turn) => (
         <div key={turn.token} className="space-y-4">
           <UserBubble text={turn.text} />
@@ -164,6 +249,11 @@ export function Conversation({
             <p className="mt-3 whitespace-pre-wrap text-sm leading-7">
               {turn.explanation}
             </p>
+            <FollowUpView
+              followUp={turn.followUp}
+              disabled={disabled || turn !== live.at(-1)}
+              onChoose={onSuggestion}
+            />
             {turn.plan && (
               <Assumptions
                 plan={turn.plan}

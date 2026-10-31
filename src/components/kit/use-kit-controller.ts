@@ -7,9 +7,11 @@ import type {
   KitSelection,
   Profile,
   ThreadResponse,
+  PersonaResponse,
+  FollowUp,
 } from '@/contract/types';
 import type { KitApi } from '@/lib/client/kit-api';
-import type { LiveTurn } from './conversation';
+import type { LiveTurn, LocalAction } from './conversation';
 import { selectionFor, pickProduct } from '@/lib/client/kit-selection';
 import { useCart } from '@/components/store/cart-context';
 export function useKitController({
@@ -28,6 +30,8 @@ export function useKitController({
   const [thread, setThread] = useState<ThreadResponse | null>(null);
   const [history, setHistory] = useState<KitThreadSummary[]>([]);
   const [runs, setRuns] = useState<LiveTurn[]>([]);
+  const [persona, setPersona] = useState<PersonaResponse>();
+  const [actions, setActions] = useState<LocalAction[]>([]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(!!id);
@@ -91,6 +95,7 @@ export function useKitController({
       setText('');
       setSelectedVersion(undefined);
       setSelectionUndo(undefined);
+      setActions((old) => old.map((a) => ({ ...a, undo: undefined })));
       const runToken = ++token.current;
       const runId = threadId.current;
       const abort = new AbortController();
@@ -139,6 +144,8 @@ export function useKitController({
               ...run,
               explanation: run.explanation + event.data.delta,
             }));
+          if (event.event === 'followup')
+            update((run) => ({ ...run, followUp: event.data.followUp }));
           if (event.event === 'clarify')
             update((run) => ({ ...run, question: event.data.question }));
           if (event.event === 'error')
@@ -149,7 +156,22 @@ export function useKitController({
             }));
           if (event.event === 'done') {
             threadId.current = event.data.threadId;
-            update((run) => ({ ...run, complete: true }));
+            update((run) => ({
+              ...run,
+              complete: true,
+              answered: event.data.answered,
+              ...(event.data.answered
+                ? {
+                    steps: [
+                      {
+                        id: 'understand' as const,
+                        status: 'done' as const,
+                        detail: 'Answering',
+                      },
+                    ],
+                  }
+                : {}),
+            }));
             // Do not await read-back: a later turn may already be streaming when it resolves.
             api
               .getThread(event.data.threadId)
@@ -301,6 +323,8 @@ export function useKitController({
     try {
       const { option } = await api.price(threadId.current, selection);
       if (recordUndo)
+        setActions((old) => old.map((a) => ({ ...a, undo: undefined })));
+      if (recordUndo)
         setSelectionUndo({
           version: latest.version,
           selection: selectionFor(latest, selection.profile),
@@ -341,6 +365,65 @@ export function useKitController({
       throw new Error('This edit is no longer available to undo.');
     return priceSelection(selectionUndo.selection, false);
   }
+  async function chooseSuggestion(suggestion: FollowUp['suggestions'][number]) {
+    if (!suggestion.action) {
+      void send(suggestion.text);
+      return;
+    }
+    if (!latest || inFlight.current) return;
+    const action = suggestion.action;
+    const actionId = ++token.current;
+    const item = latest.plan.items.find((item) => item.key === action.itemKey);
+    const candidate = latest.options
+      .flatMap((o) => [
+        ...o.lines.flatMap((l) => [{ product: l.product }, ...l.alternatives]),
+        ...o.noMatch.flatMap((g) => (g.closest ? [g.closest.candidate] : [])),
+        ...(o.interests || []).map((i) => i.candidate),
+      ])
+      .find((c) => c.product.id === action.productId);
+    const previous = selectionFor(
+      latest,
+      latest.selection?.profile || 'balanced',
+    );
+    setActions((old) => [
+      ...old,
+      {
+        id: actionId,
+        createdAt: new Date().toISOString(),
+        userText: suggestion.text,
+        text: 'Switching…',
+      },
+    ]);
+    try {
+      await swap(previous.profile, action.itemKey, action.productId);
+      setActions((old) =>
+        old.map((a) =>
+          a.id === actionId
+            ? {
+                ...a,
+                text: `Switched ${item?.needLabel || 'item'} to ${candidate?.product.title || 'selected product'}`,
+                undo: () => {
+                  void priceSelection(previous, false)
+                    .then(() =>
+                      setActions((items) =>
+                        items.filter((i) => i.id !== actionId),
+                      ),
+                    )
+                    .catch((e) => setError(e.message));
+                },
+              }
+            : a,
+        ),
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not switch product');
+      setActions((old) =>
+        old.map((a) =>
+          a.id === actionId ? { ...a, text: 'Could not switch product' } : a,
+        ),
+      );
+    }
+  }
   function add(option: BasketOption) {
     option.lines.forEach((line) =>
       cart.add({
@@ -352,6 +435,12 @@ export function useKitController({
     window.location.assign('/cart');
   }
   return {
+    persona,
+    setPersona,
+    actions,
+    messages: thread?.messages || [],
+    chooseSuggestion,
+    boundPersona: thread?.thread.persona || persona?.persona.id,
     drawer,
     setDrawer,
     sidebar,

@@ -14,10 +14,10 @@ T11 can be developed and verified in the explicitly supported fixture replay mod
 `npm test` (125 passed), `npm run lint`, and `npm run build` pass after T04. A separate `npx tsc --noEmit` still reports fixture typing errors in `tests/ui/store.test.tsx` from T10: imported JSON attributes infer optional `undefined` entries incompatible with `Record<string, string>`. This is outside the requested Lane 1 tickets; the UI test file was not edited. Its fixtures should be parsed through the existing contract schemas by Lane 2. No blocker remains for the requested runtime/test/build gates.
 
 
-## Lane 2 push authentication
-
-T11 and T15 are rebased onto T04 and committed locally. Agent-side `git push` fails because HTTPS GitHub credentials are unavailable in its process (`could not read Username`). Run `git push` in the authenticated user terminal. No force push is required.
-
 ## T15 live integration dependency
 
 T15 frontend edits are implemented and verified with fixture-backed API responses: remove/undo, closest Add anyway, Fit/Undo, inline edits, selection reload and request/error locking. Live verification awaits T09 adjust/price/history endpoints. Fixture replay does not simulate arbitrary optimizer responses; unsupported edits fail explicitly and leave the kit unchanged. No new env values or dependencies are needed.
+
+## T17 live integration dependency
+
+T17 persona/interest/wallet/follow-up/answer UI passes fixture tests and browser flows. Full live verification awaits T09 price/history and T16 interest/follow-up/answer support. GitHub credential helper is configured and Lane 2 can push. No new env values are needed.

@@ -18,6 +18,7 @@ import {
 } from '@/lib/client/kit-selection';
 import { InlineEdit } from './inline-edit';
 import { BudgetWarning } from './budget-warning';
+import { InterestCard } from './interest-card';
 import { BasketRows } from './basket-rows';
 const meanings = {
   saver: 'lowest total',
@@ -36,6 +37,8 @@ export function KitPanel({
   onAdjust,
   onUndoPrice,
   canUndoPrice,
+  deliveryAddress,
+  guest = false,
   busy = false,
 }: {
   version?: KitVersion;
@@ -48,6 +51,8 @@ export function KitPanel({
     id: string,
   ) => Promise<BasketOption | void>;
   onAdd: (option: BasketOption) => void;
+  deliveryAddress?: string;
+  guest?: boolean;
   busy?: boolean;
   onSelect?: (selection: KitSelection) => Promise<BasketOption | void>;
   onRemove?: (key: string) => void;
@@ -177,6 +182,11 @@ export function KitPanel({
             )
           )}
         </div>
+        {deliveryAddress && (
+          <p className="mt-2 text-xs text-slate-500">
+            Deliver to {deliveryAddress}
+          </p>
+        )}
         {older && (
           <div className="mt-3 rounded-xl bg-amber-50 p-3 text-xs">
             Viewing an earlier version · read-only
@@ -260,6 +270,43 @@ export function KitPanel({
                     Missing:{' '}
                     {g.closest!.missingTags.join(', ') || 'No missing tags'}
                   </p>
+                  {!guest &&
+                    option.interests
+                      ?.filter(
+                        (interest) =>
+                          interest.itemKey === g.itemKey &&
+                          !option.lines.some(
+                            (line) =>
+                              line.itemKey === interest.itemKey &&
+                              line.product.id === interest.candidate.product.id,
+                          ),
+                      )
+                      .map((interest) => (
+                        <InterestCard
+                          key={interest.itemKey}
+                          interest={interest}
+                          limit={
+                            version.plan.items.find(
+                              (item) => item.key === interest.itemKey,
+                            )?.maxUnitPrice
+                          }
+                          disabled={older || busy || pending}
+                          onSwitch={
+                            onSelect
+                              ? () =>
+                                  void reprice(() =>
+                                    onSelect(
+                                      pickProduct(
+                                        selectionFor(version, option.profile),
+                                        interest.itemKey,
+                                        interest.candidate.product.id,
+                                      ),
+                                    ),
+                                  )
+                              : undefined
+                          }
+                        />
+                      ))}
                   <button
                     disabled={older || busy || pending || !onSelect}
                     onClick={() =>
@@ -289,6 +336,21 @@ export function KitPanel({
             option={option}
             version={version}
             disabled={older || busy || pending}
+            interests={guest ? [] : option.interests}
+            onInterest={
+              onSelect
+                ? (interest) =>
+                    void reprice(() =>
+                      onSelect(
+                        pickProduct(
+                          selectionFor(version, option.profile),
+                          interest.itemKey,
+                          interest.candidate.product.id,
+                        ),
+                      ),
+                    )
+                : undefined
+            }
             onRemove={onRemove}
             onSwap={(key, id) =>
               void reprice(() => onSwap(option.profile, key, id))
@@ -367,11 +429,17 @@ export function KitPanel({
                 </p>
               </>
             )}
-            {option.savings.map((s, i) => (
-              <p key={i} className="text-xs text-emerald-700">
-                {s.label} · save {money(s.amount)}
-              </p>
-            ))}
+            <div data-testid="savings" className="space-y-2">
+              {[...option.savings]
+                .filter((s) => !guest || !s.wallet)
+                .sort((a, b) => Number(!!b.wallet) - Number(!!a.wallet))
+                .map((s, i) => (
+                  <p key={i} className="text-xs text-emerald-700">
+                    {s.wallet ? '🎟 ' : ''}
+                    {s.label} · save {money(s.amount)}
+                  </p>
+                ))}
+            </div>
           </section>
           {error && (
             <p role="alert" className="text-sm text-red-700">

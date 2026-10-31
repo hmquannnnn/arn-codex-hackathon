@@ -1,17 +1,22 @@
 'use client';
 import Link from 'next/link';
-import type { BasketOption, KitVersion } from '@/contract/types';
+import type { BasketOption, KitVersion, Interest } from '@/contract/types';
+import { InterestCard } from './interest-card';
 import { money } from '@/lib/client/store';
 export function BasketRows({
   option,
   version,
   disabled,
   onRemove,
+  interests = [],
+  onInterest,
   onSwap,
 }: {
   option: BasketOption;
   version: KitVersion;
   disabled: boolean;
+  interests?: Interest[];
+  onInterest?: (interest: Interest) => void;
   onRemove?: (key: string) => void;
   onSwap: (key: string, id: string) => void;
 }) {
@@ -67,6 +72,24 @@ export function BasketRows({
                   .join(', ')}`
               : line.reason}
           </p>
+          {interests
+            .filter(
+              (i) =>
+                i.itemKey === line.itemKey &&
+                i.candidate.product.id !== line.product.id,
+            )
+            .map((interest) => (
+              <InterestCard
+                key={interest.itemKey}
+                interest={interest}
+                limit={
+                  version.plan.items.find((i) => i.key === line.itemKey)
+                    ?.maxUnitPrice
+                }
+                disabled={disabled}
+                onSwitch={onInterest ? () => onInterest(interest) : undefined}
+              />
+            ))}
           {line.alternatives.length > 0 && (
             <details className="mt-3 text-xs">
               <summary className="cursor-pointer text-accent">

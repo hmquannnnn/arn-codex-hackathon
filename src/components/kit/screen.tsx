@@ -7,6 +7,7 @@ import { relativeDate } from '@/lib/client/kit-text';
 import { Conversation } from './conversation';
 import { useKitController } from './use-kit-controller';
 import { KitPanel } from './panel';
+import { PersonaChip } from '@/components/persona-chip';
 import { CartProvider } from '@/components/store/cart-context';
 const examples = [
   'My kid starts Grade 1. Budget 1.5M VND. The backpack must be anti-hunchback, under 400k.',
@@ -63,6 +64,12 @@ function Workspace({
   onNavigate?: (url: string) => void;
 }) {
   const {
+    persona,
+    setPersona,
+    actions,
+    messages,
+    chooseSuggestion,
+    boundPersona,
     drawer,
     setDrawer,
     sidebar,
@@ -92,7 +99,7 @@ function Workspace({
   } = useKitController({ api, id, query, today, onNavigate });
   return (
     <div className="flex h-dvh flex-col bg-white">
-      <header className="flex shrink-0 items-center justify-between border-b px-5 py-4">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-5 py-4">
         <div className="flex items-center gap-3">
           <button
             aria-label="Toggle history"
@@ -117,6 +124,7 @@ function Workspace({
             </span>
           )}
         </div>
+        <PersonaChip api={api} insideKit onChange={setPersona} />
         <Link href="/" className="text-xs text-slate-500">
           ← Back to DemoMart
         </Link>
@@ -241,6 +249,9 @@ function Workspace({
             )}
             <Conversation
               versions={savedVersions}
+              messages={messages}
+              actions={actions}
+              onSuggestion={(suggestion) => void chooseSuggestion(suggestion)}
               live={runs}
               disabled={busy}
               onBudget={(budget) => void adjust({ type: 'set_budget', budget })}
@@ -307,6 +318,14 @@ function Workspace({
             onRestore={(n) =>
               void adjust({ type: 'restore_version', version: n })
             }
+            deliveryAddress={
+              boundPersona === 'lan'
+                ? persona?.persona.id === 'lan' && persona.persona.address
+                  ? `${persona.persona.address.district}, ${persona.persona.address.city}`
+                  : 'Cau Giay, Hanoi'
+                : undefined
+            }
+            guest={boundPersona === 'guest'}
             onSwap={swap}
             onSelect={priceSelection}
             onUndoPrice={undoPrice}

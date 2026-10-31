@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ShoppingCart, Search, Sparkles } from 'lucide-react';
+import { PersonaChip } from '@/components/persona-chip';
 import { useCart } from './cart-context';
 export function StoreHeader() {
   const [need, setNeed] = useState(false);
@@ -55,6 +56,7 @@ export function StoreHeader() {
             </button>
           </form>
         </div>
+        <PersonaChip />
         <Link href="/kit" className="text-sm font-medium">
           My kits
         </Link>
