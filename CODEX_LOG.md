@@ -1,3 +1,4 @@
 # Codex build log
 
 T00 | 1 | full | Next.js scaffold, frozen contract/fixtures, memory adapters, identity/auth, Responses wrapper, store/persona APIs, schema template, sin1 config | 34 seam tests + 12 production HTTP smoke checks | npm test 34/34, npm run lint clean, npm run build green; Vercel production deployed (hmquannnnns-projects, sin1), public smoke 4/4; updateListing field-boundary regression fixed; code commit 57e5015; GitHub Write access verified 2026-10-31; previous 403 push blocker resolved; no DB or existing env changes
+T01 | 1 | full | BLOCKED before implementation delivery: existing SUPABASE_URL rejected by SDK (missing HTTP/HTTPS scheme) | no tests retained; incomplete changes removed | Postgres read-only connection succeeded, public has no tables; no migration/seed/env changes; npm test 34/34, npm run build exit 0; see BLOCKERS.md; T02–T04 not started
