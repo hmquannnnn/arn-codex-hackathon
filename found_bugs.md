@@ -120,7 +120,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 - Expected: a new kit submitted after choosing Guest uses Guest consistently. Coordinate persona changes with kit
   submission; merely adding a wait to the E2E test would hide the user-facing race (tickets 16/17, D43).
 - Regression seam: persona switch + new-kit submission with a deliberately held persona response, then live E2E.
-- Status: open
+- Status: fixed in a26e3b1
 
 ## Not bugs — notes for the demo (Lane 3)
 - **Re-seed before the demo** (`npm run seed` only, no migrate): live counts are polluted by testing — listing gap shows

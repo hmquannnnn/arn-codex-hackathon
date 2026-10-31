@@ -117,3 +117,16 @@ it('S4 draft schema is accepted by strict Structured Outputs, with attributes re
   );
   expect(result.attributes).toEqual({ support: 'S-shaped straps' });
 });
+
+it('B2 uses grounded fallback when the model repeats an existing description verbatim', async () => {
+  const product = (await new InMemoryAdapter().getProduct(
+    'prod-minhan-backpack',
+  ))!;
+  const proposal = await proposeEnrichment(
+    product,
+    { needLabel: 'Backpack', tags: ['anti-hunchback'] },
+    new FakeLLM([{ ...draft, descriptionAppend: product.description }]),
+  );
+  expect(proposal.descriptionAppend).not.toBe('');
+  expect(proposal.descriptionAppend).toContain('spine straight');
+});

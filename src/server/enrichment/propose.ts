@@ -87,13 +87,22 @@ export async function proposeEnrichment(
     const attributes = Object.fromEntries(
       draft.attributes.map((a) => [a.key, a.value]),
     );
-    const merged = mergeEnrichment(product, {
+    let merged = mergeEnrichment(product, {
       ...draft,
       titleSuffix,
       descriptionAppend,
       attributes,
       tags: supported,
     });
+    if (merged.description === product.description) {
+      merged = mergeEnrichment(product, {
+        ...draft,
+        titleSuffix,
+        tags: supported,
+        attributes,
+        descriptionAppend: `Evidence for ${supported.join(', ')}: “${evidence}”.`,
+      });
+    }
     return {
       ...draft,
       titleSuffix,
