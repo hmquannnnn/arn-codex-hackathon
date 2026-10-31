@@ -1,5 +1,18 @@
 create schema if not exists :"KITLY_DB_SCHEMA";
 
+drop table if exists :"KITLY_DB_SCHEMA".kit_messages;
+drop table if exists :"KITLY_DB_SCHEMA".kit_versions;
+drop table if exists :"KITLY_DB_SCHEMA".kit_threads;
+drop table if exists :"KITLY_DB_SCHEMA".demand_items;
+drop table if exists :"KITLY_DB_SCHEMA".intent_sessions;
+drop table if exists :"KITLY_DB_SCHEMA".product_versions;
+drop table if exists :"KITLY_DB_SCHEMA".vouchers;
+drop table if exists :"KITLY_DB_SCHEMA".personas;
+drop table if exists :"KITLY_DB_SCHEMA".insight_advice;
+drop table if exists :"KITLY_DB_SCHEMA".demand_watches;
+drop table if exists :"KITLY_DB_SCHEMA".products;
+drop table if exists :"KITLY_DB_SCHEMA".shops;
+
 -- psql template: supply -v KITLY_DB_SCHEMA="$KITLY_DB_SCHEMA". Never change the configured schema.
 create table :"KITLY_DB_SCHEMA".shops (id text primary key, name text not null, tier text not null, rating numeric not null,
   ship_fee int not null, city text not null);

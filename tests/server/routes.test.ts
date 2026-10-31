@@ -128,8 +128,9 @@ it('persona endpoints default to Lan and switch to Guest using a SameSite cookie
   expect(bad.status).toBe(400);
   errorResponseSchema.parse(await bad.json());
 });
-it('unavailable backend returns a safe error without leaking server config', async () => {
+it('missing backend credentials return a safe error without leaking server config', async () => {
   vi.stubEnv('KITLY_ADAPTER', 'supabase');
+  vi.stubEnv('SUPABASE_URL', '');
   const r = await products(request('/api/products'));
   expect(r.status).toBe(503);
   expect(errorResponseSchema.parse(await r.json()).error.code).toBe(

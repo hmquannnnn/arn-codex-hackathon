@@ -1,0 +1,24 @@
+import { expect, it } from 'vitest';
+import nextEnv from '@next/env';
+import { seedWorld } from '../../scripts/seed';
+import { buildCatalog } from '../../scripts/seed/catalog';
+import { generateDemand } from '../../scripts/seed/demand';
+import { SupabaseAdapter } from '@/server/commerce/supabase';
+nextEnv.loadEnvConfig(process.cwd());
+it.skipIf(process.env.KITLY_TEST_SEED !== '1')('seed can reload only Kitly tables twice and serves the planted world through the adapter', async () => {
+  const world=buildCatalog([], '2026-09-02');
+  const demand=generateDemand(world.products,'2026-09-02');
+  await seedWorld(world,demand);
+  await seedWorld(world,demand);
+  const a=new SupabaseAdapter();
+  expect(await a.listShops()).toHaveLength(25);
+  const products=await a.searchProducts({});
+  expect(products.length).toBeGreaterThan(300);
+  expect(products.filter(p=>p.tags.includes('anti-hunchback'))).toHaveLength(1);
+  expect(products.some(p=>p.tags.includes('backpack-cover')||p.tags.includes('anti-blue-light'))).toBe(false);
+  expect((await a.getProduct('prod-minhan-backpack'))?.tags).toEqual(['kids']);
+  expect((await a.getPersona('lan')).cart[0].productId).toBe('prod-kidzone-lite-backpack');
+  expect((await a.listVouchers('lan')).find(v=>v.code==='LAN-BTS10')?.validUntil).toBe('2026-09-04');
+  const seeded = new Set(demand.sessions.map(s=>s.id));
+  expect((await a.demandItemsSince('2026-08-01')).filter(d=>seeded.has(d.sessionId))).toHaveLength(demand.demandItems.length);
+},60000);

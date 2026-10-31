@@ -79,7 +79,9 @@ it('uses the same backend switch as CommerceAdapter', () => {
   vi.stubEnv('KITLY_ADAPTER', 'memory');
   expect(getKitStore()).toBeInstanceOf(InMemoryKitStore);
   vi.stubEnv('KITLY_ADAPTER', 'supabase');
-  expect(() => getKitStore()).toThrow(/not implemented/i);
+  vi.stubEnv('SUPABASE_URL', 'https://example.supabase.co');
+  vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-server-key');
+  expect(getKitStore().constructor.name).toBe('SupabaseKitStore');
   vi.stubEnv('KITLY_ADAPTER', 'unknown');
   expect(() => getKitStore()).toThrow(/adapter/i);
 });

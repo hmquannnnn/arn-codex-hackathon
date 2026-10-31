@@ -1,5 +1,9 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { InMemoryAdapter, getAdapter } from '@/server/commerce';
+import {
+  InMemoryAdapter,
+  SupabaseAdapter,
+  getAdapter,
+} from '@/server/commerce';
 import { today } from '@/server/today';
 import type { KitPlan } from '@/contract/types';
 afterEach(() => vi.unstubAllEnvs());
@@ -110,11 +114,13 @@ it('records live and seed demand, filters history, and returns only newest live 
   vi.stubEnv('DEMO_TODAY', '2026-08-20');
   expect(today()).toBe('2026-08-20');
 });
-it('selects memory explicitly and refuses an unimplemented or unknown backend', () => {
+it('selects memory or Supabase and rejects unknown backends', () => {
   vi.stubEnv('KITLY_ADAPTER', 'memory');
   expect(getAdapter()).toBeInstanceOf(InMemoryAdapter);
   vi.stubEnv('KITLY_ADAPTER', 'supabase');
-  expect(() => getAdapter()).toThrow(/not implemented/i);
+  vi.stubEnv('SUPABASE_URL', 'https://example.supabase.co');
+  vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-service-role');
+  expect(getAdapter()).toBeInstanceOf(SupabaseAdapter);
   vi.stubEnv('KITLY_ADAPTER', 'typo');
   expect(() => getAdapter()).toThrow(/adapter/i);
 });

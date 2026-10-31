@@ -3,13 +3,13 @@
 Tell Kitly your need, get the whole kit. Built during the hackathon with Codex.
 The prepared product brief, contract, data specification and tickets are in [kit/](kit/).
 
-## T00 scaffold
+## Current implementation (T01)
 
 Next.js App Router, strict TypeScript, Tailwind, lucide-react, Zod contracts, fixtures,
-in-memory CommerceAdapter/KitStore, one OpenAI Responses wrapper, store APIs and an unapplied SQL migration.
+memory and Supabase CommerceAdapter/KitStore, one OpenAI Responses wrapper, store APIs and scoped migration/seed commands.
 This is an API-ready skeleton; the buyer/seller screens and AI pipeline belong to later tickets.
 
-Production: [Kitly on Vercel](https://kitly-arn-codex-hackathon.vercel.app) — memory adapter,
+Production: [Kitly on Vercel](https://kitly-arn-codex-hackathon.vercel.app) — Supabase adapter,
 team `hmquannnnns-projects`, functions in Singapore (`sin1`).
 
 Verified T00: `npm test` **34/34**, `npm run lint` clean, `npm run build` succeeds,
@@ -26,7 +26,7 @@ KITLY_ADAPTER=memory npm run dev
 
 The existing env files are deliberately ignored by Git and Vercel uploads. The memory adapter needs no
 API or database credentials. In-memory state is for local tests/demo only: it is not durable or shared
-between Vercel instances. `KITLY_ADAPTER=supabase` intentionally throws until ticket 01.
+between Vercel instances. `KITLY_ADAPTER=supabase` uses the configured Supabase schema for catalog and durable kit history.
 
 ```sh
 npm test
@@ -60,11 +60,17 @@ The contract is frozen after T00. Further changes must be Lane 1 commits titled 
 
 ## Database migration
 
-`supabase/migrations/0001_init.sql` is a **psql variable template**, copied from DATA §6 and qualified
-throughout with `:"KITLY_DB_SCHEMA"`. The future ticket 01 migration runner must pass the exact configured
-schema as an identifier (`psql -v KITLY_DB_SCHEMA="$KITLY_DB_SCHEMA" ...`). This ticket does not execute SQL,
-seed data, or change the supplied schema/database. Grants name only Kitly tables and their sequences;
-no other application's tables are modified. RLS remains disabled per the demo specification.
+`npm run db:migrate` renders `supabase/migrations/*.sql` with the exact configured `KITLY_DB_SCHEMA`
+and applies the twelve Kitly tables through `SUPABASE_DB_URL`. It resets only those tables, without CASCADE.
+`npm run seed` generates and caches six tiered offers per non-planted category, enforces delivery/depth rules,
+and reloads the planted world: 25 shops, 359 products, 10 vouchers, Lan, and 1,640 demand sessions.
+Both commands print the target schema and demo date before any writes. RLS is disabled per the demo spec;
+the service-role key stays on the server. Never run either command against another app's schema/database.
+
+Tests run the shared memory/Supabase contracts when local credentials exist. The read-only seed checks
+expect a seeded catalog. `KITLY_TEST_SEED=1 npm test -- tests/server/seed-integration.test.ts` separately
+verifies destructive seed idempotency (Kitly tables only); ordinary `npm test` skips that reset test.
+The express Balanced check and six-event Planner/Matcher coverage probe require T02/T03 and will run there.
 
 ## Verification record
 
