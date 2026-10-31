@@ -33,3 +33,7 @@ After pushing T17 and T12, `git pull --rebase` is up to date at 885a684. Ticket 
 ## Backend dependency update after T09/T16/T05
 
 T09 edit/history, T16 personalization/answer turns and T05 seller insights are implemented and verified (see CODEX_LOG.md). The T13 historical blocker above describes its earlier checkout; its remaining missing backend dependencies are T06 enrichment and T07 Notify me (and later T20a for T20b). No active blocker applies to this run’s requested T09/T16/T05 tickets. No env values changed.
+
+## T06 backend dependency update
+
+T06 enrichment preview/apply/undo is implemented and verified through real-model/DB production HTTP, including durable insights `appliedFix` and exact Undo restoration. Migration `0004_enrichment_apply.sql` was applied alone to the configured schema, preserving data. Apply is atomic across instances. T13's remaining missing route dependency is T07 Notify me; T20b still awaits T20a. No env values changed.

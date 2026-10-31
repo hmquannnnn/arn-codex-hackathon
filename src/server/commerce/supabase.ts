@@ -1,3 +1,4 @@
+import { HttpError } from '@/server/http';
 import { readPages } from './paging';
 import { demoTimestamp } from '@/server/today';
 import { createDb } from '@/server/db';
@@ -226,7 +227,32 @@ export class SupabaseAdapter implements CommerceAdapter {
   async updateListing(
     productId: string,
     patch: Pick<Product, 'title' | 'description' | 'tags' | 'attributes'>,
+    expected?: Product,
   ) {
+    if (expected) {
+      const toRow = (p: object) =>
+        Object.fromEntries(
+          Object.entries(p).map(([k, v]) => [
+            k.replace(/[A-Z]/g, (c) => '_' + c.toLowerCase()),
+            v,
+          ]),
+        );
+      const { data, error } = await this.db.rpc('kitly_apply_listing', {
+        p_id: productId,
+        p_expected: toRow(expected),
+        p_snapshot: expected,
+        p_patch: toRow(patch),
+        p_updated_at: demoTimestamp(),
+      });
+      if (error) throw error;
+      if (data.status !== 'ok')
+        throw new HttpError(
+          data.status === 'changed' ? 409 : 404,
+          data.status === 'changed' ? 'listing_changed' : 'not_found',
+          'Proposal used or listing changed',
+        );
+      return productSchema.parse(contractRow(data.product));
+    }
     const original = await this.getProduct(productId);
     if (!original) throw new Error('Product not found');
     const updated = productSchema.parse({

@@ -1,3 +1,5 @@
+import { isDeepStrictEqual } from 'node:util';
+import { HttpError } from '@/server/http';
 import { randomUUID } from 'node:crypto';
 import type {
   CommerceAdapter,
@@ -151,10 +153,23 @@ export class InMemoryAdapter implements CommerceAdapter {
   async updateListing(
     productId: string,
     patch: Pick<Product, 'title' | 'description' | 'tags' | 'attributes'>,
+    expected?: Product,
   ) {
     const index = this.products.findIndex((p) => p.id === productId);
     if (index < 0) throw new Error('Product not found');
     const current = this.products[index];
+    if (expected && !isDeepStrictEqual(current, expected)) {
+      const used =
+        current.title === patch.title &&
+        current.description === patch.description &&
+        isDeepStrictEqual(current.tags, patch.tags) &&
+        isDeepStrictEqual(current.attributes, patch.attributes);
+      throw new HttpError(
+        used ? 404 : 409,
+        used ? 'not_found' : 'listing_changed',
+        'Proposal used or listing changed',
+      );
+    }
     const updated = productSchema.parse({
       ...current,
       title: patch.title,
