@@ -6,4 +6,4 @@ T00's earlier GitHub push blocker remains resolved.
 
 ## Local verification after T01/T10 rebase
 
-The local SUPABASE_URL still lacks an HTTP(S) scheme, so the new Supabase integration tests fail before network access. The environment owner must provide the complete URL for the same project; no env file was edited. T10 previously passed 39 Vitest and 2 Playwright tests on the T00 memory baseline.
+Lane 2 previously reported a URL without an HTTP(S) scheme on its checkout. On this Lane 1 checkout, Huy authorized the HTTPS prefix fix and the API, shared Supabase tests, seed, and deployed catalog now work. No active URL blocker here; another checkout may still need its local env updated. T10 previously passed 39 Vitest and 2 Playwright tests on the T00 memory baseline.
