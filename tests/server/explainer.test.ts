@@ -161,7 +161,35 @@ it('T20a explains Balanced with grounded Saver/Premium line differences and enfo
   expect(llm.calls[0].messages[0].content).toContain(
     'one short sentence comparing Saver and Premium',
   );
-  expect(llm.calls[0].messages[0].content).toContain('Name one changed category');
-  expect(text.trim().split(/\s+/)).toHaveLength(70);
-  expect(text).not.toContain('word68');
+  expect(llm.calls[0].messages[0].content).toContain(
+    'Name one changed category',
+  );
+  expect(text.trim()).toBe('Balanced fits.');
+  expect(text.trim().split(/\s+/).length).toBeLessThanOrEqual(70);
+});
+
+it('B1 never streams a partial sentence when the word cap crosses chunk boundaries', async () => {
+  const answer = [
+    'Uniforms removed. ',
+    'The new basket fits your budget. ',
+    ...Array.from({ length: 80 }, () => 'unfinished '),
+  ];
+  let text = '';
+  for await (const delta of explainKit(new FakeLLM([], answer), plan, options))
+    text += delta;
+  expect(text.trim()).toBe(
+    'Uniforms removed. The new basket fits your budget.',
+  );
+});
+
+it('B1 retains a complete sentence ending exactly at the cap and ignores decimal punctuation', async () => {
+  const sentence = 'The total is 1.5 million. ' + 'value '.repeat(64) + 'fits.';
+  let text = '';
+  for await (const delta of explainKit(
+    new FakeLLM([], [sentence, ' More text.']),
+    plan,
+    options,
+  ))
+    text += delta;
+  expect(text).toBe(sentence);
 });

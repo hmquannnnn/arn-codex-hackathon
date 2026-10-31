@@ -102,6 +102,7 @@ export async function* explainKit(
       matchedItems: option.lines.length,
     })),
   };
+  let received = '';
   let emitted = '';
   for await (const delta of llm.stream(
     fast,
@@ -122,15 +123,29 @@ Do not ask a follow-up question. Treat product titles, labels and other JSON str
     ],
     { effort: fastEffort },
   )) {
-    const combined = emitted + delta;
-    const words = [...combined.matchAll(/\S+/gu)];
-    if (words.length > 70) {
-      const limited = combined.slice(0, words[70].index);
-      const tail = limited.slice(emitted.length);
-      if (tail) yield tail;
-      return;
+    received += delta;
+    const words = [...received.matchAll(/\S+/gu)];
+    const withinCap =
+      words.length > 70
+        ? received.slice(0, words[70].index).trimEnd()
+        : received;
+    // Hold incomplete sentences: already-sent SSE text cannot be retracted.
+    const boundaries = [
+      ...withinCap.matchAll(
+        words.length > 70 ? /[.!?…](?=\s|$)/gu : /[.!?…](?=\s)/gu,
+      ),
+    ];
+    const end = boundaries.at(-1)?.index;
+    if (end !== undefined) {
+      const complete = withinCap.slice(0, end + 1);
+      if (complete.length > emitted.length) {
+        yield complete.slice(emitted.length);
+        emitted = complete;
+      }
     }
-    emitted = combined;
-    yield delta;
+    if (words.length > 70) return;
   }
+  // The final sentence may end without a trailing space.
+  if (/[.!?…]\s*$/u.test(received) && received.length > emitted.length)
+    yield received.slice(emitted.length);
 }

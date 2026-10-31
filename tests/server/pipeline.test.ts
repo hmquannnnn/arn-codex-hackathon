@@ -29,14 +29,7 @@ it('streams validated options before explanation and saves one owned version and
   const major = events
     .filter((event) => event.event !== 'step')
     .map((event) => event.event);
-  expect(major).toEqual([
-    'plan',
-    'options',
-    'explanation',
-    'explanation',
-    'followup',
-    'done',
-  ]);
+  expect(major).toEqual(['plan', 'options', 'explanation', 'followup', 'done']);
   const planEvent = events.find((event) => event.event === 'plan');
   if (planEvent?.event !== 'plan') throw new Error('No plan');
   const { threadId, sessionId } = planEvent.data;
@@ -147,7 +140,7 @@ it('keeps a ready basket and persists partial explanation when the explainer fai
     store: new InMemoryKitStore(),
     llm: new FakeLLM(
       [plan()],
-      ['Partial ', new Error('private stream failure')],
+      ['A complete sentence. Unfinished ', new Error('private stream failure')],
     ),
   };
   const events = await collect(deps);
@@ -161,7 +154,7 @@ it('keeps a ready basket and persists partial explanation when the explainer fai
   const stored = await deps.store.getThread(done.data.threadId, 'alice');
   expect(stored?.versions[0]).toMatchObject({
     status: 'ready',
-    explanation: 'Partial ',
+    explanation: 'A complete sentence.',
   });
   expect(stored?.versions[0].options).toHaveLength(3);
   expect(JSON.stringify(events)).not.toContain('private');
