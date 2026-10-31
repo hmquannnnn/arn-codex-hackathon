@@ -49,7 +49,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 ### B6 — After-swap totals in answers can drop a line (low priority)
 - Code: `src/server/kit/alternatives.ts:17-25` — a line whose product is not in `related` is skipped in the recount, so the
   "after swap" total comes out too low. Recompute from the full selection.
-- Status: open
+- Status: fixed in e8f7130
 
 ### B7 — First budget supplied through chat never records demand (P2, confirmed)
 - Repro: start a need without a budget; when Kitly asks for it, type `My budget is 1.5M` in the composer instead of

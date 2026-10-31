@@ -122,7 +122,7 @@ export async function* runRefine(
       excludedKeys: latest.excludedKeys,
       diff: diffPlans(latest.plan, plan),
       previousPlan: latest.plan,
-      recordDemand: false,
+      recordDemand: !thread.versions.some((v) => v.status === 'ready'),
     },
     deps,
   );

@@ -250,3 +250,62 @@ it('uses only the most recent historical category for each excluded stable key',
       ?.plan.items.map((item) => item.key),
   ).toEqual(['new-pencils']);
 });
+
+it.each(['composer', 'quick choice'])(
+  'B7 first budget via %s records demand once across later edits',
+  async (entry) => {
+    const { createEditHandlers } = await import('@/server/kit/edits');
+    const adapter = new InMemoryAdapter({ demand: [] });
+    const store = new InMemoryKitStore();
+    for await (const e of runKit(
+      { query: 'School kit', owner: 'alice', persona: 'guest' },
+      { adapter, store, llm: new FakeLLM([{ ...initial, budget: null }]) },
+    ))
+      void e;
+    const threadId = (await store.listThreads('alice'))[0].id;
+    const handlers = createEditHandlers({ adapter, store });
+    const adjust = () =>
+      handlers.adjust(
+        new Request('http://localhost/api/kit/adjust', {
+          method: 'POST',
+          headers: { cookie: 'kitly_uid=alice' },
+          body: JSON.stringify({
+            threadId,
+            change: { type: 'set_budget', budget: 1500000 },
+          }),
+        }),
+      );
+    if (entry === 'composer') {
+      for await (const e of runRefine(
+        { threadId, owner: 'alice', message: 'My budget is 1.5M' },
+        {
+          adapter,
+          store,
+          llm: new FakeLLM([{ ...initial, intent: 'change_kit' }]),
+        },
+      ))
+        void e;
+    } else expect((await adjust()).status).toBe(200);
+    expect(
+      (await store.getThread(threadId, 'alice'))?.versions.map((v) => v.status),
+    ).toEqual(['awaiting_budget', 'ready']);
+    expect(await adapter.demandItemsSince('2000-01-01')).toHaveLength(
+      initial.items.length,
+    );
+    for await (const e of runRefine(
+      { threadId, owner: 'alice', message: 'Budget 1M' },
+      {
+        adapter,
+        store,
+        llm: new FakeLLM([
+          { ...initial, budget: 1000000, intent: 'change_kit' },
+        ]),
+      },
+    ))
+      void e;
+    expect((await adjust()).status).toBe(200);
+    expect(await adapter.demandItemsSince('2000-01-01')).toHaveLength(
+      initial.items.length,
+    );
+  },
+);
