@@ -30,6 +30,7 @@ const contextTags = new Set([
 function plannerPrompt() {
   return `Today is ${today()}. You plan complete shopping kits in integer VND.
 Vietnamese input → language vi; otherwise follow the buyer's language.
+needLabel is only the plain item name; never prefix it with Required, Useful extra, Optional or other priority labels. Priority belongs only in the required field.
 Use null when no category fits, never force one. Categories: ${CATEGORY_IDS.join(', ')}.
 Use only canonical tags: ${canonicalTags.join(', ')}.
 For every event, including other (a wedding, a puppy, learning guitar), list the full kit: 5–10 items, category null for each item no category fits; never an empty or one-item plan.
@@ -89,6 +90,14 @@ function normalize(raw: z.infer<typeof plannerSchema>): KitPlan {
     assumptions,
     items: raw.items.map((item) => ({
       ...item,
+      // Strip legacy priority formatting at the shared planner boundary, before labels reach any UI.
+      needLabel:
+        item.needLabel
+          .replace(
+            /^(?:required|useful extra|optional|must-have|nice-to-have)\s*[—–:-]\s*/iu,
+            '',
+          )
+          .trim() || item.needLabel,
       quantity: Math.max(1, Math.min(3, item.quantity)),
       mustHaveTags: [
         ...new Set(item.mustHaveTags.filter((tag) => !contextTags.has(tag))),

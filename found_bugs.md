@@ -29,7 +29,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   Water bottle · 100%" (same on the raincoat and desk-lamp cards).
 - Expected: real co-occurrence share per kit/DATA.md / ticket 05 (share of sessions with this need that also asked for
   the other category). All-100% looks fake to judges. Check the maths and the seed data.
-- Status: open
+- Status: fixed in a0cdca5
 
 ### B4 — Raw plan labels leak into UI text
 - Repro: new kit `Grade 1, budget 200k` → Fit suggestion reads "Drop Required — Grade 1 backpack, Required — school

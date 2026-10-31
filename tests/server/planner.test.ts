@@ -299,3 +299,21 @@ it('keeps essential needs independent of the spending limit in both initial and 
     expect(prompt).toContain('optimizer reports the minimum cost');
   }
 });
+
+it('B4 keeps plain need labels in initial and refined plans, with priority in its own field', async () => {
+  const raw = plan();
+  raw.items[0].needLabel = 'Required — Grade 1 backpack';
+  raw.items[1].needLabel = 'Useful extra — pencil case';
+  raw.items[2].needLabel = 'Optional — school shoes';
+  const llm = new FakeLLM([raw, { ...raw, intent: 'change_kit' }]);
+  const initial = await planNeed(llm, 'Grade 1, budget 200k');
+  const refined = await refineNeed(llm, initial, 'Budget 300k', []);
+  for (const result of [initial, refined.plan]) {
+    expect(result.items.map((i) => i.needLabel)).toEqual([
+      'Grade 1 backpack',
+      'pencil case',
+      'school shoes',
+    ]);
+    expect(result.items.every((i) => i.required)).toBe(true);
+  }
+});
