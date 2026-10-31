@@ -48,3 +48,64 @@ it('streams a short language-aware explanation grounded in actual totals, saving
     String(options.find((o) => o.profile === 'balanced')!.grandTotal),
   );
 });
+it('grounds a refinement explanation in the item diff and instructs it to lead with changes and new total', async () => {
+  const llm = new FakeLLM([], ['Removed uniform. New total is lower.']);
+  const diff = { added: [], removed: ['uniform'], changed: ['backpack'] };
+  for await (const _chunk of explainKit(llm, plan, options, diff)) {
+    void _chunk;
+  }
+  const system = llm.calls[0].messages.find(
+    (message) => message.role === 'system',
+  )!.content;
+  const facts = JSON.parse(
+    llm.calls[0].messages.find((message) => message.role === 'user')!.content,
+  );
+  expect(system).toContain('Start with what changed and the new total');
+  expect(facts.changes).toEqual(diff);
+  expect(facts.selected.grandTotal).toBe(
+    options.find((option) => option.profile === 'balanced')!.grandTotal,
+  );
+});
+it('provides previous and next constraint values plus labelled item changes for opaque stable keys', async () => {
+  const previous = {
+    ...plan,
+    budget: 1500000,
+    deadline: '2026-09-05',
+    items: [
+      { ...plan.items[0], key: 'item-2', needLabel: 'Notebooks', quantity: 1 },
+    ],
+  };
+  const next = {
+    ...previous,
+    budget: 1000000,
+    deadline: '2026-09-04',
+    items: [{ ...previous.items[0], quantity: 2 }],
+  };
+  const llm = new FakeLLM();
+  for await (const chunk of explainKit(
+    llm,
+    next,
+    options,
+    { added: [], removed: [], changed: ['item-2'] },
+    previous,
+  )) {
+    void chunk;
+  }
+  const facts = JSON.parse(
+    llm.calls[0].messages.find((message) => message.role === 'user')!.content,
+  );
+  expect(facts.changeContext.before).toEqual({
+    budget: 1500000,
+    deadline: '2026-09-05',
+  });
+  expect(facts.changeContext.after).toEqual({
+    budget: 1000000,
+    deadline: '2026-09-04',
+  });
+  expect(facts.changeContext.changed).toMatchObject([
+    {
+      before: { key: 'item-2', needLabel: 'Notebooks', quantity: 1 },
+      after: { key: 'item-2', needLabel: 'Notebooks', quantity: 2 },
+    },
+  ]);
+});

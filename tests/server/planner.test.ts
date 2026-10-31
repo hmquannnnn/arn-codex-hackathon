@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { planNeed } from '@/server/planner';
+import { planNeed, refineNeed } from '@/server/planner';
 import { FakeLLM } from '@/server/llm';
 import type { KitPlan } from '@/contract/types';
 
@@ -175,4 +175,112 @@ it('uses next year school opening once this year opening has passed', async () =
   expect(
     (await planNeed(new FakeLLM([raw]), 'School kit')).assumptions,
   ).toEqual(['By Sep 5 (school opening)']);
+});
+
+it('refines previous constraints with stable keys, new items and item tags while blocking excluded keys or categories', async () => {
+  const previous = plan();
+  previous.items[0].key = 'backpack';
+  previous.items[1].key = 'pens';
+  previous.items[2] = {
+    ...previous.items[2],
+    key: 'uniform',
+    category: 'uniform-shirt',
+  };
+  const excluded = [
+    { ...previous.items[1], key: 'owned-bottle', category: 'water-bottle' },
+    { ...previous.items[1], key: 'owned-key', category: 'book-covers' },
+  ];
+  const revised = {
+    ...previous,
+    budget: 1000000,
+    intent: 'change_kit',
+    items: [
+      {
+        ...previous.items[0],
+        mustHaveTags: ['waterproof', 'kids'],
+        quantity: 5,
+      },
+      previous.items[1],
+      { ...previous.items[1], key: 'raincoat', category: 'kids-raincoat' },
+      { ...previous.items[1], key: 'new-bottle-key', category: 'water-bottle' },
+      { ...previous.items[1], key: 'owned-key', category: 'notebooks' },
+    ],
+  };
+  const fake = new FakeLLM([revised]);
+  const result = await refineNeed(
+    fake,
+    previous,
+    'The school gives uniforms. Budget 1M, waterproof backpack and add a raincoat.',
+    excluded,
+  );
+  expect(result.intent).toBe('change_kit');
+  expect(result.plan.budget).toBe(1000000);
+  expect(result.plan.items.map((item) => item.key)).toEqual([
+    'backpack',
+    'pens',
+    'raincoat',
+  ]);
+  expect(result.plan.items[0]).toMatchObject({
+    mustHaveTags: ['waterproof'],
+    niceToHaveTags: ['kids'],
+    quantity: 3,
+  });
+  expect(previous.items.map((item) => item.key)).toEqual([
+    'backpack',
+    'pens',
+    'uniform',
+  ]);
+  const context = JSON.parse(
+    fake.calls[0].messages.find((message) => message.role === 'user')!.content,
+  );
+  expect(context).toMatchObject({
+    previousPlan: previous,
+    excludedItems: excluded,
+  });
+  expect(context.changeMessage).toContain('Budget 1M');
+  const system = fake.calls[0].messages[0].content;
+  expect(system).toContain('the buyer already has these, never add them');
+  expect(system).toContain('unchanged');
+  expect(system).toContain('key');
+});
+it('requires refine intent, retries once and returns the plan even for answer intent', async () => {
+  const previous = plan();
+  const fake = new FakeLLM([previous, { ...previous, intent: 'answer' }]);
+  const result = await refineNeed(
+    fake,
+    previous,
+    'Does this backpack protect the spine?',
+    [],
+  );
+  expect(result.intent).toBe('answer');
+  expect(result.plan.budget).toBe(previous.budget);
+  expect(result.plan.items).toEqual(previous.items);
+  expect(fake.calls).toHaveLength(2);
+  expect(fake.calls[0].messages[0].content).toContain(
+    'answer only when no constraint changes',
+  );
+});
+it('honors deliberate sparse refinements and excludes uncovered needs by key without deleting unrelated null-category items', async () => {
+  const previous = plan();
+  previous.event = 'other';
+  previous.items = previous.items.map((item, index) => ({
+    ...item,
+    category: null,
+    key: `pet-${index}`,
+  }));
+  const fake = new FakeLLM([
+    {
+      ...previous,
+      intent: 'change_kit',
+      items: [previous.items[0], previous.items[1]],
+    },
+  ]);
+  const result = await refineNeed(
+    fake,
+    previous,
+    'Remove the leash, I already have food.',
+    [previous.items[0]],
+  );
+  expect(result.plan.items.map((item) => item.key)).toEqual(['pet-1']);
+  expect(fake.calls).toHaveLength(1);
 });

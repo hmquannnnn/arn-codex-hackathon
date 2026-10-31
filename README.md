@@ -3,11 +3,11 @@
 Tell Kitly your need, get the whole kit. Built during the hackathon with Codex.
 The prepared product brief, contract, data specification and tickets are in [kit/](kit/).
 
-## Current implementation (T03)
+## Current implementation (T04)
 
 Next.js App Router, strict TypeScript, Tailwind, lucide-react, Zod contracts, fixtures,
 memory and Supabase CommerceAdapter/KitStore, one OpenAI Responses wrapper, store APIs and scoped migration/seed commands.
-The storefront and live Kit API are implemented; the remaining kit/seller screens and refinement APIs follow their tickets.
+The storefront and live Kit/refine APIs are implemented; the remaining kit edits and seller screens follow their tickets.
 
 Production: [Kitly on Vercel](https://kitly-arn-codex-hackathon.vercel.app) — Supabase adapter,
 team `hmquannnnns-projects`, functions in Singapore (`sin1`).
@@ -54,7 +54,8 @@ Install browsers with `npx playwright install chromium` when that suite is added
 - `today()` from `@/server/today` reads `DEMO_TODAY` (default `2026-09-02`).
 - `optimizeProfiles`, `optimize`, `priceBasket` and `fitToBudget` from `@/server/optimizer`: pure basket arithmetic and deterministic profile selection. Exact search for small pools; bounded multi-start search for large pools (including voucher-shop starts).
 - `planNeed`, `matchPlan`, `explainKit`, and `runKit` implement the live pipeline; `POST /api/kit` streams contract SSE, saves version 1, and records demand once. Missing budget asks one question and saves `awaiting_budget`; explanation failures preserve a ready basket.
-- Routes: products list/detail, shops, categories, checkout, persona GET/POST and Kit POST.
+- `POST /api/kit/refine` authorizes the latest thread before SSE, preserves exclusions and history, emits a key-based diff and saves a new version without recording demand. Explanation facts include before/after constraints and labelled item changes.
+- Routes: products list/detail, shops, categories, checkout, persona GET/POST, Kit POST and refine POST.
   Checkout is a fake receipt: catalog prices + one shipping fee per shop, stock checked, no payment or
   stock mutation. Voucher optimization belongs to the optimizer ticket.
 

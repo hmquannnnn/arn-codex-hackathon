@@ -1,6 +1,12 @@
 import type { CommerceAdapter } from '@/contract/commerce-adapter';
 import type { KitStore } from '@/contract/kit-store';
-import type { KitEvent, PersonaId, Profile } from '@/contract/types';
+import type {
+  KitEvent,
+  KitPlan,
+  PersonaId,
+  PlanDiff,
+  Profile,
+} from '@/contract/types';
 import type { LLM } from '@/server/llm/types';
 import { planNeed } from '@/server/planner';
 import { matchPlan } from '@/server/matcher';
@@ -18,46 +24,58 @@ export interface KitInput {
   persona: PersonaId;
   profiles?: Profile[];
 }
-function logStep(id: string, start: number) {
+interface CompletionInput extends KitInput {
+  threadId: string;
+  plan: KitPlan;
+  version: number;
+  kind: 'new' | 'refine';
+  excludedKeys: string[];
+  diff: PlanDiff | null;
+  recordDemand: boolean;
+  previousPlan?: KitPlan;
+}
+export function logKitStep(id: string, start: number) {
   console.info(
     `[kit] ${id} ${((performance.now() - start) / 1000).toFixed(3)}s`,
   );
 }
+export function kitFailure(): KitEvent {
+  return {
+    event: 'error',
+    data: {
+      code: 'llm_error',
+      message: 'Unable to build your kit. Please try again.',
+    },
+  };
+}
 
-/** A run owns a fresh thread and persists its complete version before yielding done. */
-export async function* runKit(
-  input: KitInput,
+/** Shared downstream pipeline; only the first ready run writes demand rows. */
+export async function* completeKit(
+  input: CompletionInput,
   deps: PipelineDeps,
 ): AsyncGenerator<KitEvent> {
   let optionsSent = false;
   try {
     const { adapter, store, llm } = deps;
-    const { threadId } = await store.createThread(
-      input.owner,
-      input.query,
-      input.persona,
-    );
+    const { plan, threadId } = input;
     let start = performance.now();
-    yield {
-      event: 'step',
-      data: {
-        id: 'understand',
-        status: 'running',
-        detail: 'Understanding your need',
-      },
-    };
-    const plan = await planNeed(llm, input.query);
-    logStep('understand', start);
-    yield { event: 'step', data: { id: 'understand', status: 'done' } };
-    start = performance.now();
     yield { event: 'step', data: { id: 'plan', status: 'running' } };
     const { sessionId } = await adapter.recordIntent({
       query: input.query,
       plan,
       source: 'live',
     });
-    yield { event: 'plan', data: { sessionId, threadId, version: 1, plan } };
-    logStep('plan', start);
+    yield {
+      event: 'plan',
+      data: {
+        sessionId,
+        threadId,
+        version: input.version,
+        plan,
+        ...(input.diff ? { diff: input.diff } : {}),
+      },
+    };
+    logKitStep('plan', start);
     yield {
       event: 'step',
       data: {
@@ -66,12 +84,22 @@ export async function* runKit(
         detail: `Planned ${plan.items.length} items`,
       },
     };
+    const base = {
+      threadId,
+      kind: input.kind,
+      userText: input.query,
+      plan,
+      excludedKeys: input.excludedKeys,
+      diff: input.diff,
+      selection: null,
+      followUp: null,
+    };
     if (plan.budget === null) {
       yield {
         event: 'clarify',
         data: {
           threadId,
-          version: 1,
+          version: input.version,
           question: {
             kind: 'budget',
             text:
@@ -83,19 +111,7 @@ export async function* runKit(
         },
       };
       const version = await store.appendVersion(
-        {
-          threadId,
-          kind: 'new',
-          userText: input.query,
-          plan,
-          excludedKeys: [],
-          status: 'awaiting_budget',
-          options: [],
-          explanation: '',
-          diff: null,
-          selection: null,
-          followUp: null,
-        },
+        { ...base, status: 'awaiting_budget', options: [], explanation: '' },
         input.owner,
       );
       yield {
@@ -111,7 +127,7 @@ export async function* runKit(
       adapter.getPersona(input.persona),
       adapter.listVouchers(input.persona),
     ]);
-    logStep('search', start);
+    logKitStep('search', start);
     yield {
       event: 'step',
       data: {
@@ -131,17 +147,18 @@ export async function* runKit(
       },
       input.profiles,
     );
-    await adapter.recordDemandItems(
-      sessionId,
-      plan.items.map((item) => ({
-        item,
-        matchedCount: matched.matchedCounts[item.key] ?? 0,
-        budgetHint:
-          item.maxUnitPrice ??
-          Math.floor(plan.budget! / Math.max(1, plan.items.length)),
-      })),
-    );
-    logStep('optimize', start);
+    if (input.recordDemand)
+      await adapter.recordDemandItems(
+        sessionId,
+        plan.items.map((item) => ({
+          item,
+          matchedCount: matched.matchedCounts[item.key] ?? 0,
+          budgetHint:
+            item.maxUnitPrice ??
+            Math.floor(plan.budget! / Math.max(1, plan.items.length)),
+        })),
+      );
+    logKitStep('optimize', start);
     yield {
       event: 'step',
       data: {
@@ -157,14 +174,20 @@ export async function* runKit(
     let explanation = '';
     let explanationUnavailable = false;
     try {
-      for await (const delta of explainKit(llm, plan, options)) {
+      for await (const delta of explainKit(
+        llm,
+        plan,
+        options,
+        input.diff ?? undefined,
+        input.previousPlan,
+      )) {
         explanation += delta;
         yield { event: 'explanation', data: { delta } };
       }
     } catch {
       explanationUnavailable = true;
     }
-    logStep('explain', start);
+    logKitStep('explain', start);
     yield {
       event: 'step',
       data: {
@@ -176,19 +199,7 @@ export async function* runKit(
       },
     };
     const version = await store.appendVersion(
-      {
-        threadId,
-        kind: 'new',
-        userText: input.query,
-        plan,
-        excludedKeys: [],
-        status: 'ready',
-        options,
-        explanation,
-        diff: null,
-        selection: null,
-        followUp: null,
-      },
+      { ...base, status: 'ready', options, explanation },
       input.owner,
     );
     yield {
@@ -196,15 +207,51 @@ export async function* runKit(
       data: { sessionId, threadId, version: version.version },
     };
   } catch {
-    // Once options exist, stream failure must not mislabel a completed basket as
-    // an LLM error or claim that an unsaved version was persisted.
     if (optionsSent) throw new Error('Unable to save your kit');
+    yield kitFailure();
+  }
+}
+
+/** A new need owns a fresh thread; failures before any options become terminal SSE errors. */
+export async function* runKit(
+  input: KitInput,
+  deps: PipelineDeps,
+): AsyncGenerator<KitEvent> {
+  let threadId: string;
+  let plan: KitPlan;
+  try {
+    ({ threadId } = await deps.store.createThread(
+      input.owner,
+      input.query,
+      input.persona,
+    ));
+    const start = performance.now();
     yield {
-      event: 'error',
+      event: 'step',
       data: {
-        code: 'llm_error',
-        message: 'Unable to build your kit. Please try again.',
+        id: 'understand',
+        status: 'running',
+        detail: 'Understanding your need',
       },
     };
+    plan = await planNeed(deps.llm, input.query);
+    logKitStep('understand', start);
+    yield { event: 'step', data: { id: 'understand', status: 'done' } };
+  } catch {
+    yield kitFailure();
+    return;
   }
+  yield* completeKit(
+    {
+      ...input,
+      threadId,
+      plan,
+      version: 1,
+      kind: 'new',
+      excludedKeys: [],
+      diff: null,
+      recordDemand: true,
+    },
+    deps,
+  );
 }
