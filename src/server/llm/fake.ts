@@ -10,7 +10,7 @@ export class FakeLLM implements LLM {
   private outputs: unknown[];
   constructor(
     outputs: unknown[] = [],
-    private chunks: string[] = [],
+    private chunks: (string | Error)[] = [],
   ) {
     this.outputs = structuredClone(outputs);
   }
@@ -27,7 +27,9 @@ export class FakeLLM implements LLM {
       effort: options.effort,
     });
     if (!this.outputs.length) throw new Error('FakeLLM has no scripted output');
-    return schema.parse(this.outputs.shift());
+    const output = this.outputs.shift();
+    if (output instanceof Error) throw output;
+    return schema.parse(output);
   }
   async *stream(
     model: string,
@@ -40,6 +42,9 @@ export class FakeLLM implements LLM {
       messages: structuredClone(messages),
       effort: options.effort,
     });
-    for (const delta of this.chunks) yield delta;
+    for (const delta of this.chunks) {
+      if (delta instanceof Error) throw delta;
+      yield delta;
+    }
   }
 }

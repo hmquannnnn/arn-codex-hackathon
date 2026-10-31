@@ -3,6 +3,7 @@ import { zodTextFormat } from 'openai/helpers/zod';
 import type { ServiceTier } from 'openai/resources/responses/responses';
 import { z } from 'zod';
 import type { LLM, LLMOptions, Message } from './types';
+import { withIdleTimeout } from './idle';
 export class OpenAILLM implements LLM {
   private client: OpenAI;
   constructor() {
@@ -48,34 +49,35 @@ export class OpenAILLM implements LLM {
     options: LLMOptions = {},
   ): AsyncGenerator<string> {
     const controller = new AbortController();
-    let idle: ReturnType<typeof setTimeout>;
-    const reset = () => {
-      clearTimeout(idle);
-      idle = setTimeout(
-        () => controller.abort(new Error('No text delta for 20 seconds')),
-        20_000,
-      );
+    const client = this.client;
+    const request = {
+      model,
+      input: messages,
+      stream: true as const,
+      ...this.settings(options),
     };
-    reset();
-    try {
-      const events = await this.client.responses.create(
-        { model, input: messages, stream: true, ...this.settings(options) },
-        { signal: controller.signal },
-      );
+    async function* textDeltas() {
+      const events = await client.responses.create(request, {
+        signal: controller.signal,
+      });
       for await (const event of events) {
-        if (event.type === 'response.output_text.delta' && event.delta.length) {
-          reset();
+        if (event.type === 'response.output_text.delta' && event.delta.length)
           yield event.delta;
-        } else if (
+        else if (
           event.type === 'error' ||
           event.type === 'response.failed' ||
           event.type === 'response.incomplete'
-        )
+        ) {
           throw new Error('LLM stream failed');
+        }
       }
+    }
+    try {
+      yield* withIdleTimeout(textDeltas(), 20_000, (reason) =>
+        controller.abort(reason),
+      );
       if (controller.signal.aborted) throw controller.signal.reason;
     } finally {
-      clearTimeout(idle!);
       controller.abort();
     }
   }

@@ -3,11 +3,11 @@
 Tell Kitly your need, get the whole kit. Built during the hackathon with Codex.
 The prepared product brief, contract, data specification and tickets are in [kit/](kit/).
 
-## Current implementation (T02)
+## Current implementation (T03)
 
 Next.js App Router, strict TypeScript, Tailwind, lucide-react, Zod contracts, fixtures,
 memory and Supabase CommerceAdapter/KitStore, one OpenAI Responses wrapper, store APIs and scoped migration/seed commands.
-This is an API-ready skeleton; the buyer/seller screens and AI pipeline belong to later tickets.
+The storefront and live Kit API are implemented; the remaining kit/seller screens and refinement APIs follow their tickets.
 
 Production: [Kitly on Vercel](https://kitly-arn-codex-hackathon.vercel.app) — Supabase adapter,
 team `hmquannnnns-projects`, functions in Singapore (`sin1`).
@@ -48,12 +48,13 @@ Install browsers with `npx playwright install chromium` when that suite is added
 - `getAdapter()` from `@/server/commerce`; `getKitStore()` from `@/server/kits`.
 - `structured`, `stream`, `getModels` and `FakeLLM` from `@/server/llm`. Zod schemas are passed to
   `structured`; model names and efforts come from `getModels()`. Streams yield raw text deltas and abort
-  after 20 seconds without a delta. No real LLM calls are made by T00 routes or tests.
+  after 20 seconds without a delta. The Kit API uses the real client; ordinary tests use FakeLLM and a local HTTP transport test.
 - `ownerFrom(request)` / `personaFrom(request)` from `@/server/identity`; middleware forwards a newly
   created owner cookie into the initial request as well as setting the response cookie.
 - `today()` from `@/server/today` reads `DEMO_TODAY` (default `2026-09-02`).
 - `optimizeProfiles`, `optimize`, `priceBasket` and `fitToBudget` from `@/server/optimizer`: pure basket arithmetic and deterministic profile selection. Exact search for small pools; bounded multi-start search for large pools (including voucher-shop starts).
-- Routes: products list/detail, shops, categories, checkout and persona GET/POST.
+- `planNeed`, `matchPlan`, `explainKit`, and `runKit` implement the live pipeline; `POST /api/kit` streams contract SSE, saves version 1, and records demand once. Missing budget asks one question and saves `awaiting_budget`; explanation failures preserve a ready basket.
+- Routes: products list/detail, shops, categories, checkout, persona GET/POST and Kit POST.
   Checkout is a fake receipt: catalog prices + one shipping fee per shop, stock checked, no payment or
   stock mutation. Voucher optimization belongs to the optimizer ticket.
 
@@ -71,7 +72,7 @@ the service-role key stays on the server. Never run either command against anoth
 Tests run the shared memory/Supabase contracts when local credentials exist. The read-only seed checks
 expect a seeded catalog. `KITLY_TEST_SEED=1 npm test -- tests/server/seed-integration.test.ts` separately
 verifies destructive seed idempotency (Kitly tables only); ordinary `npm test` skips that reset test.
-The express Balanced check passes against the real seed. The six-event Planner/Matcher coverage probe requires T03.
+The express Balanced check passes against the real seed. The real six-event Planner/Matcher coverage probe found no unintended gaps.
 
 ## Verification record
 
