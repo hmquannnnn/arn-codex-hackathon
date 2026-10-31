@@ -146,7 +146,12 @@ test('DEMO beats 1–4: buyer intent, durable conversation, seller fix, exact ma
       .savings.find((saving) => !saving.wallet);
     expect(shopSaving).toBeDefined();
     await expect(
-      page.getByText(shopSaving!.label, { exact: true }).first(),
+      page
+        .getByTestId('savings')
+        .getByText(`${shopSaving!.label} · save ${money(shopSaving!.amount)}`, {
+          exact: true,
+        })
+        .first(),
     ).toBeVisible();
     await expect(page.getByTestId('no-match')).toContainText(
       'Minh An Kids Backpack New Model 2026',
