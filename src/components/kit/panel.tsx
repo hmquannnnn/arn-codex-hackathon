@@ -10,7 +10,7 @@ import type {
 } from '@/contract/types';
 import { money } from '@/lib/client/store';
 import { noMatchText } from '@/lib/client/kit-text';
-import { mergeOptions } from '@/lib/client/kit-compare';
+import { mergeOptions, compareToBalanced } from '@/lib/client/kit-compare';
 import {
   applyFit,
   pickProduct,
@@ -80,10 +80,13 @@ export function KitPanel({
     );
   const options = mergeOptions(version.options);
   const selected =
-    options.find((o) => o.profile === profile) ||
+    options.find((o) => o.profiles.includes(profile)) ||
     options.find((o) => o.profile === 'balanced') ||
     options[0];
-  const option = repriced?.profile === selected?.profile ? repriced : selected;
+  const option =
+    repriced && selected?.profiles.includes(repriced.profile)
+      ? repriced
+      : selected;
   const gapKey = (key: string) => {
     const item = version.plan.items.find((i) => i.key === key);
     return `${item?.category ?? 'none'}|${[...(item?.mustHaveTags || [])].sort().join(',')}`;
@@ -215,37 +218,54 @@ export function KitPanel({
         </p>
       ) : (
         <>
-          <div
-            role="tablist"
-            aria-label="Basket profiles"
-            className="grid grid-cols-3 gap-2"
-          >
-            {options.map((o) => (
-              <button
-                key={o.profile}
-                role="tab"
-                aria-selected={option.profile === o.profile}
-                disabled={busy || pending}
-                onClick={() => {
-                  setProfile(o.profile);
-                  setRepriced(undefined);
-                  setError('');
-                }}
-                className={`rounded-xl border p-2 text-left ${option.profile === o.profile ? 'border-accent bg-orange-50' : 'bg-white'}`}
-              >
-                <span className="block text-xs font-bold capitalize">
-                  {o.status === 'over_budget' ? '⚠ ' : ''}
-                  {o.profile[0].toUpperCase() + o.profile.slice(1)}
-                </span>
-                <span className="mt-1 block text-sm font-semibold">
-                  {money(o.grandTotal)}
-                </span>
-                <span className="mt-1 block text-[10px] text-slate-500">
-                  {meanings[o.profile]}
-                </span>
-              </button>
-            ))}
-          </div>
+          {version.options.some((o) => o.lines.length > 0) && (
+            <div
+              role="tablist"
+              aria-label="Basket profiles"
+              className="grid gap-2"
+              style={{
+                gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
+              }}
+            >
+              {options.map((o) => (
+                <button
+                  key={o.profile}
+                  role="tab"
+                  aria-selected={selected.profile === o.profile}
+                  disabled={busy || pending}
+                  onClick={() => {
+                    setProfile(o.profile);
+                    setRepriced(undefined);
+                    setError('');
+                  }}
+                  className={`rounded-xl border p-2 text-left ${selected.profile === o.profile ? 'border-accent bg-orange-50' : 'bg-white'}`}
+                >
+                  <span className="block text-xs font-bold capitalize">
+                    {o.status === 'over_budget' ? '⚠ ' : ''}
+                    {o.label}
+                  </span>
+                  <span className="mt-1 block text-sm font-semibold">
+                    {money(o.grandTotal)}
+                  </span>
+                  <span className="mt-1 block text-[10px] text-slate-500">
+                    {meanings[o.profile]}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+          {version.options.some((o) => o.lines.length > 0) && (
+            <p
+              data-testid="basket-difference"
+              className="text-xs leading-5 text-slate-600"
+            >
+              {compareToBalanced(
+                option,
+                version.options.find((o) => o.profile === 'balanced'),
+                version.plan.items,
+              )}
+            </p>
+          )}
           <section
             data-testid="no-match"
             aria-label="No exact match"
