@@ -90,7 +90,7 @@ it('refines one owned thread, keeps version1 immutable and records an intent wit
   });
   expect(await store.getThread(threadId, 'bob')).toBeNull();
 });
-it('never re-adds an excluded historical category even under a renamed key, including answer intent', async () => {
+it('never re-adds an excluded historical category even under a renamed key on change turns', async () => {
   const adapter = new CountingAdapter();
   const store = new InMemoryKitStore();
   for await (const event of runKit(
@@ -120,7 +120,7 @@ it('never re-adds an excluded historical category even under a renamed key, incl
       item.key === 'water-bottle' ? { ...item, key: 'new-drink' } : item,
     ),
   };
-  const llm = new FakeLLM([{ ...renamed, intent: 'answer' }]);
+  const llm = new FakeLLM([{ ...renamed, intent: 'change_kit' }]);
   const events: KitEvent[] = [];
   for await (const event of runRefine(
     { threadId, owner: 'alice', message: 'Make it waterproof' },

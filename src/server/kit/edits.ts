@@ -13,6 +13,8 @@ import { loadRefineThread } from '@/server/refine';
 import { matchPlan } from '@/server/matcher';
 import { optimizeProfiles } from '@/server/optimizer';
 import { priceSelection } from '@/server/optimizer/selection';
+import { findInterests } from './interests';
+import { today } from '@/server/today';
 import { diffPlans } from '@/server/diff';
 
 type Deps = { adapter: CommerceAdapter; store: KitStore };
@@ -31,10 +33,13 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
         // Persona is thread-owned: fetch both possible voucher sets while loading history.
         const shops = adapter.listShops();
         const products = adapter.searchProducts({});
-        const [thread, lanVouchers, guestVouchers] = await Promise.all([
+        const [thread, lanVouchers, guestVouchers, lan] = await Promise.all([
           loadRefineThread(body.threadId, owner, store),
           adapter.listVouchers('lan'),
           adapter.listVouchers('guest'),
+          adapter.getPersona('lan'),
+          shops,
+          products,
         ]);
         const latest = thread.versions.at(-1)!;
         let plan = structuredClone(latest.plan),
@@ -102,6 +107,25 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
               },
               body.profiles,
             );
+        const persona =
+          thread.thread.persona === 'lan'
+            ? lan
+            : {
+                id: 'guest' as const,
+                name: 'Guest',
+                address: null,
+                favoriteShopIds: [],
+                cart: [],
+              };
+        for (const option of options)
+          option.interests = findInterests(
+            plan,
+            option,
+            matched.related,
+            persona,
+            vouchers,
+            today(),
+          );
         if (!awaiting && !thread.versions.some((v) => v.status === 'ready')) {
           const { sessionId } = await adapter.recordIntent({
             query: thread.thread.title,
@@ -156,10 +180,13 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
           { adapter, store } = deps();
         const shops = adapter.listShops();
         const products = adapter.searchProducts({});
-        const [thread, lanVouchers, guestVouchers] = await Promise.all([
+        const [thread, lanVouchers, guestVouchers, lan] = await Promise.all([
           loadRefineThread(threadId, owner, store),
           adapter.listVouchers('lan'),
           adapter.listVouchers('guest'),
+          adapter.getPersona('lan'),
+          shops,
+          products,
         ]);
         const latest = thread.versions.at(-1)!;
         if (latest.status !== 'ready')
@@ -169,11 +196,40 @@ export function createEditHandlers(dependencies: Deps | (() => Deps)) {
             'Budget is required first',
           );
         const matched = await matchPlan(latest.plan, adapter, shops, products);
+        const persona =
+          thread.thread.persona === 'lan'
+            ? lan
+            : {
+                id: 'guest' as const,
+                name: 'Guest',
+                address: null,
+                favoriteShopIds: [],
+                cart: [],
+              };
+        const vouchers =
+          thread.thread.persona === 'lan' ? lanVouchers : guestVouchers;
+        const interests = findInterests(
+          latest.plan,
+          { lines: [] },
+          matched.related,
+          persona,
+          vouchers,
+          today(),
+        );
         const option = priceSelection(
           latest.plan,
           matched,
           selection,
-          thread.thread.persona === 'lan' ? lanVouchers : guestVouchers,
+          vouchers,
+          interests,
+        );
+        option.interests = findInterests(
+          latest.plan,
+          option,
+          matched.related,
+          persona,
+          vouchers,
+          today(),
         );
         await store.saveSelection(threadId, owner, selection);
         console.info(

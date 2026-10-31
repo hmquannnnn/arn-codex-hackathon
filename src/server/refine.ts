@@ -15,6 +15,7 @@ import {
 } from '@/server/pipeline';
 import { refineNeed } from '@/server/planner';
 import { diffPlans } from '@/server/diff';
+import { answerKit } from '@/server/kit/answer';
 import { categories } from '@/contract/taxonomy';
 export interface RefineInput {
   threadId: string;
@@ -69,8 +70,32 @@ export async function* runRefine(
     ];
   });
   let plan;
+  let intent;
   try {
     const start = performance.now();
+    ({ plan, intent } = await refineNeed(
+      deps.llm,
+      latest.plan,
+      input.message,
+      excluded,
+    ));
+    logKitStep('understand', start);
+    if (intent === 'answer' && latest.status === 'ready') {
+      yield {
+        event: 'step',
+        data: { id: 'understand', status: 'running', detail: 'Answering' },
+      };
+      yield* answerKit(
+        {
+          latest,
+          persona: thread.thread.persona,
+          owner: input.owner,
+          message: input.message,
+        },
+        deps,
+      );
+      return;
+    }
     yield {
       event: 'step',
       data: {
@@ -79,13 +104,6 @@ export async function* runRefine(
         detail: 'Understanding your changes',
       },
     };
-    ({ plan } = await refineNeed(
-      deps.llm,
-      latest.plan,
-      input.message,
-      excluded,
-    ));
-    logKitStep('understand', start);
     yield { event: 'step', data: { id: 'understand', status: 'done' } };
   } catch {
     yield kitFailure();

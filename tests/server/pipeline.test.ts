@@ -34,6 +34,7 @@ it('streams validated options before explanation and saves one owned version and
     'options',
     'explanation',
     'explanation',
+    'followup',
     'done',
   ]);
   const planEvent = events.find((event) => event.event === 'plan');
@@ -45,7 +46,7 @@ it('streams validated options before explanation and saves one owned version and
     version: 1,
     status: 'ready',
     explanation: 'Your kit is ready.',
-    followUp: null,
+    followUp: expect.objectContaining({ source: 'template' }),
     diff: null,
     selection: null,
   });
@@ -210,7 +211,7 @@ it('records zero matches for every uncovered puppy need and retries one invalid 
   ).toBe(true);
   expect(
     deps.llm.calls.filter((call) => call.kind === 'structured'),
-  ).toHaveLength(2);
+  ).toHaveLength(3);
 });
 it('yields options before starting the explainer and persists before the done event', async () => {
   const deps = {

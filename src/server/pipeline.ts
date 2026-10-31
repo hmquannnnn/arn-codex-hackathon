@@ -12,6 +12,11 @@ import { planNeed } from '@/server/planner';
 import { matchPlan } from '@/server/matcher';
 import { optimizeProfiles } from '@/server/optimizer';
 import { explainKit } from '@/server/explainer';
+import { findInterests } from '@/server/kit/interests';
+import { buildSalesContext } from '@/server/kit/sales-context';
+import { followUp } from '@/server/kit/follow-up';
+import { alternativeFacts } from '@/server/kit/alternatives';
+import { today } from '@/server/today';
 
 export interface PipelineDeps {
   adapter: CommerceAdapter;
@@ -122,7 +127,7 @@ export async function* completeKit(
     }
     start = performance.now();
     yield { event: 'step', data: { id: 'search', status: 'running' } };
-    const [matched, , vouchers] = await Promise.all([
+    const [matched, persona, vouchers] = await Promise.all([
       matchPlan(plan, adapter),
       adapter.getPersona(input.persona),
       adapter.listVouchers(input.persona),
@@ -147,6 +152,15 @@ export async function* completeKit(
       },
       input.profiles,
     );
+    for (const option of options)
+      option.interests = findInterests(
+        plan,
+        option,
+        matched.related,
+        persona,
+        vouchers,
+        today(),
+      );
     if (input.recordDemand)
       await adapter.recordDemandItems(
         sessionId,
@@ -169,6 +183,23 @@ export async function* completeKit(
     };
     optionsSent = true;
     yield { event: 'options', data: { options } };
+    const selected =
+      options.find((o) => o.profile === 'balanced') ?? options[0];
+    const context = buildSalesContext(
+      plan,
+      selected,
+      persona,
+      vouchers,
+      today(),
+      matched.shops,
+    );
+    const following = followUp(llm, {
+      plan,
+      option: selected,
+      context,
+      alternatives: alternativeFacts(plan, selected, matched, vouchers),
+      message: input.query,
+    });
     start = performance.now();
     yield { event: 'step', data: { id: 'explain', status: 'running' } };
     let explanation = '';
@@ -180,6 +211,7 @@ export async function* completeKit(
         options,
         input.diff ?? undefined,
         input.previousPlan,
+        context,
       )) {
         explanation += delta;
         yield { event: 'explanation', data: { delta } };
@@ -198,8 +230,16 @@ export async function* completeKit(
           : {}),
       },
     };
+    const nextFollowUp = await following;
+    yield { event: 'followup', data: { followUp: nextFollowUp } };
     const version = await store.appendVersion(
-      { ...base, status: 'ready', options, explanation },
+      {
+        ...base,
+        followUp: nextFollowUp,
+        status: 'ready',
+        options,
+        explanation,
+      },
       input.owner,
     );
     yield {

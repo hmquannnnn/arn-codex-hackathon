@@ -11,6 +11,8 @@ import { today } from '@/server/today';
 
 export interface MatchResult {
   candidates: Record<string, Candidate[]>;
+  related: Record<string, Candidate[]>;
+  shops: Shop[];
   noMatch: BasketOption['noMatch'];
   matchedCounts: Record<string, number>;
   comparedProducts: number;
@@ -66,6 +68,8 @@ export async function matchPlan(
   const shopById = new Map(shops.map((shop) => [shop.id, shop]));
   const result: MatchResult = {
     candidates: {},
+    related: {},
+    shops,
     noMatch: [],
     matchedCounts: {},
     comparedProducts: products.length,
@@ -87,6 +91,7 @@ export async function matchPlan(
       ].filter((tag) => product.tags.includes(tag)),
       arrivesBy: arrival(product),
     }));
+    result.related[item.key] = scored;
     const tagged = scored.filter((candidate) =>
       item.mustHaveTags.every((tag) => candidate.product.tags.includes(tag)),
     );

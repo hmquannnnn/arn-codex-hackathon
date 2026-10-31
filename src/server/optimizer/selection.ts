@@ -16,6 +16,7 @@ export function priceSelection(
   matched: Pick<MatchResult, 'candidates' | 'noMatch'>,
   selection: KitSelection,
   vouchers: Voucher[],
+  interests: import('@/contract/types').Interest[] = [],
 ) {
   const input = {
     plan,
@@ -41,6 +42,8 @@ export function priceSelection(
     const closest = matched.noMatch.find((gap) => gap.itemKey === key)?.closest
       ?.candidate;
     const candidate =
+      interests.find((i) => i.itemKey === key && i.candidate.product.id === id)
+        ?.candidate ??
       matched.candidates[key]?.find((c) => c.product.id === id) ??
       (closest?.product.id === id ? closest : undefined);
     if (!candidate)
