@@ -72,7 +72,34 @@ export const planItemSchema = z.object({
   niceToHaveTags: z.array(z.string()),
   maxUnitPrice: money.nullable(),
 });
+export const shoppingContextSchema = z
+  .object({
+    source: z.enum(['catalog', 'cart_only']),
+    cart: z
+      .array(
+        z.object({
+          productId: z.string().min(1),
+          quantity: z.number().int().positive().max(999),
+        }),
+      )
+      .max(100),
+    keepProductIds: z.array(z.string().min(1)).max(100),
+  })
+  .refine(
+    (value) =>
+      new Set(value.cart.map((line) => line.productId)).size ===
+      value.cart.length,
+    'Duplicate cart product',
+  )
+  .refine(
+    (value) =>
+      value.keepProductIds.every((id) =>
+        value.cart.some((line) => line.productId === id),
+      ),
+    'Keep must reference cart',
+  );
 export const kitPlanSchema = z.object({
+  shopping: shoppingContextSchema.optional(),
   event: eventTypeSchema,
   language: z.enum(['en', 'vi']),
   budget: money.nullable(),
@@ -321,6 +348,7 @@ export const personaResponseSchema = z.object({
   walletVouchers: z.array(voucherSchema),
 });
 export const kitRequestSchema = z.object({
+  shopping: shoppingContextSchema.optional(),
   query: z.string().min(1),
   profiles: z.array(profileSchema).optional(),
 });

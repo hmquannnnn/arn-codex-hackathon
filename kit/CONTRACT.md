@@ -367,3 +367,27 @@ Personalisation fixtures (D39–D46): persona `lan` exactly as DATA.md §7 (+ it
 backpack (KidZone Lite 520.000₫ → 440.000₫ with `LAN-KZ80`, `overMaxPriceBy` 40.000), a `wallet: true` saving, and a
 `followup` event (deadline_soon question + a swap suggestion); `kit.answer.sample.json` = an answer turn stream;
 `threads.sample.json` includes one `KitMessage`.
+
+## T21 — Cart-aware kits
+
+`POST /api/kit` optionally accepts `shopping`, persisted verbatim in `KitPlan` (except interpreted keeps):
+`{ source: "catalog" | "cart_only", cart: { productId: string, quantity: number }[], keepProductIds: string[] }`.
+IDs are unique, at most 100 cart lines, quantities 1–999; kept IDs must belong to the snapshot.
+Clients send IDs/quantities only; server resolves current products through CommerceAdapter. Existing requests without
+`shopping` keep their behavior. The LLM cannot change source or snapshot. Checkbox keeps on creation are authoritative;
+spoken keeps/releases update the list on refinement. The plan JSON supplies durable state for all subsequent requests.
+
+Cart-only matcher pools, closest candidates, swaps and fit suggestions stay within saved quantities. Aggregate product
+quantities cannot exceed snapshot amounts or current stock. Keep conflicts are explicit `noMatch` entries; hard tags,
+delivery and unit prices are never relaxed. Kept eligible products cannot be automatically dropped for budget.
+Catalog mode adds at most 0.02 to eligible saved candidates' quality, capped at 1; cart-only uses baseline quality.
+Profile cost objectives and exact pricing remain unchanged. Cart-only gaps do not create marketplace demand rows.
+
+`POST /api/cart/quote` accepts the checkout `lines` and returns a `BasketOption` for those exact quantities using
+current catalog prices, shop shipping, public vouchers and the cookie persona's wallet. `POST /api/checkout` uses the
+same calculation and optionally accepts `expectedTotal`; a changed total returns 409. Checkout remains a demo receipt,
+without payments or inventory mutations. The browser subtracts only purchased quantities after success.
+
+Confirmation merges desired kit quantities using max(existing, desired), never increments an already-saved line;
+repeated kit products are aggregated. Unselected products and remaining quantities stay saved. Neither recommendations
+nor version/refinement changes mutate the browser cart.
