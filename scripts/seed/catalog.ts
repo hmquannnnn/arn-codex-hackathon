@@ -1,3 +1,4 @@
+import { enrichSchoolProducts } from './school';
 import { categories, canonicalTags } from '../../src/contract/taxonomy';
 import {
   productSchema,
@@ -271,5 +272,10 @@ export function buildCatalog(generated: Product[], today: string): SeedCatalog {
       ],
     },
   ];
-  return { shops: allShops, products, vouchers, personas };
+  return {
+    shops: allShops,
+    products: enrichSchoolProducts(products),
+    vouchers,
+    personas,
+  };
 }
