@@ -1,0 +1,146 @@
+[
+  {
+    "event": "step",
+    "data": {
+      "id": "understand",
+      "status": "done"
+    }
+  },
+  {
+    "event": "plan",
+    "data": {
+      "sessionId": "00000000-0000-4000-8000-000000000010",
+      "threadId": "00000000-0000-4000-8000-000000000002",
+      "version": 1,
+      "plan": {
+        "event": "back_to_school",
+        "language": "en",
+        "budget": null,
+        "deadline": "2026-09-05",
+        "items": [
+          {
+            "key": "backpack",
+            "needLabel": "Anti-hunchback backpack",
+            "category": "school-backpack",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": ["anti-hunchback"],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": 400000
+          },
+          {
+            "key": "notebooks",
+            "needLabel": "Notebooks",
+            "category": "notebooks",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "pencils-pens",
+            "needLabel": "Pencils pens",
+            "category": "pencils-pens",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "pencil-case",
+            "needLabel": "Pencil case",
+            "category": "pencil-case",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "crayons-paints",
+            "needLabel": "Crayons paints",
+            "category": "crayons-paints",
+            "required": false,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "water-bottle",
+            "needLabel": "Water bottle",
+            "category": "water-bottle",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "lunch-box",
+            "needLabel": "Lunch box",
+            "category": "lunch-box",
+            "required": false,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "school-shoes",
+            "needLabel": "School shoes",
+            "category": "school-shoes",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "uniform-shirt",
+            "needLabel": "Uniform shirt",
+            "category": "uniform-shirt",
+            "required": true,
+            "quantity": 2,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "book-covers",
+            "needLabel": "Book covers",
+            "category": "book-covers",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          }
+        ],
+        "assumptions": ["By Sep 5 (school opening)", "1 child", "Grade 1"]
+      }
+    }
+  },
+  {
+    "event": "clarify",
+    "data": {
+      "threadId": "00000000-0000-4000-8000-000000000002",
+      "version": 1,
+      "question": {
+        "kind": "budget",
+        "text": "What's your budget?",
+        "choices": [500000, 1000000, 2000000, null]
+      }
+    }
+  },
+  {
+    "event": "done",
+    "data": {
+      "sessionId": "00000000-0000-4000-8000-000000000010",
+      "threadId": "00000000-0000-4000-8000-000000000002",
+      "version": 1
+    }
+  }
+]

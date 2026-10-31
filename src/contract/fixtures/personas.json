@@ -1,0 +1,24 @@
+[
+  {
+    "id": "lan",
+    "name": "Lan",
+    "address": {
+      "district": "Cau Giay",
+      "city": "Hanoi"
+    },
+    "favoriteShopIds": ["shop-kidzone"],
+    "cart": [
+      {
+        "productId": "prod-kidzone-lite-backpack",
+        "addedAt": "2026-08-19T00:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "guest",
+    "name": "Guest",
+    "address": null,
+    "favoriteShopIds": [],
+    "cart": []
+  }
+]

@@ -1,0 +1,706 @@
+[
+  {
+    "id": "prod-minhan-backpack",
+    "shopId": "shop-minhan",
+    "title": "Minh An Kids Backpack New Model 2026",
+    "category": "school-backpack",
+    "description": "Padded ergonomic back panel with S-shaped straps that keep the spine straight. Weighs only 0.75 kg. Water-resistant fabric. Sized for children aged 6–8.",
+    "price": 349000,
+    "rating": 4.8,
+    "reviewCount": 412,
+    "soldCount": 1930,
+    "stock": 120,
+    "tags": ["kids"],
+    "attributes": {
+      "material": "polyester"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-lite-backpack",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Lite Backpack Grade 1–3",
+    "category": "school-backpack",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 520000,
+    "rating": 4.9,
+    "reviewCount": 860,
+    "soldCount": 2400,
+    "stock": 40,
+    "tags": ["kids", "lightweight", "grade-1"],
+    "attributes": {
+      "weight": "0.6 kg",
+      "age": "6-9"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-ergo-backpack",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Ergo Spine-Care Backpack",
+    "category": "school-backpack",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 890000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["anti-hunchback"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-homie-backpack",
+    "shopId": "shop-homie",
+    "title": "Homie Lightweight School Backpack",
+    "category": "school-backpack",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 420000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "lightweight"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 3,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-bago-backpack-1",
+    "shopId": "shop-bago",
+    "title": "Bago Basic Backpack 1",
+    "category": "school-backpack",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 150000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": [],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 6,
+    "shipDaysMax": 9,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-bago-backpack-2",
+    "shopId": "shop-bago",
+    "title": "Bago Basic Backpack 2",
+    "category": "school-backpack",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 200000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": [],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 6,
+    "shipDaysMax": 9,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-bago-backpack-3",
+    "shopId": "shop-bago",
+    "title": "Bago Basic Backpack 3",
+    "category": "school-backpack",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 250000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": [],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 6,
+    "shipDaysMax": 9,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-notebooks",
+    "shopId": "shop-minhan",
+    "title": "Minh An Notebooks",
+    "category": "notebooks",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 35000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-notebooks",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium Notebooks",
+    "category": "notebooks",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 70000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-pencils-pens",
+    "shopId": "shop-minhan",
+    "title": "Minh An Pencils pens",
+    "category": "pencils-pens",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 25000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-pencils-pens",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium Pencils pens",
+    "category": "pencils-pens",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 50000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-pencil-case",
+    "shopId": "shop-minhan",
+    "title": "Minh An Pencil case",
+    "category": "pencil-case",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 45000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-pencil-case",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium Pencil case",
+    "category": "pencil-case",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 90000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-crayons-paints",
+    "shopId": "shop-minhan",
+    "title": "Minh An Crayons paints",
+    "category": "crayons-paints",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 55000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-crayons-paints",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium Crayons paints",
+    "category": "crayons-paints",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 110000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-water-bottle",
+    "shopId": "shop-minhan",
+    "title": "Minh An Water bottle",
+    "category": "water-bottle",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 85000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-water-bottle",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium Water bottle",
+    "category": "water-bottle",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 170000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-lunch-box",
+    "shopId": "shop-minhan",
+    "title": "Minh An Lunch box",
+    "category": "lunch-box",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 95000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-lunch-box",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium Lunch box",
+    "category": "lunch-box",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 190000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-school-shoes",
+    "shopId": "shop-minhan",
+    "title": "Minh An School shoes",
+    "category": "school-shoes",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 140000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-school-shoes",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium School shoes",
+    "category": "school-shoes",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 280000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-uniform-shirt",
+    "shopId": "shop-minhan",
+    "title": "Minh An Uniform shirt",
+    "category": "uniform-shirt",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 95000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-uniform-shirt",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium Uniform shirt",
+    "category": "uniform-shirt",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 190000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-kids-raincoat",
+    "shopId": "shop-minhan",
+    "title": "Minh An Kids raincoat",
+    "category": "kids-raincoat",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 75000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-book-covers",
+    "shopId": "shop-minhan",
+    "title": "Minh An Book covers",
+    "category": "book-covers",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 25000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-kidzone-book-covers",
+    "shopId": "shop-kidzone",
+    "title": "KidZone Premium Book covers",
+    "category": "book-covers",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 50000,
+    "rating": 4.9,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["kids", "premium"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-minhan-kids-desk-lamp",
+    "shopId": "shop-minhan",
+    "title": "Minh An Kids desk lamp",
+    "category": "kids-desk-lamp",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 180000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-diapers",
+    "shopId": "shop-kidzone",
+    "title": "Diapers",
+    "category": "diapers",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 180000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-baby-bottles",
+    "shopId": "shop-kidzone",
+    "title": "Baby Bottles",
+    "category": "baby-bottles",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 120000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-rice-cooker",
+    "shopId": "shop-homie",
+    "title": "Rice Cooker",
+    "category": "rice-cooker",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 450000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-bedding-set",
+    "shopId": "shop-homie",
+    "title": "Bedding Set",
+    "category": "bedding-set",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 350000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-tent",
+    "shopId": "shop-trailhead",
+    "title": "Tent",
+    "category": "tent",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 900000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-sleeping-bag",
+    "shopId": "shop-trailhead",
+    "title": "Sleeping Bag",
+    "category": "sleeping-bag",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 320000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-office-chair",
+    "shopId": "shop-deskpro",
+    "title": "Office Chair",
+    "category": "office-chair",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 850000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-keyboard",
+    "shopId": "shop-deskpro",
+    "title": "Keyboard",
+    "category": "keyboard",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 280000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-tea-gift-box",
+    "shopId": "shop-tetxinh",
+    "title": "Tea Gift Box",
+    "category": "tea-gift-box",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 250000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  },
+  {
+    "id": "prod-cookie-tin",
+    "shopId": "shop-tetxinh",
+    "title": "Cookie Tin",
+    "category": "cookie-tin",
+    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+    "price": 120000,
+    "rating": 4.5,
+    "reviewCount": 120,
+    "soldCount": 550,
+    "stock": 100,
+    "tags": ["budget"],
+    "attributes": {
+      "material": "mixed"
+    },
+    "shipDaysMin": 1,
+    "shipDaysMax": 2,
+    "updatedForDemandAt": null
+  }
+]

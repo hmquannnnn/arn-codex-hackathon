@@ -1,0 +1,602 @@
+[
+  {
+    "sessionId": "fixture-session-000",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-001",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-002",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-003",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-004",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-005",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-006",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-007",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-008",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-009",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-010",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-011",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-012",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-013",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-014",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-015",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-016",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-017",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-018",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-019",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-020",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-021",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-022",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-023",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-024",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-025",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-026",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-027",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-028",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-029",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-030",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-031",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-032",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-033",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-034",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-035",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-036",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-037",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-038",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-039",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-040",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-041",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-042",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-043",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-044",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-045",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-046",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-047",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-048",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-049",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-050",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-051",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-052",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-053",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-054",
+    "createdAt": "2026-08-26T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-055",
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-056",
+    "createdAt": "2026-08-28T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  },
+  {
+    "sessionId": "fixture-session-057",
+    "createdAt": "2026-08-29T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Anti-hunchback backpack",
+    "category": "school-backpack",
+    "tags": ["anti-hunchback"],
+    "matchedCount": 0,
+    "budgetHint": 300000
+  },
+  {
+    "sessionId": "fixture-session-058",
+    "createdAt": "2026-08-30T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Kids raincoat with backpack cover",
+    "category": "kids-raincoat",
+    "tags": ["backpack-cover"],
+    "matchedCount": 0,
+    "budgetHint": 120000
+  },
+  {
+    "sessionId": "fixture-session-059",
+    "createdAt": "2026-08-31T08:00:00.000Z",
+    "event": "back_to_school",
+    "needLabel": "Dog food",
+    "category": null,
+    "tags": [],
+    "matchedCount": 0,
+    "budgetHint": null
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "event": "step",
+    "data": {
+      "id": "understand",
+      "status": "done",
+      "detail": "Answering"
+    }
+  },
+  {
+    "event": "explanation",
+    "data": {
+      "delta": "The description mentions S-shaped straps that keep the spine straight, but the listing does not explicitly carry the anti-hunchback tag."
+    }
+  },
+  {
+    "event": "followup",
+    "data": {
+      "followUp": {
+        "question": "School opens in 3 days — would you like express delivery?",
+        "suggestions": [
+          {
+            "text": "Choose express delivery"
+          },
+          {
+            "text": "Switch to KidZone Lite",
+            "action": {
+              "type": "swap",
+              "itemKey": "backpack",
+              "productId": "prod-kidzone-lite-backpack"
+            }
+          }
+        ],
+        "source": "template"
+      }
+    }
+  },
+  {
+    "event": "done",
+    "data": {
+      "sessionId": null,
+      "threadId": "00000000-0000-4000-8000-000000000001",
+      "version": 1,
+      "answered": true
+    }
+  }
+]

@@ -1,0 +1,2404 @@
+[
+  {
+    "event": "step",
+    "data": {
+      "id": "understand",
+      "status": "running"
+    }
+  },
+  {
+    "event": "step",
+    "data": {
+      "id": "understand",
+      "status": "done"
+    }
+  },
+  {
+    "event": "step",
+    "data": {
+      "id": "plan",
+      "status": "done",
+      "detail": "Planned 10 items"
+    }
+  },
+  {
+    "event": "plan",
+    "data": {
+      "sessionId": "00000000-0000-4000-8000-000000000010",
+      "threadId": "00000000-0000-4000-8000-000000000001",
+      "version": 1,
+      "plan": {
+        "event": "back_to_school",
+        "language": "en",
+        "budget": 1500000,
+        "deadline": "2026-09-05",
+        "items": [
+          {
+            "key": "backpack",
+            "needLabel": "Anti-hunchback backpack",
+            "category": "school-backpack",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": ["anti-hunchback"],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": 400000
+          },
+          {
+            "key": "notebooks",
+            "needLabel": "Notebooks",
+            "category": "notebooks",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "pencils-pens",
+            "needLabel": "Pencils pens",
+            "category": "pencils-pens",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "pencil-case",
+            "needLabel": "Pencil case",
+            "category": "pencil-case",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "crayons-paints",
+            "needLabel": "Crayons paints",
+            "category": "crayons-paints",
+            "required": false,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "water-bottle",
+            "needLabel": "Water bottle",
+            "category": "water-bottle",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "lunch-box",
+            "needLabel": "Lunch box",
+            "category": "lunch-box",
+            "required": false,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "school-shoes",
+            "needLabel": "School shoes",
+            "category": "school-shoes",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "uniform-shirt",
+            "needLabel": "Uniform shirt",
+            "category": "uniform-shirt",
+            "required": true,
+            "quantity": 2,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          },
+          {
+            "key": "book-covers",
+            "needLabel": "Book covers",
+            "category": "book-covers",
+            "required": true,
+            "quantity": 1,
+            "mustHaveTags": [],
+            "niceToHaveTags": ["grade-1"],
+            "maxUnitPrice": null
+          }
+        ],
+        "assumptions": ["By Sep 5 (school opening)", "1 child", "Grade 1"]
+      }
+    }
+  },
+  {
+    "event": "step",
+    "data": {
+      "id": "search",
+      "status": "done",
+      "detail": "Compared 37 products from 7 shops"
+    }
+  },
+  {
+    "event": "step",
+    "data": {
+      "id": "optimize",
+      "status": "done"
+    }
+  },
+  {
+    "event": "options",
+    "data": {
+      "options": [
+        {
+          "profile": "saver",
+          "status": "ok",
+          "lines": [
+            {
+              "itemKey": "notebooks",
+              "product": {
+                "id": "prod-minhan-notebooks",
+                "shopId": "shop-minhan",
+                "title": "Minh An Notebooks",
+                "category": "notebooks",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 35000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 35000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-notebooks",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Notebooks",
+                    "category": "notebooks",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 70000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "pencils-pens",
+              "product": {
+                "id": "prod-minhan-pencils-pens",
+                "shopId": "shop-minhan",
+                "title": "Minh An Pencils pens",
+                "category": "pencils-pens",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 25000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 25000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-pencils-pens",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Pencils pens",
+                    "category": "pencils-pens",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 50000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "pencil-case",
+              "product": {
+                "id": "prod-minhan-pencil-case",
+                "shopId": "shop-minhan",
+                "title": "Minh An Pencil case",
+                "category": "pencil-case",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 45000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 45000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-pencil-case",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Pencil case",
+                    "category": "pencil-case",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 90000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "crayons-paints",
+              "product": {
+                "id": "prod-minhan-crayons-paints",
+                "shopId": "shop-minhan",
+                "title": "Minh An Crayons paints",
+                "category": "crayons-paints",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 55000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 55000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-crayons-paints",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Crayons paints",
+                    "category": "crayons-paints",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 110000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "water-bottle",
+              "product": {
+                "id": "prod-minhan-water-bottle",
+                "shopId": "shop-minhan",
+                "title": "Minh An Water bottle",
+                "category": "water-bottle",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 85000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 85000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-water-bottle",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Water bottle",
+                    "category": "water-bottle",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 170000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "lunch-box",
+              "product": {
+                "id": "prod-minhan-lunch-box",
+                "shopId": "shop-minhan",
+                "title": "Minh An Lunch box",
+                "category": "lunch-box",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 95000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 95000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-lunch-box",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Lunch box",
+                    "category": "lunch-box",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 190000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "school-shoes",
+              "product": {
+                "id": "prod-minhan-school-shoes",
+                "shopId": "shop-minhan",
+                "title": "Minh An School shoes",
+                "category": "school-shoes",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 140000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 140000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-school-shoes",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium School shoes",
+                    "category": "school-shoes",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 280000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "uniform-shirt",
+              "product": {
+                "id": "prod-minhan-uniform-shirt",
+                "shopId": "shop-minhan",
+                "title": "Minh An Uniform shirt",
+                "category": "uniform-shirt",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 95000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 2,
+              "lineTotal": 190000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-uniform-shirt",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Uniform shirt",
+                    "category": "uniform-shirt",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 190000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "book-covers",
+              "product": {
+                "id": "prod-minhan-book-covers",
+                "shopId": "shop-minhan",
+                "title": "Minh An Book covers",
+                "category": "book-covers",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 25000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 25000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-book-covers",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Book covers",
+                    "category": "book-covers",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 50000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            }
+          ],
+          "noMatch": [
+            {
+              "itemKey": "backpack",
+              "needLabel": "Anti-hunchback backpack",
+              "reason": "no_product_with_tags",
+              "closest": {
+                "candidate": {
+                  "product": {
+                    "id": "prod-minhan-backpack",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Kids Backpack New Model 2026",
+                    "category": "school-backpack",
+                    "description": "Padded ergonomic back panel with S-shaped straps that keep the spine straight. Weighs only 0.75 kg. Water-resistant fabric. Sized for children aged 6–8.",
+                    "price": 349000,
+                    "rating": 4.8,
+                    "reviewCount": 412,
+                    "soldCount": 1930,
+                    "stock": 120,
+                    "tags": ["kids"],
+                    "attributes": {
+                      "material": "polyester"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                },
+                "missingTags": ["anti-hunchback"],
+                "overMaxPriceBy": null
+              }
+            }
+          ],
+          "skipped": [],
+          "shops": [
+            {
+              "shopId": "shop-minhan",
+              "shopName": "Minh An Stationery",
+              "subtotal": 695000,
+              "shipping": 25000,
+              "shopDiscount": 30000,
+              "voucherCodes": ["MINHAN30", "FREESHIP"]
+            }
+          ],
+          "itemsTotal": 695000,
+          "shippingTotal": 25000,
+          "discountTotal": 124500,
+          "grandTotal": 595500,
+          "savings": [
+            {
+              "label": "Minh An Stationery voucher",
+              "amount": 30000
+            },
+            {
+              "label": "Minh An Stationery free shipping",
+              "amount": 25000
+            },
+            {
+              "label": "Your wallet voucher Back-to-school 10%",
+              "amount": 69500,
+              "wallet": true
+            }
+          ],
+          "interests": [
+            {
+              "itemKey": "backpack",
+              "candidate": {
+                "product": {
+                  "id": "prod-kidzone-lite-backpack",
+                  "shopId": "shop-kidzone",
+                  "title": "KidZone Lite Backpack Grade 1–3",
+                  "category": "school-backpack",
+                  "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                  "price": 520000,
+                  "rating": 4.9,
+                  "reviewCount": 860,
+                  "soldCount": 2400,
+                  "stock": 40,
+                  "tags": ["kids", "lightweight", "grade-1"],
+                  "attributes": {
+                    "weight": "0.6 kg",
+                    "age": "6-9"
+                  },
+                  "shipDaysMin": 1,
+                  "shipDaysMax": 2,
+                  "updatedForDemandAt": null
+                },
+                "shop": {
+                  "id": "shop-kidzone",
+                  "name": "KidZone Mall",
+                  "tier": "mall",
+                  "rating": 4.9,
+                  "shipFee": 30000,
+                  "city": "Hanoi"
+                },
+                "score": 0.9,
+                "matchedTags": [],
+                "arrivesBy": "2026-09-04"
+              },
+              "addedToCartAt": "2026-08-19T00:00:00.000Z",
+              "walletVoucherCode": "LAN-KZ80",
+              "priceAfterVoucher": 440000,
+              "overMaxPriceBy": 40000,
+              "missingTags": ["anti-hunchback"]
+            }
+          ]
+        },
+        {
+          "profile": "balanced",
+          "status": "ok",
+          "lines": [
+            {
+              "itemKey": "notebooks",
+              "product": {
+                "id": "prod-minhan-notebooks",
+                "shopId": "shop-minhan",
+                "title": "Minh An Notebooks",
+                "category": "notebooks",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 35000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 35000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-notebooks",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Notebooks",
+                    "category": "notebooks",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 70000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "pencils-pens",
+              "product": {
+                "id": "prod-minhan-pencils-pens",
+                "shopId": "shop-minhan",
+                "title": "Minh An Pencils pens",
+                "category": "pencils-pens",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 25000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 25000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-pencils-pens",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Pencils pens",
+                    "category": "pencils-pens",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 50000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "pencil-case",
+              "product": {
+                "id": "prod-minhan-pencil-case",
+                "shopId": "shop-minhan",
+                "title": "Minh An Pencil case",
+                "category": "pencil-case",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 45000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 45000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-pencil-case",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Pencil case",
+                    "category": "pencil-case",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 90000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "crayons-paints",
+              "product": {
+                "id": "prod-minhan-crayons-paints",
+                "shopId": "shop-minhan",
+                "title": "Minh An Crayons paints",
+                "category": "crayons-paints",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 55000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 55000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-crayons-paints",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Crayons paints",
+                    "category": "crayons-paints",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 110000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "water-bottle",
+              "product": {
+                "id": "prod-kidzone-water-bottle",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Water bottle",
+                "category": "water-bottle",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 170000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 170000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-water-bottle",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Water bottle",
+                    "category": "water-bottle",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 85000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "lunch-box",
+              "product": {
+                "id": "prod-kidzone-lunch-box",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Lunch box",
+                "category": "lunch-box",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 190000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 190000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-lunch-box",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Lunch box",
+                    "category": "lunch-box",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 95000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "school-shoes",
+              "product": {
+                "id": "prod-kidzone-school-shoes",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium School shoes",
+                "category": "school-shoes",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 280000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 280000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-school-shoes",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An School shoes",
+                    "category": "school-shoes",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 140000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "uniform-shirt",
+              "product": {
+                "id": "prod-minhan-uniform-shirt",
+                "shopId": "shop-minhan",
+                "title": "Minh An Uniform shirt",
+                "category": "uniform-shirt",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 95000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 2,
+              "lineTotal": 190000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-uniform-shirt",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Uniform shirt",
+                    "category": "uniform-shirt",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 190000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "book-covers",
+              "product": {
+                "id": "prod-minhan-book-covers",
+                "shopId": "shop-minhan",
+                "title": "Minh An Book covers",
+                "category": "book-covers",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 25000,
+                "rating": 4.5,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["budget"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-minhan",
+                "name": "Minh An Stationery",
+                "tier": "preferred",
+                "rating": 4.8,
+                "shipFee": 25000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 25000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-kidzone-book-covers",
+                    "shopId": "shop-kidzone",
+                    "title": "KidZone Premium Book covers",
+                    "category": "book-covers",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 50000,
+                    "rating": 4.9,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["kids", "premium"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-kidzone",
+                    "name": "KidZone Mall",
+                    "tier": "mall",
+                    "rating": 4.9,
+                    "shipFee": 30000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.9,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            }
+          ],
+          "noMatch": [
+            {
+              "itemKey": "backpack",
+              "needLabel": "Anti-hunchback backpack",
+              "reason": "no_product_with_tags",
+              "closest": {
+                "candidate": {
+                  "product": {
+                    "id": "prod-minhan-backpack",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Kids Backpack New Model 2026",
+                    "category": "school-backpack",
+                    "description": "Padded ergonomic back panel with S-shaped straps that keep the spine straight. Weighs only 0.75 kg. Water-resistant fabric. Sized for children aged 6–8.",
+                    "price": 349000,
+                    "rating": 4.8,
+                    "reviewCount": 412,
+                    "soldCount": 1930,
+                    "stock": 120,
+                    "tags": ["kids"],
+                    "attributes": {
+                      "material": "polyester"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                },
+                "missingTags": ["anti-hunchback"],
+                "overMaxPriceBy": null
+              }
+            }
+          ],
+          "skipped": [],
+          "shops": [
+            {
+              "shopId": "shop-kidzone",
+              "shopName": "KidZone Mall",
+              "subtotal": 640000,
+              "shipping": 30000,
+              "shopDiscount": 50000,
+              "voucherCodes": ["KIDZONE10", "FREESHIP"]
+            },
+            {
+              "shopId": "shop-minhan",
+              "shopName": "Minh An Stationery",
+              "subtotal": 375000,
+              "shipping": 25000,
+              "shopDiscount": 30000,
+              "voucherCodes": ["MINHAN30", "FREESHIP"]
+            }
+          ],
+          "itemsTotal": 1015000,
+          "shippingTotal": 55000,
+          "discountTotal": 235000,
+          "grandTotal": 835000,
+          "savings": [
+            {
+              "label": "KidZone Mall voucher",
+              "amount": 50000
+            },
+            {
+              "label": "KidZone Mall free shipping",
+              "amount": 30000
+            },
+            {
+              "label": "Minh An Stationery voucher",
+              "amount": 30000
+            },
+            {
+              "label": "Minh An Stationery free shipping",
+              "amount": 25000
+            },
+            {
+              "label": "Your wallet voucher Back-to-school 10%",
+              "amount": 100000,
+              "wallet": true
+            }
+          ],
+          "interests": [
+            {
+              "itemKey": "backpack",
+              "candidate": {
+                "product": {
+                  "id": "prod-kidzone-lite-backpack",
+                  "shopId": "shop-kidzone",
+                  "title": "KidZone Lite Backpack Grade 1–3",
+                  "category": "school-backpack",
+                  "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                  "price": 520000,
+                  "rating": 4.9,
+                  "reviewCount": 860,
+                  "soldCount": 2400,
+                  "stock": 40,
+                  "tags": ["kids", "lightweight", "grade-1"],
+                  "attributes": {
+                    "weight": "0.6 kg",
+                    "age": "6-9"
+                  },
+                  "shipDaysMin": 1,
+                  "shipDaysMax": 2,
+                  "updatedForDemandAt": null
+                },
+                "shop": {
+                  "id": "shop-kidzone",
+                  "name": "KidZone Mall",
+                  "tier": "mall",
+                  "rating": 4.9,
+                  "shipFee": 30000,
+                  "city": "Hanoi"
+                },
+                "score": 0.9,
+                "matchedTags": [],
+                "arrivesBy": "2026-09-04"
+              },
+              "addedToCartAt": "2026-08-19T00:00:00.000Z",
+              "walletVoucherCode": "LAN-KZ80",
+              "priceAfterVoucher": 440000,
+              "overMaxPriceBy": 40000,
+              "missingTags": ["anti-hunchback"]
+            }
+          ]
+        },
+        {
+          "profile": "premium",
+          "status": "ok",
+          "lines": [
+            {
+              "itemKey": "notebooks",
+              "product": {
+                "id": "prod-kidzone-notebooks",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Notebooks",
+                "category": "notebooks",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 70000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 70000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-notebooks",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Notebooks",
+                    "category": "notebooks",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 35000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "pencils-pens",
+              "product": {
+                "id": "prod-kidzone-pencils-pens",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Pencils pens",
+                "category": "pencils-pens",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 50000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 50000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-pencils-pens",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Pencils pens",
+                    "category": "pencils-pens",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 25000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "pencil-case",
+              "product": {
+                "id": "prod-kidzone-pencil-case",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Pencil case",
+                "category": "pencil-case",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 90000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 90000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-pencil-case",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Pencil case",
+                    "category": "pencil-case",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 45000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "crayons-paints",
+              "product": {
+                "id": "prod-kidzone-crayons-paints",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Crayons paints",
+                "category": "crayons-paints",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 110000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 110000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-crayons-paints",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Crayons paints",
+                    "category": "crayons-paints",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 55000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "water-bottle",
+              "product": {
+                "id": "prod-kidzone-water-bottle",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Water bottle",
+                "category": "water-bottle",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 170000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 170000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-water-bottle",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Water bottle",
+                    "category": "water-bottle",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 85000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "lunch-box",
+              "product": {
+                "id": "prod-kidzone-lunch-box",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Lunch box",
+                "category": "lunch-box",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 190000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 190000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-lunch-box",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Lunch box",
+                    "category": "lunch-box",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 95000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "school-shoes",
+              "product": {
+                "id": "prod-kidzone-school-shoes",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium School shoes",
+                "category": "school-shoes",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 280000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 280000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-school-shoes",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An School shoes",
+                    "category": "school-shoes",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 140000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "uniform-shirt",
+              "product": {
+                "id": "prod-kidzone-uniform-shirt",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Uniform shirt",
+                "category": "uniform-shirt",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 190000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 2,
+              "lineTotal": 380000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-uniform-shirt",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Uniform shirt",
+                    "category": "uniform-shirt",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 95000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            },
+            {
+              "itemKey": "book-covers",
+              "product": {
+                "id": "prod-kidzone-book-covers",
+                "shopId": "shop-kidzone",
+                "title": "KidZone Premium Book covers",
+                "category": "book-covers",
+                "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                "price": 50000,
+                "rating": 4.9,
+                "reviewCount": 120,
+                "soldCount": 550,
+                "stock": 100,
+                "tags": ["kids", "premium"],
+                "attributes": {
+                  "material": "mixed"
+                },
+                "shipDaysMin": 1,
+                "shipDaysMax": 2,
+                "updatedForDemandAt": null
+              },
+              "shop": {
+                "id": "shop-kidzone",
+                "name": "KidZone Mall",
+                "tier": "mall",
+                "rating": 4.9,
+                "shipFee": 30000,
+                "city": "Hanoi"
+              },
+              "quantity": 1,
+              "lineTotal": 50000,
+              "reason": "In stock, arrives by Sep 4",
+              "alternatives": [
+                {
+                  "product": {
+                    "id": "prod-minhan-book-covers",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Book covers",
+                    "category": "book-covers",
+                    "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                    "price": 25000,
+                    "rating": 4.5,
+                    "reviewCount": 120,
+                    "soldCount": 550,
+                    "stock": 100,
+                    "tags": ["budget"],
+                    "attributes": {
+                      "material": "mixed"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                }
+              ]
+            }
+          ],
+          "noMatch": [
+            {
+              "itemKey": "backpack",
+              "needLabel": "Anti-hunchback backpack",
+              "reason": "no_product_with_tags",
+              "closest": {
+                "candidate": {
+                  "product": {
+                    "id": "prod-minhan-backpack",
+                    "shopId": "shop-minhan",
+                    "title": "Minh An Kids Backpack New Model 2026",
+                    "category": "school-backpack",
+                    "description": "Padded ergonomic back panel with S-shaped straps that keep the spine straight. Weighs only 0.75 kg. Water-resistant fabric. Sized for children aged 6–8.",
+                    "price": 349000,
+                    "rating": 4.8,
+                    "reviewCount": 412,
+                    "soldCount": 1930,
+                    "stock": 120,
+                    "tags": ["kids"],
+                    "attributes": {
+                      "material": "polyester"
+                    },
+                    "shipDaysMin": 1,
+                    "shipDaysMax": 2,
+                    "updatedForDemandAt": null
+                  },
+                  "shop": {
+                    "id": "shop-minhan",
+                    "name": "Minh An Stationery",
+                    "tier": "preferred",
+                    "rating": 4.8,
+                    "shipFee": 25000,
+                    "city": "Hanoi"
+                  },
+                  "score": 0.7,
+                  "matchedTags": [],
+                  "arrivesBy": "2026-09-04"
+                },
+                "missingTags": ["anti-hunchback"],
+                "overMaxPriceBy": null
+              }
+            }
+          ],
+          "skipped": [],
+          "shops": [
+            {
+              "shopId": "shop-kidzone",
+              "shopName": "KidZone Mall",
+              "subtotal": 1390000,
+              "shipping": 30000,
+              "shopDiscount": 50000,
+              "voucherCodes": ["KIDZONE10", "FREESHIP"]
+            }
+          ],
+          "itemsTotal": 1390000,
+          "shippingTotal": 30000,
+          "discountTotal": 180000,
+          "grandTotal": 1240000,
+          "savings": [
+            {
+              "label": "KidZone Mall voucher",
+              "amount": 50000
+            },
+            {
+              "label": "KidZone Mall free shipping",
+              "amount": 30000
+            },
+            {
+              "label": "Your wallet voucher Back-to-school 10%",
+              "amount": 100000,
+              "wallet": true
+            }
+          ],
+          "interests": [
+            {
+              "itemKey": "backpack",
+              "candidate": {
+                "product": {
+                  "id": "prod-kidzone-lite-backpack",
+                  "shopId": "shop-kidzone",
+                  "title": "KidZone Lite Backpack Grade 1–3",
+                  "category": "school-backpack",
+                  "description": "Durable materials for daily use. Practical design with an easy-care finish.",
+                  "price": 520000,
+                  "rating": 4.9,
+                  "reviewCount": 860,
+                  "soldCount": 2400,
+                  "stock": 40,
+                  "tags": ["kids", "lightweight", "grade-1"],
+                  "attributes": {
+                    "weight": "0.6 kg",
+                    "age": "6-9"
+                  },
+                  "shipDaysMin": 1,
+                  "shipDaysMax": 2,
+                  "updatedForDemandAt": null
+                },
+                "shop": {
+                  "id": "shop-kidzone",
+                  "name": "KidZone Mall",
+                  "tier": "mall",
+                  "rating": 4.9,
+                  "shipFee": 30000,
+                  "city": "Hanoi"
+                },
+                "score": 0.9,
+                "matchedTags": [],
+                "arrivesBy": "2026-09-04"
+              },
+              "addedToCartAt": "2026-08-19T00:00:00.000Z",
+              "walletVoucherCode": "LAN-KZ80",
+              "priceAfterVoucher": 440000,
+              "overMaxPriceBy": 40000,
+              "missingTags": ["anti-hunchback"]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "event": "step",
+    "data": {
+      "id": "explain",
+      "status": "running"
+    }
+  },
+  {
+    "event": "explanation",
+    "data": {
+      "delta": "Your kit fits the 1.5M budget and uses your wallet voucher. No anti-hunchback backpack under 400k matches; Minh An is the closest, missing that tag."
+    }
+  },
+  {
+    "event": "step",
+    "data": {
+      "id": "explain",
+      "status": "done"
+    }
+  },
+  {
+    "event": "followup",
+    "data": {
+      "followUp": {
+        "question": "School opens in 3 days — would you like express delivery?",
+        "suggestions": [
+          {
+            "text": "Choose express delivery"
+          },
+          {
+            "text": "Switch to KidZone Lite",
+            "action": {
+              "type": "swap",
+              "itemKey": "backpack",
+              "productId": "prod-kidzone-lite-backpack"
+            }
+          }
+        ],
+        "source": "template"
+      }
+    }
+  },
+  {
+    "event": "done",
+    "data": {
+      "sessionId": "00000000-0000-4000-8000-000000000010",
+      "threadId": "00000000-0000-4000-8000-000000000001",
+      "version": 1
+    }
+  }
+]
