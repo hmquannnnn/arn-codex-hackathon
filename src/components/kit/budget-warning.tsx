@@ -22,7 +22,7 @@ export function BudgetWarning({
       className="space-y-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
     >
       <p className="font-semibold">Over budget by {money(over)}</p>
-      <p>Minimum cost: {money(option.minimumCost ?? option.grandTotal)}</p>
+      <p>{option.minimumCost === undefined ? 'Current basket' : 'Minimum cost'}: {money(option.minimumCost ?? option.grandTotal)}</p>
       {option.costDrivers?.map((d) => (
         <p key={d} className="text-xs">
           {d}

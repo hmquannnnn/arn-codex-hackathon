@@ -74,7 +74,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   (PRD version/history promises and ticket 15 edit persistence). Explicitly handle choices invalidated by a changed constraint.
 - Regression seams: S6/S9 handlers plus the history UI. Cover Add anyway/swap/Fit → unrelated remove or budget edit,
   and reload → view/restore an older version containing a selection.
-- Status: open
+- Status: fixed in c740238
 
 ### B9 — Over-budget swap labels the current total as "Minimum cost" (P2, confirmed)
 - Repro with the public pricing seam and fixtures: budget 1,000,000₫, expensive selection totals 1,210,000₫; the same

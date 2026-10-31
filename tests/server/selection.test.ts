@@ -110,3 +110,32 @@ it('S9 a deliberately expensive hero swap exceeds1M and has an executable fit', 
     ).grandTotal,
   ).toBeLessThanOrEqual(1000000);
 });
+
+it('B9 over-budget selected total is distinct from the achievable minimum and has cost drivers', async () => {
+  const adapter = new InMemoryAdapter();
+  const plan = { ...hero, budget: 1000000 };
+  const matched = await matchPlan(plan, adapter);
+  const selection = {
+    profile: 'balanced' as const,
+    dropped: [],
+    picks: Object.fromEntries(
+      Object.entries(matched.candidates)
+        .filter(([, pool]) => pool.length)
+        .map(([key, pool]) => [
+          key,
+          [...pool].sort((a, b) => b.product.price - a.product.price)[0].product
+            .id,
+        ]),
+    ),
+  };
+  const option = priceSelection(
+    plan,
+    matched,
+    selection,
+    await adapter.listVouchers('lan'),
+  );
+  expect(option.grandTotal).toBe(1210000);
+  expect(option.minimumCost).toBe(598500);
+  expect(option.costDrivers?.length).toBeGreaterThan(0);
+  expect(option.minimumCost).toBeLessThan(option.fit![0].grandTotal);
+});

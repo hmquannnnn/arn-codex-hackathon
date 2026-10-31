@@ -63,6 +63,30 @@ export function priceSelection(
     selection.profile,
   );
   if (option.status === 'over_budget') {
+    // Compare the same selected needs, allowing cheaper products, without dropping items to hit the budget.
+    const minimum = optimize(
+      {
+        ...input,
+        plan: {
+          ...plan,
+          budget: null,
+          items: plan.items.filter((item) => picks[item.key]),
+        },
+        candidates: Object.fromEntries(
+          Object.entries(picks).map(([key, selected]) => [
+            key,
+            [...(matched.candidates[key] ?? []), selected],
+          ]),
+        ),
+        noMatch: [],
+      },
+      'saver',
+    );
+    option.minimumCost = minimum.grandTotal;
+    option.costDrivers = [...option.lines]
+      .sort((a, b) => b.lineTotal - a.lineTotal)
+      .slice(0, 3)
+      .map((line) => line.product.title);
     option.overBy = option.grandTotal - plan.budget!;
     option.fit = fitToBudget(input, option, added);
   }

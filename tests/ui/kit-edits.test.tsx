@@ -487,3 +487,21 @@ it('normalizes a backend removal explanation into the required system line', () 
   render(<Conversation versions={[previous, removed]} onUndoRemove={noop} />);
   expect(screen.getByText(/^⚙ Removed: Water bottle/)).toBeTruthy();
 });
+
+it('B9 an unknown minimum is labelled as the current basket rather than a minimum', () => {
+  const over = basketOptionSchema.parse(overBudget);
+  delete over.minimumCost;
+  const version = { ...thread.versions[0], options: [over] };
+  render(
+    <KitPanel
+      version={version}
+      versions={[version]}
+      onVersion={noop}
+      onRestore={noop}
+      onSwap={async () => {}}
+      onAdd={noop}
+    />,
+  );
+  expect(screen.queryByText(/Minimum cost:/)).toBeNull();
+  expect(screen.getByText('Current basket: 835.000₫')).toBeTruthy();
+});
