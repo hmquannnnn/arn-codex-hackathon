@@ -74,7 +74,7 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   (PRD version/history promises and ticket 15 edit persistence). Explicitly handle choices invalidated by a changed constraint.
 - Regression seams: S6/S9 handlers plus the history UI. Cover Add anyway/swap/Fit → unrelated remove or budget edit,
   and reload → view/restore an older version containing a selection.
-- Status: fixed in c740238
+- Status: fixed in c740238 + 2711735
 
 ### B9 — Over-budget swap labels the current total as "Minimum cost" (P2, confirmed)
 - Repro with the public pricing seam and fixtures: budget 1,000,000₫, expensive selection totals 1,210,000₫; the same
@@ -144,3 +144,28 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   Serialize live Apply/Undo checks and seed-invariant reads to avoid testing transient shared data as the baseline.
 - Cleanup verified: Minh An listing restored (original title, tags `["kids"]`, no update badge), persona Lan, browser
   closed, no dev servers started, repository clean. Live rehearsals added real demand; no reseed/migrate/env edits.
+
+
+## Fix verification — 31/10
+
+- **Current state:** B1–B4, B6–B9 and F1–F5 fixed and pushed. B5 was checked against the hero fixture and current
+  catalog; all three baskets differ, so its conditional instruction was followed and optimizer weights are unchanged.
+- B2 review follow-up handles a model paragraph that duplicates the original description. B8 review follow-up stores
+  priced basket snapshots atomically inside the existing selection JSON, preserves historical prices and explains the
+  actual selected profile. No contract/schema migration. Legacy selections without snapshots use read-only reconstruction;
+  prices that were never stored cannot be recovered retroactively.
+- **Verification:** `npm test` → **242 passed / 10 opt-in skipped**. `npm run build`, `npm run lint` and
+  `npx tsc --noEmit` passed. `npm run eval` against the real model → **13/13 passed**.
+- **Real browser/DB/model:** `BASE_URL=http://localhost:3199 KITLY_E2E_LIVE=1 node --env-file=.env.local node_modules/@playwright/test/cli.js test --workers=1`
+  → **9 passed / 5 fixture-only skipped**, no retry needed. Includes held persona-cookie response, visible Premium swap,
+  saved Add anyway → remove → reload → historical restore, chat scroll, full DEMO buyer/seller loop, tiny budget,
+  express, expensive swap/Fit and mobile storefront. Final hero first basket: **6,234 ms**.
+- E2E reliability: identify the listing-gap card by its stable heading, not model-written product wording. The shared
+  DB received concurrent new threads during an earlier run; the test now verifies exact demand counts for its own
+  SSE intent-session IDs through CommerceAdapter (initial plan item count, refine zero), plus aggregate growth.
+- **B3 DB repair:** only the 720 existing school seed sessions were refreshed in a transaction; 5,778 seed demand rows
+  replaced. At patch time all **589 live demand rows and 65 threads were preserved exactly**. Current cards now show
+  varied shares. Exact forced seed gap counts and price bands verified unchanged. Private backup path is in CODEX_LOG.md.
+- **Cleanup:** listing restored to its exact original snapshot, persona reset to Lan, local server stopped and port3199
+  verified free. No env edits, database migration, full reseed or secret/artifact commits.
+- **Next:** no requested bug fixes remain; normal demo rehearsal can proceed. Keep seller Apply/Undo checks serial.

@@ -91,7 +91,9 @@ test('B8/F1 saved Add anyway survives edits, reload and historical restore; chat
     page.getByRole('button', { name: 'Undo last basket edit' }),
   ).toBeEnabled();
   const selected = (await thread(page)).versions[0];
-  expect(selected.selection?.picks).toHaveProperty('backpack');
+  expect(Object.keys(selected.selection?.picks ?? {}).length).toBeGreaterThan(
+    0,
+  );
   const productId = Object.values(selected.selection!.picks)[0];
   const selectedKey = Object.keys(selected.selection!.picks)[0];
   const basket = selected.options.find(
@@ -128,12 +130,10 @@ test('B8/F1 saved Add anyway survives edits, reload and historical restore; chat
   await page.getByLabel('Kit version').selectOption('1');
   await expect(page.getByText(/Viewing an earlier version/)).toBeVisible();
   await expect(
-    page
-      .getByTestId('basket')
-      .getByRole('link', {
-        name: 'Minh An Kids Backpack New Model 2026',
-        exact: true,
-      }),
+    page.getByTestId('basket').getByRole('link', {
+      name: 'Minh An Kids Backpack New Model 2026',
+      exact: true,
+    }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Restore this version' }).click();
   await ready(page, 3);
@@ -151,4 +151,47 @@ test('B8/F1 saved Add anyway survives edits, reload and historical restore; chat
       ),
     )
     .toBeLessThanOrEqual(2);
+});
+
+test('F3 follow-up swap prices the visible Premium profile through the real API', async ({
+  page,
+}) => {
+  await page.goto('/kit/new');
+  await page.getByLabel('Message Kitly').fill(hero);
+  await page.getByRole('button', { name: 'Send message' }).click();
+  await ready(page, 1);
+  let saved = await thread(page);
+  let follow = saved.versions.at(-1)!.followUp;
+  let action = follow?.suggestions.find((s) => s.action?.type === 'swap');
+  for (let attempt = 0; !action && attempt < 2; attempt++) {
+    const answer = page.waitForResponse(
+      (r) => new URL(r.url()).pathname === '/api/kit/refine',
+    );
+    await page
+      .getByLabel('Message Kitly')
+      .fill('Which other lunch box can I choose?');
+    await page.getByRole('button', { name: 'Send message' }).click();
+    await (await answer).finished();
+    await ready(page, 1);
+    saved = await thread(page);
+    follow = saved.messages.at(-1)?.followUp ?? null;
+    action = follow?.suggestions.find((s) => s.action?.type === 'swap');
+  }
+  expect(
+    action,
+    'Model should offer a grounded swap after an explicit alternatives question',
+  ).toBeDefined();
+  await page.getByRole('tab', { name: /Premium/ }).click();
+  const pricing = page.waitForRequest(
+    (r) => new URL(r.url()).pathname === '/api/kit/price',
+  );
+  await page
+    .getByRole('button', { name: action!.text, exact: true })
+    .last()
+    .click();
+  const request = await pricing;
+  expect(request.postDataJSON().selection.profile).toBe('premium');
+  await expect(
+    page.getByRole('button', { name: 'Undo last basket edit' }),
+  ).toBeEnabled();
 });

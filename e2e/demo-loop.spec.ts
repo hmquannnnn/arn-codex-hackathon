@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
+import { parseSSE } from '../src/lib/client/sse';
 import type {
   EnrichmentPreviewResponse,
   InsightsResponse,
@@ -50,6 +52,16 @@ test('DEMO beats 1–4: buyer intent, durable conversation, seller fix, exact ma
   page,
   browser,
 }, testInfo) => {
+  const sessionWires: Promise<string>[] = [];
+  page.on('response', (response) => {
+    if (
+      ['/api/kit', '/api/kit/refine'].includes(
+        new URL(response.url()).pathname,
+      ) &&
+      response.request().method() === 'POST'
+    )
+      sessionWires.push(response.text());
+  });
   let applied = false;
   let beforeProduct: unknown;
   try {
@@ -244,17 +256,48 @@ test('DEMO beats 1–4: buyer intent, durable conversation, seller fix, exact ma
       await other.close();
     }
     const after = backpackGap(await insights(page));
-    expect(after.thisWeek).toBe(baseline + 1);
+    // Shared demo DB can receive other buyers during this walk. Verify our exact
+    // once-per-thread invariant via the public adapter, then check aggregate growth.
+    const sessions: string[] = [];
+    for (const body of await Promise.all(sessionWires)) {
+      for await (const event of parseSSE(new Response(body).body!))
+        if (event.event === 'plan') sessions.push(event.data.sessionId);
+    }
+    expect(sessions).toHaveLength(2); // initial kit + changed plan; answer creates no intent
+    const demandCounts: number[] = JSON.parse(
+      execFileSync(
+        process.execPath,
+        [
+          '--import',
+          'tsx',
+          '--input-type=module',
+          '-e',
+          `import { SupabaseAdapter } from './src/server/commerce/supabase.ts';
+       const sessions = JSON.parse(process.argv[1]);
+       const rows = await new SupabaseAdapter().demandItemsSince('2000-01-01');
+       console.log(JSON.stringify(sessions.map(id => rows.filter(row => row.sessionId === id).length)));`,
+          JSON.stringify(sessions),
+        ],
+        { encoding: 'utf8', timeout: 30000 },
+      ),
+    );
+    expect(demandCounts).toEqual([v1.plan.items.length, 0]);
+    expect(after.thisWeek).toBeGreaterThanOrEqual(baseline + 1);
     await page.goto('/seller?shop=shop-minhan');
     const gap = page
       .getByTestId('gap-card')
-      .filter({ hasText: 'Minh An Kids Backpack New Model 2026' })
+      .filter({
+        has: page.getByRole('heading', {
+          name: 'Anti-hunchback backpack',
+          exact: true,
+        }),
+      })
       .first();
     await expect(page.getByTestId('recent-need').first()).toContainText(
       'Anti-hunchback backpack',
       { timeout: 30000 },
     );
-    await expect(gap).toContainText(`${baseline + 1} this week`);
+    await expect(gap).toContainText(`${after.thisWeek} this week`);
     await expect(gap).toContainText('21 last week');
     expect(after.priceBand).not.toBeNull();
     await expect(gap).toContainText(
