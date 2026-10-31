@@ -98,3 +98,12 @@ adapter, so any marketplace can plug it in."
   production it comes from the account. Telling sellers "18 buyers left your backpack in their cart" is a next step (D47).
 - "Is the data real?": a seeded catalog behind the Commerce Adapter; swap the adapter for a marketplace API.
 - After the demo: click **Undo** on the listing so the next run starts clean (or re-seed).
+
+## Automated live rehearsal
+
+Run `BASE_URL=https://kitly-arn-codex-hackathon.vercel.app npm run e2e -- --workers=1` against the real seeded app.
+The demo loop runs by default, retries once, saves failure screenshots, records first-basket latency, and undoes its own
+listing enrichment in cleanup. Counts and accepted price bands are compared with the live baseline: repeated rehearsals
+add real demand, so the original 37 → 38 count and 300k–400k seed band can change without reseeding.
+Set `KITLY_E2E_LIVE=1` to include the additional tiny-budget/express/swap judge checks in the same serial run.
+For a fixture replay build, use `KITLY_E2E_MOCK=1`; the live loop is skipped.

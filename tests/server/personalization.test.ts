@@ -379,12 +379,12 @@ it('S10 follow-up and explainer run concurrently, not in series', async () => {
   const { runKit } = await import('@/server/pipeline');
   class DelayedFake extends FakeLLM {
     override async structured<T>(
-      ...args: Parameters<FakeLLM['structured']>
+      ...args: Parameters<InstanceType<typeof FakeLLM>['structured']>
     ): Promise<T> {
       if (this.calls.length) await new Promise((r) => setTimeout(r, 150));
       return super.structured(...args) as Promise<T>;
     }
-    override async *stream(...args: Parameters<FakeLLM['stream']>) {
+    override async *stream(...args: Parameters<InstanceType<typeof FakeLLM>['stream']>) {
       await new Promise((r) => setTimeout(r, 150));
       yield* super.stream(...args);
     }

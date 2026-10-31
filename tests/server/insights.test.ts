@@ -331,3 +331,36 @@ it('S3 canonical seeded backpack label does not depend on generic planner/catalo
   expect(result.gaps[0].needLabel).toBe('Anti-hunchback backpack');
   expect(result.recent[0].needLabel).toBe('Anti-hunchback backpack');
 });
+it('S3 keeps equally frequent companion categories at the top-three boundary', async () => {
+  const { aggregateDemand } = await import('@/server/insights/aggregate');
+  const adapter = new InMemoryAdapter();
+  for (let i = 0; i < 3; i++)
+    await addDemand(adapter, [
+      {
+        key: 'lamp',
+        needLabel: 'UV lamp',
+        category: 'headlamp',
+        tags: ['uv-protection'],
+      },
+      ...['school-backpack', 'notebooks', 'pencil-case', 'water-bottle'].map(
+        (category) => ({
+          key: category,
+          needLabel: category,
+          category,
+          tags: [],
+          matched: 5,
+        }),
+      ),
+    ]);
+  const result = aggregateDemand(await adapter.demandItemsSince('2026-08-20'), {
+    today: '2026-09-02',
+    thisWeekFrom: '2026-08-27',
+    lastWeekFrom: '2026-08-20',
+  });
+  const gap = result.gaps.find((g) => g.key === 'headlamp|uv-protection')!;
+  expect(gap.neededWith).toHaveLength(4);
+  expect(gap.neededWith).toContainEqual({
+    category: 'school-backpack',
+    share: 1,
+  });
+});

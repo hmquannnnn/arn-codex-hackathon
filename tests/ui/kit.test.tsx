@@ -197,3 +197,15 @@ it('auto-starts a query once under React StrictMode effect replay', async () => 
     expect(screen.getAllByTestId('user-turn')).toHaveLength(1),
   );
 });
+it('renders named refine diff chips from server keys after removal and on reload', () => {
+  const versions = structuredClone(thread.versions);
+  const removed = versions[0].plan.items.find(
+    (item) => item.category === 'uniform-shirt',
+  )!;
+  versions[1].diff = { added: [], removed: [removed.key], changed: [] };
+  versions[1].explanation = 'The kit is updated.';
+  render(<Conversation versions={versions} />);
+  expect(
+    screen.getByText(`Removed: ${removed.needLabel}`, { exact: true }),
+  ).toBeTruthy();
+});

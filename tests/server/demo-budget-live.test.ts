@@ -32,8 +32,8 @@ it.skipIf(process.env.KITLY_TEST_DEMO !== '1')(
     expect(option.status).toBe('over_budget');
     expect(option.minimumCost).toBeGreaterThan(200000);
     expect(option.costDrivers?.length).toBeGreaterThan(0);
-    expect(option.fit.length).toBeGreaterThan(0);
-    expect(option.fit.some((fit) => fit.grandTotal <= 200000)).toBe(true);
+    expect(option.fit?.length).toBeGreaterThan(0);
+    expect(option.fit?.some((fit) => fit.grandTotal <= 200000)).toBe(true);
   },
   60000,
 );

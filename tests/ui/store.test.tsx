@@ -1,6 +1,8 @@
 import { afterEach, expect, it } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
-import products from '@/contract/fixtures/products.json';
+import productFixtures from '@/contract/fixtures/products.json';
+import { productSchema } from '@/contract/schemas';
+const products = productSchema.array().parse(productFixtures);
 import shops from '@/contract/fixtures/shops.json';
 import { ProductCard } from '@/components/store/product-card';
 import { CartTotals } from '@/components/store/cart-totals';

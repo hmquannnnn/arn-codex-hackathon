@@ -201,6 +201,39 @@ export function Conversation({
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7">
                 {v.explanation}
               </p>
+              {v.diff && (
+                <div
+                  aria-label="Kit changes"
+                  className="mt-3 flex flex-wrap gap-2"
+                >
+                  {(['removed', 'added', 'changed'] as const).flatMap((kind) =>
+                    v.diff![kind].map((key) => {
+                      const item = (
+                        kind === 'removed'
+                          ? versions
+                              .filter(
+                                (previous) => previous.version < v.version,
+                              )
+                              .flatMap((previous) => previous.plan.items)
+                          : v.plan.items
+                      ).find((item) => item.key === key);
+                      return (
+                        <span
+                          key={`${kind}-${key}`}
+                          className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600"
+                        >
+                          {kind === 'removed'
+                            ? 'Removed'
+                            : kind === 'added'
+                              ? 'Added'
+                              : 'Changed'}
+                          : {item?.needLabel ?? key}
+                        </span>
+                      );
+                    }),
+                  )}
+                </div>
+              )}
               <Assumptions
                 plan={v.plan}
                 onRefine={onRefine}

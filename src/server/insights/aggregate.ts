@@ -64,6 +64,10 @@ export function aggregateDemand(
     for (const id of ids)
       for (const cat of sessions.get(id) ?? [])
         if (cat !== category) together.set(cat, (together.get(cat) ?? 0) + 1);
+    const rankedTogether = [...together].sort(
+      (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+    );
+    const companionCutoff = rankedTogether[2]?.[1] ?? 0;
     gaps.push({
       key,
       type: 'assortment_gap',
@@ -83,9 +87,10 @@ export function aggregateDemand(
       priceBand: hints.length
         ? { p25: percentile(hints, 0.25), p75: percentile(hints, 0.75) }
         : null,
-      neededWith: [...together]
-        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-        .slice(0, 3)
+      neededWith: rankedTogether
+        // A tied category is just as frequent as the third; alphabetic order
+        // must not hide equally strong companion needs from sellers.
+        .filter(([, n]) => n >= companionCutoff)
         .map(([category, n]) => ({ category, share: n / ids.size })),
       advice: '',
       appliedFix: null,
