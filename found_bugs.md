@@ -1,7 +1,7 @@
 # Found bugs — manual demo walk on the deployed URL (31/10, ~13:45)
 
 Walked `kit/DEMO.md` Beats 1–4 + tiny-budget judge check on https://kitly-arn-codex-hackathon.vercel.app
-(1440×900, persona Lan). Everything in the demo WORKS end to end; the items below are bugs/polish.
+(1440×900, persona Lan). The main buyer → seller → buyer loop works; the audit below also found failures in rapid persona switching and combined edits.
 Rules: read AGENTS.md first. Root cause first, failing test first, one commit per fix (`fix: …`),
 `npm test` + `npm run build` green, `git pull --rebase && git push`. **Do not run `db:migrate`.** Do not stop to ask.
 When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit>`.
@@ -51,6 +51,41 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
   "after swap" total comes out too low. Recompute from the full selection.
 - Status: open
 
+### B7 — First budget supplied through chat never records demand (P2, confirmed)
+- Repro: start a need without a budget; when Kitly asks for it, type `My budget is 1.5M` in the composer instead of
+  clicking a budget choice. The thread becomes ready and shows options, but Seller Intelligence receives no demand.
+- Root cause: `src/server/refine.ts:125` always passes `recordDemand: false`, including the first ready run after
+  `awaiting_budget`. Later adjust calls cannot recover it because a ready version already exists.
+- Evidence: public `runKit` → `runRefine` with InMemoryAdapter/InMemoryKitStore/FakeLLM produced
+  `statuses: [awaiting_budget, ready]`, 10 plan items, and `demandAdded: 0`.
+- Expected: record demand exactly once on the first ready run, regardless of whether the buyer supplies the budget
+  through a quick choice or the composer (CONTRACT §3 once-per-thread invariant). Subsequent refines add no demand.
+- Regression seam: S2/S6 pipeline or HTTP handlers; cover both budget-entry paths and later edits without double counting.
+- Status: open
+
+### B8 — Adjust/restore discards saved swaps, Add anyway and Fit selections (P2, confirmed live)
+- Repro on Vercel: run the hero query → Add anyway on the closest Minh An backpack → remove the water bottle.
+  Version 2 loses the backpack and shows Add anyway again, although the buyer only removed the bottle.
+- Root cause: `src/server/kit/edits.ts:99–109` optimizes from the plan without `latest.selection`, then appends
+  `selection: null` at line 163. `restore_version` also ignores the historical selection.
+- Related history path: `src/components/kit/use-kit-controller.ts:215–220` rehydrates only the latest version's selection;
+  after reload, an older selected version shows its original option snapshot instead of its saved swaps/drops.
+- Expected: unrelated edits retain still-valid buyer choices; viewing/restoring a version reproduces its saved basket
+  (PRD version/history promises and ticket 15 edit persistence). Explicitly handle choices invalidated by a changed constraint.
+- Regression seams: S6/S9 handlers plus the history UI. Cover Add anyway/swap/Fit → unrelated remove or budget edit,
+  and reload → view/restore an older version containing a selection.
+- Status: open
+
+### B9 — Over-budget swap labels the current total as "Minimum cost" (P2, confirmed)
+- Repro with the public pricing seam and fixtures: budget 1,000,000₫, expensive selection totals 1,210,000₫; the same
+  response offers Fit for 910,000₫, but the warning labels 1,210,000₫ as the minimum.
+- Root cause: `src/server/optimizer/selection.ts:65–67` adds `overBy`/`fit` without `minimumCost` or `costDrivers`;
+  `src/components/kit/budget-warning.tsx:25` falls back to `grandTotal` and calls it "Minimum cost".
+- Expected: show a correctly computed minimum and meaningful drivers, or avoid calling the selected total a minimum.
+  Ticket 11 requires the over-budget warning's minimum cost and drivers.
+- Regression seams: S9 pricing plus BudgetWarning UI; assert the meaning of the minimum, not just total/Fit arithmetic.
+- Status: open
+
 ## Lane 2 (frontend)
 
 ### F1 — Chat does not auto-scroll to the newest turn (most visible in the demo)
@@ -74,6 +109,19 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 - Repro: after a refine the sidebar still says "Today · 1 versions" until reload; also "1 versions" → "1 version".
 - Status: open
 
+### F5 — Switching to Guest and immediately sending can create a Lan kit (P2, confirmed live)
+- Repro: on `/kit/new`, switch Lan → Guest and immediately send the hero query. The header becomes Guest, but the
+  new kit can still show Lan's cart interest, wallet saving and Cau Giay delivery address.
+- Root cause: `src/components/persona-chip.tsx:64–75` keeps the pending persona request local to the chip;
+  `src/components/kit/screen.tsx` leaves the composer enabled. `/api/kit` can start with the old Lan cookie before
+  `/api/persona` returns its new cookie, and the thread permanently stores Lan as its persona.
+- Evidence: live `e2e/demo-loop.spec.ts:339–347` failed on the Guest cart-card assertion; screenshot also showed
+  the Guest header with Lan address/wallet. The retry passed, confirming timing-sensitive behavior.
+- Expected: a new kit submitted after choosing Guest uses Guest consistently. Coordinate persona changes with kit
+  submission; merely adding a wait to the E2E test would hide the user-facing race (tickets 16/17, D43).
+- Regression seam: persona switch + new-kit submission with a deliberately held persona response, then live E2E.
+- Status: open
+
 ## Not bugs — notes for the demo (Lane 3)
 - **Re-seed before the demo** (`npm run seed` only, no migrate): live counts are polluted by testing — listing gap shows
   76 this week (script expects 38), band 350–400k (script 300–400k), live strip is a wall of duplicate rows.
@@ -82,3 +130,17 @@ When a bug is fixed, change its line `Status: open` to `Status: fixed in <commit
 - The local "⚙ Switched …" line disappears after F5 (swap itself is saved) — don't reload right after a pill swap.
 - `KITLY_SERVICE_TIER` must be exactly `fast` (no trailing space) or every AI call fails.
 - After any rehearsal: Seller → Undo the listing fix.
+
+## Audit handoff — 31/10, ~13:49
+- Added confirmed P2 findings B7–B9 and F5; no production code was changed in the audit. Suggested first fixes: F5 and B8.
+- Main code review baseline: `ea37733`; concurrent catalog/docs commits advanced HEAD to `879ea9b` during the audit.
+- Verification on `879ea9b`: `npm test` 218 passed / 10 skipped; `npm run build` passed. Earlier lint and standalone
+  type-check passed; real-model `npm run eval` passed 13/13.
+- Live run: `BASE_URL=https://kitly-arn-codex-hackathon.vercel.app KITLY_E2E_LIVE=1 npm run e2e -- --workers=1`
+  → 5 passed / 1 flaky (Guest race; passed retry) / 5 fixture-only skipped. First hero basket: 6,224 ms.
+- Additional mobile puppy check: missing-budget clarification → quick budget choice → 9 uncovered needs, no profile
+  tabs, no horizontal overflow at 390 px. B8 was reproduced separately through the deployed UI.
+- An initial seed-invariant test failed while the shared listing was enriched; the later clean-state suite passed.
+  Serialize live Apply/Undo checks and seed-invariant reads to avoid testing transient shared data as the baseline.
+- Cleanup verified: Minh An listing restored (original title, tags `["kids"]`, no update badge), persona Lan, browser
+  closed, no dev servers started, repository clean. Live rehearsals added real demand; no reseed/migrate/env edits.
